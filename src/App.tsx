@@ -16,6 +16,15 @@ import GetStarted from "./pages/GetStarted";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
+import VerifyEmail from "./pages/VerifyEmail";
+import ChooseSubdomain from "./pages/ChooseSubdomain";
+import Dashboard from "./pages/Dashboard";
+import SectionEditor from "./pages/SectionEditor";
+import RequireAuth from "./components/RequireAuth";
+import ResetPassword from "./pages/ResetPassword";
+import GuestOnly from "./components/GuestOnly";
+import Profile from "./pages/Profile";
+import SelectLanguageMode from "./pages/SelectLanguageMode";
 
 const queryClient = new QueryClient();
 
@@ -33,8 +42,15 @@ const App = () => (
               <Route path="/services" element={<Services />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} />
+              <Route path="/login" element={<GuestOnly><Login /></GuestOnly>} />
+              <Route path="/signup" element={<GuestOnly><SignUp /></GuestOnly>} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/choose-subdomain" element={<ChooseSubdomain />} />
+              <Route path="/select-language-mode" element={<RequireAuth><SelectLanguageMode /></RequireAuth>} />
+              <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+              <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+              <Route path="/section/:sectionName/editor" element={<RequireAuth><SectionEditor /></RequireAuth>} />
               <Route path="/get-started" element={<GetStarted />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
