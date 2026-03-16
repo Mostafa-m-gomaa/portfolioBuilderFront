@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import type { ApiErrorPayload } from '@/types/auth.types';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://localhost:9000';
 export const TOKEN_STORAGE_KEY = 'auth_token';
 
 let onUnauthorized: (() => void) | null = null;

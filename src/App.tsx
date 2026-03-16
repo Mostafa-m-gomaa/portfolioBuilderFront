@@ -25,6 +25,7 @@ import ResetPassword from "./pages/ResetPassword";
 import GuestOnly from "./components/GuestOnly";
 import Profile from "./pages/Profile";
 import SelectLanguageMode from "./pages/SelectLanguageMode";
+import TemplateSelector from "./pages/TemplateSelector";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => (
               <Route path="/select-language-mode" element={<RequireAuth><SelectLanguageMode /></RequireAuth>} />
               <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
               <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+              <Route path="/templates" element={<RequireAuth><TemplateSelector /></RequireAuth>} />
               <Route path="/section/:sectionName/editor" element={<RequireAuth><SectionEditor /></RequireAuth>} />
               <Route path="/get-started" element={<GetStarted />} />
               <Route path="/terms" element={<Terms />} />

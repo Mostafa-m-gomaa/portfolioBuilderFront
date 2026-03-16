@@ -4,6 +4,8 @@ export type AuthUser = {
   email?: string;
   type?: string;
   subdomain?: string | null;
+  templateName?: string | null;
+  logo?: string | null;
   isVerified?: boolean;
 };
 
@@ -58,6 +60,10 @@ export type SubdomainAvailabilityResponse = {
 
 export type UpdateSubdomainPayload = {
   subdomain: string;
+};
+
+export type UpdateTemplateNamePayload = {
+  templateName: string;
 };
 
 export type ApiErrorPayload = {

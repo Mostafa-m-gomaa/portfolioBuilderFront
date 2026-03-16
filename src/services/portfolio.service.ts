@@ -67,6 +67,11 @@ export const portfolioService = {
     return response.data;
   },
 
+  async updateDefaultLanguage(defaultLanguage: 'ar' | 'en'): Promise<{ message?: string; defaultLanguage?: string }> {
+    const response = await apiClient.patch('/portfolio/default-language', { defaultLanguage });
+    return response.data;
+  },
+
   async publishPortfolio(): Promise<{ message?: string }> {
     const response = await apiClient.post('/portfolio/publish');
     return response.data;

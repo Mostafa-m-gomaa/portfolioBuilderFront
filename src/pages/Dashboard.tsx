@@ -7,6 +7,8 @@ import { motion } from 'framer-motion';
 import { Switch } from '@/components/ui/switch';
 import SubdomainManagerCard from '@/components/auth/SubdomainManagerCard';
 import LanguageModeCard from '@/components/auth/LanguageModeCard';
+import TemplateManagerCard from '@/components/auth/TemplateManagerCard';
+import LogoManagerCard from '@/components/auth/LogoManagerCard';
 
 const Dashboard = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -76,18 +78,28 @@ const Dashboard = () => {
           <p className="text-sm text-muted-foreground">Subdomain</p>
           <p className="text-lg font-semibold">{user?.subdomain || portfolio?.subdomain || 'Not set yet'}</p>
           <p className="text-xs text-muted-foreground mt-2">
+            Template: {user?.templateName || String(portfolio?.templateName ?? 'Not selected yet')}
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
             Status: {portfolio?.isPublished ? 'Published' : 'Draft'}
           </p>
         </motion.div>
 
         <div className="mb-8 grid grid-cols-1 xl:grid-cols-2 gap-4">
-          <SubdomainManagerCard
-            title="Update subdomain"
-            description="Type any name and we will check availability as you write. Save is enabled only when available."
-            buttonLabel="Update subdomain"
-            currentSubdomain={user?.subdomain || portfolio?.subdomain || ''}
+          <div className="space-y-4">
+            <SubdomainManagerCard
+              title="Update subdomain"
+              description="Type any name and we will check availability as you write. Save is enabled only when available."
+              buttonLabel="Update subdomain"
+              currentSubdomain={user?.subdomain || portfolio?.subdomain || ''}
+            />
+            <TemplateManagerCard currentTemplateName={user?.templateName || String(portfolio?.templateName ?? '')} />
+            <LogoManagerCard currentLogo={user?.logo || null} />
+          </div>
+          <LanguageModeCard
+            currentLanguageMode={portfolio?.languageMode || null}
+            currentDefaultLanguage={portfolio?.defaultLanguage || null}
           />
-          <LanguageModeCard currentLanguageMode={portfolio?.languageMode || null} />
         </div>
 
         <h2 className="font-heading text-2xl font-semibold mb-4">Sections</h2>

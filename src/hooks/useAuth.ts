@@ -108,6 +108,48 @@ export const useAuth = () => {
     onError: (error) => toast.error(parseApiError(error, 'Failed to update subdomain')),
   });
 
+  const updateTemplateNameMutation = useMutation({
+    mutationFn: (templateName: string) => authService.updateTemplateName({ templateName }),
+    onSuccess: (data, templateName) => {
+      if (data.user) {
+        setAuth({ user: data.user });
+      } else if (user) {
+        setAuth({ user: { ...user, templateName } });
+      }
+      if (data.token) setAuth({ token: data.token });
+      toast.success('Template updated successfully.');
+    },
+    onError: (error) => toast.error(parseApiError(error, 'Failed to update template')),
+  });
+
+  const updateLogoMutation = useMutation({
+    mutationFn: (file: File) => authService.updateLogo(file),
+    onSuccess: (data) => {
+      if (data.user) {
+        setAuth({ user: data.user });
+      } else if (user) {
+        setAuth({ user: { ...user } });
+      }
+      if (data.token) setAuth({ token: data.token });
+      toast.success('Logo updated successfully.');
+    },
+    onError: (error) => toast.error(parseApiError(error, 'Failed to update logo')),
+  });
+
+  const deleteLogoMutation = useMutation({
+    mutationFn: () => authService.deleteLogo(),
+    onSuccess: (data) => {
+      if (data.user) {
+        setAuth({ user: data.user });
+      } else if (user) {
+        setAuth({ user: { ...user, logo: null } });
+      }
+      if (data.token) setAuth({ token: data.token });
+      toast.success('Logo deleted successfully.');
+    },
+    onError: (error) => toast.error(parseApiError(error, 'Failed to delete logo')),
+  });
+
   return {
     pendingEmail,
     isAuthenticated,
@@ -122,6 +164,9 @@ export const useAuth = () => {
     forgotPasswordMutation,
     resetPasswordMutation,
     updateSubdomainMutation,
+    updateTemplateNameMutation,
+    updateLogoMutation,
+    deleteLogoMutation,
   };
 };
 

@@ -5,11 +5,12 @@ type LanguageMode = 'ar' | 'en' | 'both';
 
 type LanguageModeCardProps = {
   currentLanguageMode?: string | null;
+  currentDefaultLanguage?: string | null;
   onSuccess?: () => void;
 };
 
-const LanguageModeCard = ({ currentLanguageMode, onSuccess }: LanguageModeCardProps) => {
-  const { updateLanguageModeMutation } = usePortfolioActions();
+const LanguageModeCard = ({ currentLanguageMode, currentDefaultLanguage, onSuccess }: LanguageModeCardProps) => {
+  const { updateLanguageModeMutation, updateDefaultLanguageMutation } = usePortfolioActions();
 
   const handleSelect = async (mode: LanguageMode) => {
     if (mode === currentLanguageMode) return;
@@ -26,6 +27,17 @@ const LanguageModeCard = ({ currentLanguageMode, onSuccess }: LanguageModeCardPr
     { value: 'ar', title: 'Arabic', desc: 'Arabic only' },
     { value: 'both', title: 'Both', desc: 'Arabic + English' },
   ];
+
+  const handleDefaultSelect = async (language: 'ar' | 'en') => {
+    if (currentLanguageMode !== 'both') return;
+    if (currentDefaultLanguage === language) return;
+    try {
+      await updateDefaultLanguageMutation.mutateAsync(language);
+      onSuccess?.();
+    } catch {
+      // Errors are handled in mutation hook.
+    }
+  };
 
   return (
     <motion.div
@@ -64,6 +76,38 @@ const LanguageModeCard = ({ currentLanguageMode, onSuccess }: LanguageModeCardPr
       <p className="text-xs text-muted-foreground mt-3">
         Current: {currentLanguageMode || 'Not selected yet'}
       </p>
+      {currentLanguageMode === 'both' && (
+        <div className="mt-4">
+          <p className="text-sm font-medium mb-2">Default display language</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button
+              onClick={() => handleDefaultSelect('ar')}
+              disabled={updateDefaultLanguageMutation.isPending}
+              className={`rounded-xl px-3 py-2 text-start transition-colors disabled:opacity-60 ${
+                currentDefaultLanguage === 'ar'
+                  ? 'gradient-bg text-primary-foreground'
+                  : 'glass text-foreground hover:bg-foreground/5'
+              }`}
+            >
+              Arabic (ar)
+            </button>
+            <button
+              onClick={() => handleDefaultSelect('en')}
+              disabled={updateDefaultLanguageMutation.isPending}
+              className={`rounded-xl px-3 py-2 text-start transition-colors disabled:opacity-60 ${
+                currentDefaultLanguage === 'en'
+                  ? 'gradient-bg text-primary-foreground'
+                  : 'glass text-foreground hover:bg-foreground/5'
+              }`}
+            >
+              English (en)
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Current default: {currentDefaultLanguage || 'Not selected yet'}
+          </p>
+        </div>
+      )}
     </motion.div>
   );
 };

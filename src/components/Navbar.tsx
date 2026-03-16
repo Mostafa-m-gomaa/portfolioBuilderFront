@@ -23,6 +23,13 @@ const Navbar = () => {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
 
+  const imageFromPath = (path?: string | null) => {
+    if (!path) return '';
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path;
+    if (path.startsWith('/')) return `http://localhost:9000${path}`;
+    return path;
+  };
+
   const navLinks = [
     { to: '/', label: t('nav.home') },
     { to: '/about', label: t('nav.about') },
@@ -49,11 +56,10 @@ const Navbar = () => {
               <Link
                 key={link.to}
                 to={link.to}
-                className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
-                  location.pathname === link.to
+                className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${location.pathname === link.to
                     ? 'text-primary glass'
                     : 'text-muted-foreground hover:text-foreground'
-                }`}
+                  }`}
               >
                 {link.label}
               </Link>
@@ -64,7 +70,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-2">
             <button
               onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
-              className="glass rounded-xl p-2 text-muted-foreground hover:text-foreground transition-colors"
+              className="glass rounded-xl p-2 text-muted-foreground hover:text-foreground transition-colors flex"
               aria-label="Switch language"
             >
               <Globe className="w-4 h-4" />
@@ -81,7 +87,15 @@ const Navbar = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="glass rounded-xl p-2.5 text-foreground hover:text-primary transition-colors" aria-label="Open profile menu">
-                    <UserRound className="w-5 h-5" />
+                    {user?.logo ? (
+                      <img
+                        src={imageFromPath(user.logo)}
+                        alt="Logo"
+                        className="w-5 h-5 rounded object-cover"
+                      />
+                    ) : (
+                      <UserRound className="w-5 h-5" />
+                    )}
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 glass-strong border-white/20">
@@ -157,11 +171,10 @@ const Navbar = () => {
                   key={link.to}
                   to={link.to}
                   onClick={() => setMobileOpen(false)}
-                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                    location.pathname === link.to
+                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${location.pathname === link.to
                       ? 'text-primary glass'
                       : 'text-muted-foreground hover:text-foreground'
-                  }`}
+                    }`}
                 >
                   {link.label}
                 </Link>

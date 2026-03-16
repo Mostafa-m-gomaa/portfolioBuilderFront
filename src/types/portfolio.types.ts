@@ -24,7 +24,9 @@ export type Portfolio = {
   id?: string;
   userId?: string;
   subdomain?: string;
+  templateName?: string;
   languageMode?: 'ar' | 'en' | 'both' | string;
+  defaultLanguage?: 'ar' | 'en' | string;
   isPublished?: boolean;
   sections?: Record<string, PortfolioSection>;
   [key: string]: unknown;

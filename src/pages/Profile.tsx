@@ -5,7 +5,16 @@ import Navbar from '@/components/Navbar';
 import { useAuthStore } from '@/store/auth.store';
 import SubdomainManagerCard from '@/components/auth/SubdomainManagerCard';
 import LanguageModeCard from '@/components/auth/LanguageModeCard';
+import TemplateManagerCard from '@/components/auth/TemplateManagerCard';
+import LogoManagerCard from '@/components/auth/LogoManagerCard';
 import { useMyPortfolio } from '@/hooks/usePortfolio';
+
+const imageFromPath = (path?: string | null) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path;
+  if (path.startsWith('/')) return `http://localhost:9000${path}`;
+  return path;
+};
 
 const Profile = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -23,9 +32,17 @@ const Profile = () => {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-strong rounded-3xl p-8 glow-border">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl gradient-bg-full flex items-center justify-center">
-                <UserRound className="w-8 h-8 text-primary-foreground" />
-              </div>
+              {user?.logo ? (
+                <img
+                  src={imageFromPath(user.logo)}
+                  alt="User logo"
+                  className="w-16 h-16 rounded-2xl object-cover border border-border"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-2xl gradient-bg-full flex items-center justify-center">
+                  <UserRound className="w-8 h-8 text-primary-foreground" />
+                </div>
+              )}
               <div>
                 <h1 className="font-heading text-3xl font-bold text-foreground">{user?.name || 'Portfolio User'}</h1>
                 <p className="text-sm text-muted-foreground capitalize">{user?.type || 'Creator'}</p>
@@ -61,17 +78,28 @@ const Profile = () => {
                 {user?.subdomain ? `${user.subdomain}.localhost` : '-'}
               </p>
             </div>
+            <div className="glass rounded-2xl p-4">
+              <p className="text-xs text-muted-foreground mb-2">Template</p>
+              <p className="font-medium">{user?.templateName || String(portfolio?.templateName ?? '-')}</p>
+            </div>
           </div>
         </motion.div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-          <SubdomainManagerCard
-            title="Update your subdomain"
-            description="Live check runs on each input change. Name is only saved when available and you click update."
-            buttonLabel="Update subdomain"
-            currentSubdomain={user?.subdomain || ''}
+          <div className="space-y-4">
+            <SubdomainManagerCard
+              title="Update your subdomain"
+              description="Live check runs on each input change. Name is only saved when available and you click update."
+              buttonLabel="Update subdomain"
+              currentSubdomain={user?.subdomain || ''}
+            />
+            <TemplateManagerCard currentTemplateName={user?.templateName || String(portfolio?.templateName ?? '')} />
+            <LogoManagerCard currentLogo={user?.logo || null} />
+          </div>
+          <LanguageModeCard
+            currentLanguageMode={portfolio?.languageMode || null}
+            currentDefaultLanguage={portfolio?.defaultLanguage || null}
           />
-          <LanguageModeCard currentLanguageMode={portfolio?.languageMode || null} />
         </div>
       </main>
     </div>

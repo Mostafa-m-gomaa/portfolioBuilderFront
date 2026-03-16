@@ -152,6 +152,15 @@ export const usePortfolioActions = (section?: string) => {
     onError: (error) => toast.error(parseApiError(error, 'Failed to update language mode')),
   });
 
+  const updateDefaultLanguageMutation = useMutation({
+    mutationFn: (defaultLanguage: 'ar' | 'en') => portfolioService.updateDefaultLanguage(defaultLanguage),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: portfolioKeys.me });
+      toast.success('Default language updated.');
+    },
+    onError: (error) => toast.error(parseApiError(error, 'Failed to update default language')),
+  });
+
   const publishMutation = useMutation({
     mutationFn: portfolioService.publishPortfolio,
     onSuccess: async () => {
@@ -205,6 +214,7 @@ export const usePortfolioActions = (section?: string) => {
     deleteItemMutation,
     setSectionActiveMutation,
     updateLanguageModeMutation,
+    updateDefaultLanguageMutation,
     publishMutation,
     unpublishMutation,
     uploadSingleMutation,

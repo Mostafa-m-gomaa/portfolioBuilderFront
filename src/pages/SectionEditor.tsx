@@ -3,9 +3,10 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { Plus, Trash2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
-import { useAllSections, usePortfolioActions, useSection, useSectionItems } from '@/hooks/usePortfolio';
+import { useAllSections, useMyPortfolio, usePortfolioActions, useSection, useSectionItems } from '@/hooks/usePortfolio';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
@@ -25,7 +26,7 @@ const titleCase = (key: string) =>
 const imageFromPath = (path: string) => {
   if (!path) return '';
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path;
-  if (path.startsWith('/')) return `http://localhost:5000${path}`;
+  if (path.startsWith('/')) return `http://localhost:9000${path}`;
   return path;
 };
 
@@ -41,6 +42,349 @@ const isDateKey = (key: string) => /(date|from|to|start|end)/i.test(key);
 const ensureLocalized = (value?: unknown): JsonValue => {
   if (isObject(value) && ('ar' in value || 'en' in value)) return value;
   return { ar: '', en: '' };
+};
+
+type LanguageMode = 'ar' | 'en' | 'both';
+type UiLang = 'ar' | 'en';
+
+const HERO_ALLOWED_KEYS = ['name', 'title', 'image', 'desc', 'anotherDesc', 'country', 'email'] as const;
+const HERO_LOCALIZED_KEYS = new Set(['name', 'title', 'desc', 'anotherDesc', 'country']);
+const ABOUT_ALLOWED_KEYS = ['title', 'desc', 'images'] as const;
+const ABOUT_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const SKILLS_ALLOWED_KEYS = ['title', 'desc', 'skills'] as const;
+const SKILLS_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const PROJECTS_ALLOWED_KEYS = ['title', 'desc', 'projects'] as const;
+const PROJECTS_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const EXPERIENCE_ALLOWED_KEYS = ['title', 'desc', 'experiences'] as const;
+const EXPERIENCE_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const CONTACT_ALLOWED_KEYS = ['title', 'desc', 'image', 'phone1', 'phone2', 'address', 'addressUrl', 'email', 'links'] as const;
+const CONTACT_LOCALIZED_KEYS = new Set(['title', 'desc', 'address']);
+const SERVICES_ALLOWED_KEYS = ['title', 'desc', 'image', 'services'] as const;
+const SERVICES_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const CERTIFICATES_ALLOWED_KEYS = ['title', 'desc', 'certificates'] as const;
+const CERTIFICATES_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const PRODUCTS_ALLOWED_KEYS = ['title', 'desc', 'products'] as const;
+const PRODUCTS_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const COURSES_ALLOWED_KEYS = ['title', 'desc', 'courses'] as const;
+const COURSES_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const ANNOUNCEMENT_ALLOWED_KEYS = ['title', 'desc', 'images', 'link'] as const;
+const ANNOUNCEMENT_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const CLIENTS_ALLOWED_KEYS = ['title', 'desc', 'clients'] as const;
+const CLIENTS_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const FAQ_ALLOWED_KEYS = ['title', 'desc', 'faqs'] as const;
+const FAQ_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const TESTIMONIAL_ALLOWED_KEYS = ['title', 'desc', 'testimonials'] as const;
+const TESTIMONIAL_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const GALLERY_ALLOWED_KEYS = ['title', 'desc', 'gallery'] as const;
+const GALLERY_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const BRANCHES_ALLOWED_KEYS = ['title', 'desc', 'branches'] as const;
+const BRANCHES_LOCALIZED_KEYS = new Set(['title', 'desc']);
+
+const RESTRICTED_ARRAY_KEYS = new Set([
+  'images',
+  'skills',
+  'projects',
+  'experiences',
+  'links',
+  'services',
+  'certificates',
+  'products',
+  'courses',
+  'clients',
+  'faqs',
+  'testimonials',
+  'gallery',
+  'branches',
+]);
+
+type RestrictedSectionConfig = {
+  allowedKeys: readonly string[];
+  localizedKeys: Set<string>;
+};
+
+const RESTRICTED_SECTION_CONFIGS: Record<string, RestrictedSectionConfig> = {
+  hero: { allowedKeys: HERO_ALLOWED_KEYS, localizedKeys: HERO_LOCALIZED_KEYS },
+  about: { allowedKeys: ABOUT_ALLOWED_KEYS, localizedKeys: ABOUT_LOCALIZED_KEYS },
+  skills: { allowedKeys: SKILLS_ALLOWED_KEYS, localizedKeys: SKILLS_LOCALIZED_KEYS },
+  projects: { allowedKeys: PROJECTS_ALLOWED_KEYS, localizedKeys: PROJECTS_LOCALIZED_KEYS },
+  experience: { allowedKeys: EXPERIENCE_ALLOWED_KEYS, localizedKeys: EXPERIENCE_LOCALIZED_KEYS },
+  contact: { allowedKeys: CONTACT_ALLOWED_KEYS, localizedKeys: CONTACT_LOCALIZED_KEYS },
+  services: { allowedKeys: SERVICES_ALLOWED_KEYS, localizedKeys: SERVICES_LOCALIZED_KEYS },
+  certificates: { allowedKeys: CERTIFICATES_ALLOWED_KEYS, localizedKeys: CERTIFICATES_LOCALIZED_KEYS },
+  products: { allowedKeys: PRODUCTS_ALLOWED_KEYS, localizedKeys: PRODUCTS_LOCALIZED_KEYS },
+  courses: { allowedKeys: COURSES_ALLOWED_KEYS, localizedKeys: COURSES_LOCALIZED_KEYS },
+  announcement: { allowedKeys: ANNOUNCEMENT_ALLOWED_KEYS, localizedKeys: ANNOUNCEMENT_LOCALIZED_KEYS },
+  clients: { allowedKeys: CLIENTS_ALLOWED_KEYS, localizedKeys: CLIENTS_LOCALIZED_KEYS },
+  faq: { allowedKeys: FAQ_ALLOWED_KEYS, localizedKeys: FAQ_LOCALIZED_KEYS },
+  testimonial: { allowedKeys: TESTIMONIAL_ALLOWED_KEYS, localizedKeys: TESTIMONIAL_LOCALIZED_KEYS },
+  gallery: { allowedKeys: GALLERY_ALLOWED_KEYS, localizedKeys: GALLERY_LOCALIZED_KEYS },
+  branches: { allowedKeys: BRANCHES_ALLOWED_KEYS, localizedKeys: BRANCHES_LOCALIZED_KEYS },
+};
+
+const localizedForMode = (value: unknown, mode: LanguageMode): JsonValue => {
+  const source = isObject(value) ? value : {};
+  if (mode === 'ar') return { ar: String(source.ar ?? '') };
+  if (mode === 'en') return { en: String(source.en ?? '') };
+  return { ar: String(source.ar ?? ''), en: String(source.en ?? '') };
+};
+
+const normalizeSkillItem = (value: unknown, mode: LanguageMode): Record<string, JsonValue> => {
+  const source = isObject(value) ? value : {};
+  return {
+    skillName: localizedForMode(source.skillName, mode),
+    skillImage: typeof source.skillImage === 'string' ? source.skillImage : '',
+    skillRate:
+      typeof source.skillRate === 'number' && Number.isFinite(source.skillRate) ? source.skillRate : 0,
+    skillCategory: localizedForMode(source.skillCategory, mode),
+  };
+};
+
+const normalizeProjectItem = (value: unknown, mode: LanguageMode): Record<string, JsonValue> => {
+  const source = isObject(value) ? value : {};
+  return {
+    projectTitle: localizedForMode(source.projectTitle, mode),
+    projectDesc: localizedForMode(source.projectDesc, mode),
+    projectImages: Array.isArray(source.projectImages)
+      ? source.projectImages.filter((entry): entry is string => typeof entry === 'string')
+      : [],
+    projectLink: typeof source.projectLink === 'string' ? source.projectLink : '',
+    anotherProjectLink: typeof source.anotherProjectLink === 'string' ? source.anotherProjectLink : '',
+    projectCategory: localizedForMode(source.projectCategory, mode),
+  };
+};
+
+const normalizeExperienceItem = (value: unknown, mode: LanguageMode): Record<string, JsonValue> => {
+  const source = isObject(value) ? value : {};
+  return {
+    from: typeof source.from === 'string' ? source.from : '',
+    to: typeof source.to === 'string' ? source.to : '',
+    role: localizedForMode(source.role, mode),
+    title: localizedForMode(source.title, mode),
+    desc: localizedForMode(source.desc, mode),
+  };
+};
+
+const normalizeContactLinkItem = (value: unknown): Record<string, JsonValue> => {
+  const source = isObject(value) ? value : {};
+  return {
+    platform: typeof source.platform === 'string' ? source.platform : '',
+    link: typeof source.link === 'string' ? source.link : '',
+  };
+};
+
+const normalizeServiceItem = (value: unknown, mode: LanguageMode): Record<string, JsonValue> => {
+  const source = isObject(value) ? value : {};
+  return {
+    serviceTitle: localizedForMode(source.serviceTitle, mode),
+    servicesDesc: localizedForMode(source.servicesDesc, mode),
+    servicePrice:
+      typeof source.servicePrice === 'number' && Number.isFinite(source.servicePrice) ? source.servicePrice : 0,
+    priceType: typeof source.priceType === 'string' ? source.priceType : '',
+    serviceImages: Array.isArray(source.serviceImages)
+      ? source.serviceImages.filter((entry): entry is string => typeof entry === 'string')
+      : [],
+  };
+};
+
+const normalizeCertificateItem = (value: unknown, mode: LanguageMode): Record<string, JsonValue> => {
+  const source = isObject(value) ? value : {};
+  return {
+    title: localizedForMode(source.title, mode),
+    description: localizedForMode(source.description, mode),
+    date: typeof source.date === 'string' ? source.date : '',
+    image: Array.isArray(source.image) ? source.image.filter((entry): entry is string => typeof entry === 'string') : [],
+    link: typeof source.link === 'string' ? source.link : '',
+  };
+};
+
+const normalizeCatalogItem = (value: unknown, mode: LanguageMode): Record<string, JsonValue> => {
+  const source = isObject(value) ? value : {};
+  return {
+    images: Array.isArray(source.images) ? source.images.filter((entry): entry is string => typeof entry === 'string') : [],
+    title: localizedForMode(source.title, mode),
+    desc: localizedForMode(source.desc, mode),
+    price: typeof source.price === 'number' && Number.isFinite(source.price) ? source.price : 0,
+    discount: typeof source.discount === 'number' && Number.isFinite(source.discount) ? source.discount : 0,
+    features: Array.isArray(source.features) ? source.features.map((entry) => localizedForMode(entry, mode)) : [],
+    link: typeof source.link === 'string' ? source.link : '',
+  };
+};
+
+const normalizeClientItem = (value: unknown, mode: LanguageMode): Record<string, JsonValue> => {
+  const source = isObject(value) ? value : {};
+  return {
+    clientLogo: typeof source.clientLogo === 'string' ? source.clientLogo : '',
+    clientName: localizedForMode(source.clientName, mode),
+    link: typeof source.link === 'string' ? source.link : '',
+  };
+};
+
+const normalizeFaqItem = (value: unknown, mode: LanguageMode): Record<string, JsonValue> => {
+  const source = isObject(value) ? value : {};
+  return {
+    ques: localizedForMode(source.ques, mode),
+    answer: localizedForMode(source.answer, mode),
+  };
+};
+
+const normalizeTestimonialItem = (value: unknown, mode: LanguageMode): Record<string, JsonValue> => {
+  const source = isObject(value) ? value : {};
+  return {
+    clientName: localizedForMode(source.clientName, mode),
+    clientImage: typeof source.clientImage === 'string' ? source.clientImage : '',
+    testimonialImages: Array.isArray(source.testimonialImages)
+      ? source.testimonialImages.filter((entry): entry is string => typeof entry === 'string')
+      : [],
+  };
+};
+
+const normalizeGalleryItem = (value: unknown, mode: LanguageMode): Record<string, JsonValue> => {
+  const source = isObject(value) ? value : {};
+  return {
+    image: typeof source.image === 'string' ? source.image : '',
+    desc: localizedForMode(source.desc, mode),
+  };
+};
+
+const normalizeBranchItem = (value: unknown, mode: LanguageMode): Record<string, JsonValue> => {
+  const source = isObject(value) ? value : {};
+  return {
+    name: localizedForMode(source.name, mode),
+    desc: localizedForMode(source.desc, mode),
+    locationAddress: localizedForMode(source.locationAddress, mode),
+    locationLink: typeof source.locationLink === 'string' ? source.locationLink : '',
+    image: typeof source.image === 'string' ? source.image : '',
+  };
+};
+
+const normalizeStringArray = (value: unknown): string[] =>
+  Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string') : [];
+
+const normalizeRestrictedArrayByKey = (key: string, value: unknown, mode: LanguageMode): JsonValue | null => {
+  if (key === 'images') return normalizeStringArray(value);
+  if (key === 'skills') return Array.isArray(value) ? value.map((entry) => normalizeSkillItem(entry, mode)) : [];
+  if (key === 'projects') return Array.isArray(value) ? value.map((entry) => normalizeProjectItem(entry, mode)) : [];
+  if (key === 'experiences') return Array.isArray(value) ? value.map((entry) => normalizeExperienceItem(entry, mode)) : [];
+  if (key === 'links') return Array.isArray(value) ? value.map((entry) => normalizeContactLinkItem(entry)) : [];
+  if (key === 'services') return Array.isArray(value) ? value.map((entry) => normalizeServiceItem(entry, mode)) : [];
+  if (key === 'certificates') return Array.isArray(value) ? value.map((entry) => normalizeCertificateItem(entry, mode)) : [];
+  if (key === 'products') return Array.isArray(value) ? value.map((entry) => normalizeCatalogItem(entry, mode)) : [];
+  if (key === 'courses') return Array.isArray(value) ? value.map((entry) => normalizeCatalogItem(entry, mode)) : [];
+  if (key === 'clients') return Array.isArray(value) ? value.map((entry) => normalizeClientItem(entry, mode)) : [];
+  if (key === 'faqs') return Array.isArray(value) ? value.map((entry) => normalizeFaqItem(entry, mode)) : [];
+  if (key === 'testimonials') return Array.isArray(value) ? value.map((entry) => normalizeTestimonialItem(entry, mode)) : [];
+  if (key === 'gallery') return Array.isArray(value) ? value.map((entry) => normalizeGalleryItem(entry, mode)) : [];
+  if (key === 'branches') return Array.isArray(value) ? value.map((entry) => normalizeBranchItem(entry, mode)) : [];
+  return null;
+};
+
+const defaultArrayItemForField = (fieldKey: string, mode: LanguageMode): JsonValue | null => {
+  if (/(^|\.|\[)features(\]|$)/i.test(fieldKey)) return localizedForMode({}, mode);
+  if (/(^|\.|\[)skills(\]|$)/i.test(fieldKey)) return normalizeSkillItem({}, mode);
+  if (/(^|\.|\[)projects(\]|$)/i.test(fieldKey)) return normalizeProjectItem({}, mode);
+  if (/(^|\.|\[)experiences(\]|$)/i.test(fieldKey)) return normalizeExperienceItem({}, mode);
+  if (/(^|\.|\[)links(\]|$)/i.test(fieldKey)) return normalizeContactLinkItem({});
+  if (/(^|\.|\[)services(\]|$)/i.test(fieldKey)) return normalizeServiceItem({}, mode);
+  if (/(^|\.|\[)certificates(\]|$)/i.test(fieldKey)) return normalizeCertificateItem({}, mode);
+  if (/(^|\.|\[)products(\]|$)/i.test(fieldKey)) return normalizeCatalogItem({}, mode);
+  if (/(^|\.|\[)courses(\]|$)/i.test(fieldKey)) return normalizeCatalogItem({}, mode);
+  if (/(^|\.|\[)clients(\]|$)/i.test(fieldKey)) return normalizeClientItem({}, mode);
+  if (/(^|\.|\[)faqs(\]|$)/i.test(fieldKey)) return normalizeFaqItem({}, mode);
+  if (/(^|\.|\[)testimonials(\]|$)/i.test(fieldKey)) return normalizeTestimonialItem({}, mode);
+  if (/(^|\.|\[)gallery(\]|$)/i.test(fieldKey)) return normalizeGalleryItem({}, mode);
+  if (/(^|\.|\[)branches(\]|$)/i.test(fieldKey)) return normalizeBranchItem({}, mode);
+  return null;
+};
+
+const defaultRestrictedFieldValue = (key: string, localizedKeys: Set<string>, mode: LanguageMode): JsonValue => {
+  if (localizedKeys.has(key)) return localizedForMode(undefined, mode);
+  if (RESTRICTED_ARRAY_KEYS.has(key)) return [];
+  return '';
+};
+
+const leafKeyFromFieldPath = (fieldKey: string): string => {
+  const sanitized = fieldKey.replace(/\[\d+\]/g, '');
+  const parts = sanitized.split('.');
+  return parts[parts.length - 1] || sanitized;
+};
+
+const parentLeafKeyFromFieldPath = (fieldKey: string): string => {
+  const sanitized = fieldKey.replace(/\[\d+\]/g, '');
+  const parts = sanitized.split('.');
+  return parts.length > 1 ? parts[parts.length - 2] : '';
+};
+
+const getInputPlaceholder = (fieldKey: string, label: string, uiLang: UiLang, inputType: 'text' | 'number' | 'date' | 'textarea') => {
+  const leaf = leafKeyFromFieldPath(fieldKey);
+  const parentLeaf = parentLeafKeyFromFieldPath(fieldKey);
+  const key = leaf.toLowerCase();
+  const parentKey = parentLeaf.toLowerCase();
+
+  if (key === 'ar') return uiLang === 'ar' ? 'اكتب النص باللغة العربية' : 'Write Arabic content';
+  if (key === 'en') return uiLang === 'ar' ? 'اكتب النص باللغة الإنجليزية' : 'Write English content';
+
+  if (inputType === 'date') {
+    if (key === 'from') return uiLang === 'ar' ? 'اختر تاريخ البداية' : 'Select start date';
+    if (key === 'to') return uiLang === 'ar' ? 'اختر تاريخ النهاية' : 'Select end date';
+    return uiLang === 'ar' ? 'اختر التاريخ' : 'Select date';
+  }
+
+  if (inputType === 'number') {
+    if (key.includes('rate')) return uiLang === 'ar' ? 'ادخل نسبة المهارة (مثل 80)' : 'Enter skill rate (e.g. 80)';
+    if (key.includes('price')) return uiLang === 'ar' ? 'ادخل السعر' : 'Enter price';
+    if (key.includes('discount')) return uiLang === 'ar' ? 'ادخل نسبة الخصم' : 'Enter discount value';
+    return uiLang === 'ar' ? `ادخل قيمة ${label}` : `Enter ${label} value`;
+  }
+
+  if (key.includes('image') || key.includes('images') || key.includes('logo') || key.includes('avatar')) {
+    return uiLang === 'ar' ? 'الصق رابط الصورة أو ارفع صورة' : 'Paste image URL or upload an image';
+  }
+  if (key.includes('email')) return uiLang === 'ar' ? 'ادخل البريد الإلكتروني' : 'Enter email address';
+  if (key.startsWith('phone')) return uiLang === 'ar' ? 'ادخل رقم الهاتف' : 'Enter phone number';
+  if (key.includes('addressurl') || key === 'link' || key.includes('link')) return uiLang === 'ar' ? 'الصق الرابط الكامل' : 'Paste full URL';
+  if (key.includes('address')) return uiLang === 'ar' ? 'اكتب العنوان' : 'Write address';
+  if (key.includes('desc') || key.includes('description') || key.includes('answer')) {
+    return uiLang === 'ar' ? 'اكتب وصفا واضحا ومختصرا' : 'Write a clear and concise description';
+  }
+  if (key.includes('title') || key.includes('name') || key.includes('role') || key.includes('category') || key.includes('ques')) {
+    return uiLang === 'ar' ? `اكتب ${label}` : `Enter ${label}`;
+  }
+  if (key.includes('platform')) return uiLang === 'ar' ? 'اكتب اسم المنصة (مثل LinkedIn)' : 'Enter platform name (e.g. LinkedIn)';
+  if (key.includes('pricetype')) return uiLang === 'ar' ? 'اكتب نوع السعر (ساعة، مشروع...)' : 'Enter price type (hourly, project...)';
+  if (key.includes('feature') || parentKey.includes('feature')) {
+    return uiLang === 'ar' ? 'اكتب ميزة واحدة' : 'Write one feature';
+  }
+
+  return inputType === 'textarea'
+    ? uiLang === 'ar'
+      ? `اكتب تفاصيل ${label}`
+      : `Write details for ${label}`
+    : uiLang === 'ar'
+      ? `اكتب ${label}`
+      : `Enter ${label}`;
+};
+
+const normalizeRestrictedSectionForm = (
+  source: Record<string, JsonValue>,
+  mode: LanguageMode,
+  allowedKeys: readonly string[],
+  localizedKeys: Set<string>,
+): Record<string, JsonValue> => {
+  const normalized: Record<string, JsonValue> = {};
+  allowedKeys.forEach((key) => {
+    const current = source[key];
+    if (localizedKeys.has(key)) {
+      normalized[key] = localizedForMode(current, mode);
+      return;
+    }
+    const normalizedArray = normalizeRestrictedArrayByKey(key, current, mode);
+    if (normalizedArray !== null) {
+      normalized[key] = normalizedArray;
+      return;
+    }
+    normalized[key] = typeof current === 'string' ? current : '';
+  });
+  return normalized;
 };
 
 const defaultItemTemplateBySection = (sectionName: string): Record<string, JsonValue> => {
@@ -79,9 +423,20 @@ type DynamicFieldProps = {
   onChange: (next: JsonValue) => void;
   onUploadImage?: (file: File) => Promise<string | null>;
   compact?: boolean;
+  languageMode?: LanguageMode;
+  uiLang?: UiLang;
 };
 
-const DynamicField = ({ fieldKey, label, value, onChange, onUploadImage, compact = false }: DynamicFieldProps) => {
+const DynamicField = ({
+  fieldKey,
+  label,
+  value,
+  onChange,
+  onUploadImage,
+  compact = false,
+  languageMode = 'both',
+  uiLang = 'en',
+}: DynamicFieldProps) => {
   const shellClass = compact ? 'glass rounded-xl p-3' : 'glass rounded-xl p-4';
   const [uploading, setUploading] = useState(false);
 
@@ -96,7 +451,7 @@ const DynamicField = ({ fieldKey, label, value, onChange, onUploadImage, compact
             : typeof sample === 'boolean'
               ? false
               : ''
-        : '';
+        : defaultArrayItemForField(fieldKey, languageMode) ?? '';
 
     const arrayIsImageList =
       isImageKey(fieldKey) &&
@@ -159,6 +514,8 @@ const DynamicField = ({ fieldKey, label, value, onChange, onUploadImage, compact
                 value={item}
                 compact
                 onUploadImage={onUploadImage}
+                languageMode={languageMode}
+                uiLang={uiLang}
                 onChange={(next) => {
                   const clone = [...value];
                   clone[index] = next;
@@ -193,6 +550,8 @@ const DynamicField = ({ fieldKey, label, value, onChange, onUploadImage, compact
               value={nestedValue}
               compact
               onUploadImage={onUploadImage}
+              languageMode={languageMode}
+              uiLang={uiLang}
               onChange={(next) => onChange({ ...value, [key]: next })}
             />
           ))}
@@ -218,6 +577,7 @@ const DynamicField = ({ fieldKey, label, value, onChange, onUploadImage, compact
           type="number"
           value={Number.isFinite(value) ? value : 0}
           onChange={(e) => onChange(Number(e.target.value || 0))}
+          placeholder={getInputPlaceholder(fieldKey, label, uiLang, 'number')}
           className="w-full glass rounded-xl px-3 py-2 text-sm bg-transparent focus:outline-none"
         />
       </div>
@@ -236,18 +596,21 @@ const DynamicField = ({ fieldKey, label, value, onChange, onUploadImage, compact
             type="date"
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            placeholder={getInputPlaceholder(fieldKey, label, uiLang, 'date')}
             className="w-full glass rounded-xl px-3 py-2 text-sm bg-transparent focus:outline-none"
           />
         ) : multiline ? (
           <textarea
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            placeholder={getInputPlaceholder(fieldKey, label, uiLang, 'textarea')}
             className="w-full min-h-24 glass rounded-xl px-3 py-2 text-sm bg-transparent focus:outline-none"
           />
         ) : (
           <input
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            placeholder={getInputPlaceholder(fieldKey, label, uiLang, 'text')}
             className="w-full glass rounded-xl px-3 py-2 text-sm bg-transparent focus:outline-none"
           />
         )}
@@ -295,6 +658,8 @@ const DynamicField = ({ fieldKey, label, value, onChange, onUploadImage, compact
 const SectionEditor = () => {
   const { sectionName = '' } = useParams();
   const { isAuthenticated } = useAuth();
+  const { lang } = useLanguage();
+  const { data: myPortfolio } = useMyPortfolio();
 
   const { data: allSectionsMeta } = useAllSections();
   const { data: sectionData, isLoading: sectionLoading } = useSection(sectionName);
@@ -317,6 +682,16 @@ const SectionEditor = () => {
   const [editingItemId, setEditingItemId] = useState('');
   const [editingItemForm, setEditingItemForm] = useState<Record<string, JsonValue>>({});
   const [uploadedPaths, setUploadedPaths] = useState<string[]>([]);
+  const sectionSlug = sectionName.toLowerCase();
+  const restrictedSectionConfig = useMemo(
+    () => RESTRICTED_SECTION_CONFIGS[sectionSlug] ?? null,
+    [sectionSlug],
+  );
+  const isRestrictedSection = Boolean(restrictedSectionConfig);
+  const languageMode: LanguageMode =
+    myPortfolio?.languageMode === 'ar' || myPortfolio?.languageMode === 'en' || myPortfolio?.languageMode === 'both'
+      ? myPortfolio.languageMode
+      : 'both';
 
   const items = useMemo(
     () => (Array.isArray(itemsData) ? (itemsData as Record<string, JsonValue>[]) : []),
@@ -337,18 +712,29 @@ const SectionEditor = () => {
 
   const isSectionActive = Boolean(
     sectionData &&
-      isObject(sectionData) &&
-      'active' in sectionData &&
-      typeof (sectionData as { active?: unknown }).active === 'boolean' &&
-      (sectionData as { active: boolean }).active,
+    isObject(sectionData) &&
+    'active' in sectionData &&
+    typeof (sectionData as { active?: unknown }).active === 'boolean' &&
+    (sectionData as { active: boolean }).active,
   );
 
   useEffect(() => {
     if (!sectionData || !isObject(sectionData)) return;
     const cloned = deepClone(sectionData);
     delete cloned._id;
+    if (restrictedSectionConfig) {
+      setSectionForm(
+        normalizeRestrictedSectionForm(
+          cloned,
+          languageMode,
+          restrictedSectionConfig.allowedKeys,
+          restrictedSectionConfig.localizedKeys,
+        ),
+      );
+      return;
+    }
     setSectionForm(cloned);
-  }, [sectionData]);
+  }, [sectionData, restrictedSectionConfig, languageMode]);
 
   useEffect(() => {
     if (items.length === 0) {
@@ -378,8 +764,17 @@ const SectionEditor = () => {
   };
 
   const onSaveSection = async () => {
-    if (!validateRequired(sectionForm)) return;
-    await upsertSectionMutation.mutateAsync({ sectionName, payload: sectionForm });
+    const basePayload = restrictedSectionConfig
+      ? normalizeRestrictedSectionForm(
+        sectionForm,
+        languageMode,
+        restrictedSectionConfig.allowedKeys,
+        restrictedSectionConfig.localizedKeys,
+      )
+      : sectionForm;
+    const payload = { ...basePayload, active: isSectionActive };
+    if (!validateRequired(payload)) return;
+    await upsertSectionMutation.mutateAsync({ sectionName, payload });
   };
 
   const onCreateItem = async () => {
@@ -484,6 +879,9 @@ const SectionEditor = () => {
           <div>
             <h1 className="font-heading text-3xl font-bold capitalize">{sectionName} section editor</h1>
             <p className="text-muted-foreground text-sm">Simple form editor with uploads, previews, and validation.</p>
+            <p className="text-muted-foreground text-xs mt-1">
+              Active template: {String(myPortfolio?.templateName ?? 'Not selected yet')}
+            </p>
           </div>
           <Link to="/dashboard" className="glass px-4 py-2 rounded-xl text-sm">
             Back to dashboard
@@ -526,13 +924,25 @@ const SectionEditor = () => {
           {sectionLoading && <p className="text-xs text-muted-foreground mb-3">Loading section data...</p>}
 
           <div className="space-y-3">
-            {Object.entries(sectionForm).map(([key, value]) => (
+            {(restrictedSectionConfig
+              ? restrictedSectionConfig.allowedKeys.map(
+                (key) =>
+                  [
+                    key,
+                    sectionForm[key] ??
+                    defaultRestrictedFieldValue(key, restrictedSectionConfig.localizedKeys, languageMode),
+                  ] as const,
+              )
+              : Object.entries(sectionForm)
+            ).map(([key, value]) => (
               <DynamicField
                 fieldKey={key}
                 key={key}
                 label={titleCase(key)}
                 value={value}
                 onUploadImage={uploadImageAndGetPath}
+                languageMode={languageMode}
+                uiLang={lang}
                 onChange={(next) => setSectionForm((prev) => ({ ...prev, [key]: next }))}
               />
             ))}
@@ -541,7 +951,7 @@ const SectionEditor = () => {
             )}
           </div>
 
-          {Array.isArray(sectionForm.images) && sectionForm.images.length > 0 && (
+          {!isRestrictedSection && Array.isArray(sectionForm.images) && sectionForm.images.length > 0 && (
             <div className="mt-4">
               <p className="text-sm font-medium mb-2">Section images</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -561,7 +971,7 @@ const SectionEditor = () => {
           )}
         </section>
 
-        <section className="glass-strong rounded-3xl p-5">
+        {!isRestrictedSection && <section className="glass-strong rounded-3xl p-5">
           <h2 className="font-heading text-xl font-semibold mb-3">Image uploads</h2>
           <div className="flex flex-wrap items-center gap-3">
             <label className="glass px-4 py-2 rounded-xl text-sm cursor-pointer">
@@ -598,9 +1008,9 @@ const SectionEditor = () => {
               <p className="text-xs text-muted-foreground col-span-full">Upload images and they will appear here with preview.</p>
             )}
           </div>
-        </section>
+        </section>}
 
-        <section className="glass-strong rounded-3xl p-5">
+        {!isRestrictedSection && <section className="glass-strong rounded-3xl p-5">
           <h2 className="font-heading text-xl font-semibold mb-3">Section items</h2>
           {itemsLoading && <p className="text-xs text-muted-foreground mb-3">Loading items...</p>}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
@@ -645,6 +1055,8 @@ const SectionEditor = () => {
                     label={titleCase(key)}
                     value={value}
                     onUploadImage={uploadImageAndGetPath}
+                    languageMode={languageMode}
+                    uiLang={lang}
                     onChange={(next) => setNewItemForm((prev) => ({ ...prev, [key]: next }))}
                   />
                 ))}
@@ -674,6 +1086,8 @@ const SectionEditor = () => {
                     label={titleCase(key)}
                     value={value}
                     onUploadImage={uploadImageAndGetPath}
+                    languageMode={languageMode}
+                    uiLang={lang}
                     onChange={(next) => setEditingItemForm((prev) => ({ ...prev, [key]: next }))}
                   />
                 ))}
@@ -690,7 +1104,7 @@ const SectionEditor = () => {
               </button>
             </div>
           </div>
-        </section>
+        </section>}
       </main>
     </div>
   );
