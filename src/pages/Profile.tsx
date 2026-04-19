@@ -7,6 +7,7 @@ import SubdomainManagerCard from '@/components/auth/SubdomainManagerCard';
 import LanguageModeCard from '@/components/auth/LanguageModeCard';
 import TemplateManagerCard from '@/components/auth/TemplateManagerCard';
 import LogoManagerCard from '@/components/auth/LogoManagerCard';
+import ProfilePreferencesCard from '@/components/auth/ProfilePreferencesCard';
 import { useMyPortfolio } from '@/hooks/usePortfolio';
 
 const imageFromPath = (path?: string | null) => {
@@ -75,7 +76,7 @@ const Profile = () => {
             <div className="glass rounded-2xl p-4">
               <p className="text-xs text-muted-foreground mb-2">Public URL</p>
               <p className="font-medium break-all">
-                {user?.subdomain ? `${user.subdomain}.localhost` : '-'}
+                {user?.subdomain ? `${user.subdomain}.align-dev.com` : '-'}
               </p>
             </div>
             <div className="glass rounded-2xl p-4">
@@ -95,11 +96,22 @@ const Profile = () => {
             />
             <TemplateManagerCard currentTemplateName={user?.templateName || String(portfolio?.templateName ?? '')} />
             <LogoManagerCard currentLogo={user?.logo || null} />
+
           </div>
-          <LanguageModeCard
-            currentLanguageMode={portfolio?.languageMode || null}
-            currentDefaultLanguage={portfolio?.defaultLanguage || null}
-          />
+          <div className="space-y-4">
+
+            <LanguageModeCard
+              currentLanguageMode={portfolio?.languageMode || null}
+              currentDefaultLanguage={portfolio?.defaultLanguage || null}
+            />
+            <ProfilePreferencesCard
+              currentCurrency={user?.currency || null}
+              currentAllowWhatsapp={user?.allowWhatsapp}
+              currentWhatsApp={user?.WhatsApp || null}
+              currentWhatsapp={user?.whatsapp || null}
+            />
+          </div>
+
         </div>
       </main>
     </div>

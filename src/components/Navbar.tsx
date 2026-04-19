@@ -22,6 +22,7 @@ const Navbar = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const isAr = lang === 'ar';
 
   const imageFromPath = (path?: string | null) => {
     if (!path) return '';
@@ -36,6 +37,7 @@ const Navbar = () => {
     { to: '/services', label: t('nav.services') },
     { to: '/pricing', label: t('nav.pricing') },
     { to: '/contact', label: t('nav.contact') },
+    ...(isAuthenticated ? [{ to: '/dashboard', label: isAr ? 'لوحة التحكم' : 'Dashboard' }] : []),
   ];
 
   return (
@@ -57,8 +59,8 @@ const Navbar = () => {
                 key={link.to}
                 to={link.to}
                 className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${location.pathname === link.to
-                    ? 'text-primary glass'
-                    : 'text-muted-foreground hover:text-foreground'
+                  ? 'text-primary glass'
+                  : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
                 {link.label}
@@ -172,8 +174,8 @@ const Navbar = () => {
                   to={link.to}
                   onClick={() => setMobileOpen(false)}
                   className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${location.pathname === link.to
-                      ? 'text-primary glass'
-                      : 'text-muted-foreground hover:text-foreground'
+                    ? 'text-primary glass'
+                    : 'text-muted-foreground hover:text-foreground'
                     }`}
                 >
                   {link.label}
@@ -195,13 +197,6 @@ const Navbar = () => {
                     className="w-full text-center px-4 py-3 rounded-xl text-sm font-medium glass text-foreground"
                   >
                     Profile Data
-                  </Link>
-                  <Link
-                    to="/dashboard"
-                    onClick={() => setMobileOpen(false)}
-                    className="w-full text-center px-4 py-3 rounded-xl text-sm font-medium gradient-bg text-primary-foreground"
-                  >
-                    Dashboard
                   </Link>
                   <button
                     onClick={() => {

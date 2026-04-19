@@ -3,18 +3,34 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
-  const tokenFromQuery = useMemo(() => searchParams.get('token') ?? '', [searchParams]);
-  const { resetPasswordMutation } = useAuth();
-  const [token, setToken] = useState(tokenFromQuery);
+  const emailFromQuery = useMemo(() => searchParams.get('email') ?? '', [searchParams]);
+  const { verifyResetPasswordCodeMutation, resetPasswordMutation } = useAuth();
+  const { lang } = useLanguage();
+  const [email, setEmail] = useState(emailFromQuery);
+  const [code, setCode] = useState('');
+  const [step, setStep] = useState<'verify' | 'reset'>('verify');
   const [newPassword, setNewPassword] = useState('');
+  const isAr = lang === 'ar';
 
-  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const onVerifyCode = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      await resetPasswordMutation.mutateAsync({ token, newPassword });
+      await verifyResetPasswordCodeMutation.mutateAsync({ email, code });
+      setStep('reset');
+    } catch {
+      // Error toast handled in mutation hook.
+    }
+  };
+
+  const onResetPassword = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (step !== 'reset') return;
+    try {
+      await resetPasswordMutation.mutateAsync({ email, newPassword });
       setNewPassword('');
     } catch {
       // Error toast handled in mutation hook.
@@ -30,36 +46,89 @@ const ResetPassword = () => {
           animate={{ opacity: 1, y: 0 }}
           className="glass-strong rounded-3xl p-8 w-full max-w-md glow-border"
         >
-          <h1 className="font-heading text-2xl font-bold text-foreground mb-2">Reset password</h1>
-          <p className="text-sm text-muted-foreground mb-6">Paste your reset token and set a new password.</p>
-
-          <form onSubmit={onSubmit} className="space-y-4">
-            <input
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              placeholder="Reset token"
-              required
-              className="w-full glass rounded-xl px-4 py-3 text-sm bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="New password"
-              required
-              minLength={8}
-              className="w-full glass rounded-xl px-4 py-3 text-sm bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-            <button
-              disabled={resetPasswordMutation.isPending}
-              className="w-full gradient-bg py-3 rounded-xl text-primary-foreground font-semibold text-sm disabled:opacity-70"
-            >
-              {resetPasswordMutation.isPending ? 'Updating...' : 'Update password'}
-            </button>
-          </form>
+          <h1 className="font-heading text-2xl font-bold text-foreground mb-2">
+            {isAr ? 'إعادة تعيين كلمة المرور' : 'Reset password'}
+          </h1>
+          {step === 'verify' ? (
+            <>
+              <p className="text-sm text-muted-foreground mb-6">
+                {isAr
+                  ? 'الخطوة 1 من 2: أدخل البريد الإلكتروني ورمز الاستعادة.'
+                  : 'Step 1 of 2: Enter your email and reset code.'}
+              </p>
+              <form onSubmit={onVerifyCode} className="space-y-4">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={isAr ? 'البريد الإلكتروني' : 'Email'}
+                  required
+                  className="w-full glass rounded-xl px-4 py-3 text-sm bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+                <input
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder={isAr ? 'رمز إعادة التعيين' : 'Reset code'}
+                  required
+                  className="w-full glass rounded-xl px-4 py-3 text-sm bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+                <button
+                  type="submit"
+                  disabled={verifyResetPasswordCodeMutation.isPending || !email || !code}
+                  className="w-full glass py-3 rounded-xl text-foreground font-semibold text-sm disabled:opacity-70"
+                >
+                  {verifyResetPasswordCodeMutation.isPending
+                    ? isAr
+                      ? 'جار التحقق...'
+                      : 'Verifying...'
+                    : isAr
+                      ? 'متابعة'
+                      : 'Continue'}
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground mb-6">
+                {isAr
+                  ? 'الخطوة 2 من 2: أدخل كلمة المرور الجديدة.'
+                  : 'Step 2 of 2: Enter your new password.'}
+              </p>
+              <form onSubmit={onResetPassword} className="space-y-4">
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder={isAr ? 'كلمة المرور الجديدة' : 'New password'}
+                  required
+                  minLength={8}
+                  className="w-full glass rounded-xl px-4 py-3 text-sm bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+                <button
+                  disabled={resetPasswordMutation.isPending}
+                  className="w-full gradient-bg py-3 rounded-xl text-primary-foreground font-semibold text-sm disabled:opacity-70"
+                >
+                  {resetPasswordMutation.isPending
+                    ? isAr
+                      ? 'جار التحديث...'
+                      : 'Updating...'
+                    : isAr
+                      ? 'تحديث كلمة المرور'
+                      : 'Update password'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStep('verify')}
+                  className="w-full glass py-3 rounded-xl text-foreground font-semibold text-sm"
+                >
+                  {isAr ? 'الرجوع لخطوة التحقق' : 'Back to verification'}
+                </button>
+              </form>
+            </>
+          )}
 
           <Link to="/login" className="inline-block mt-4 text-sm text-primary hover:underline">
-            Back to login
+            {isAr ? 'العودة إلى تسجيل الدخول' : 'Back to login'}
           </Link>
         </motion.div>
       </div>

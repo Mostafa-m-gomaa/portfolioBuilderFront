@@ -15,6 +15,7 @@ import SignUp from "./pages/SignUp";
 import GetStarted from "./pages/GetStarted";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import RefundPolicy from "./pages/RefundPolicy";
 import NotFound from "./pages/NotFound";
 import VerifyEmail from "./pages/VerifyEmail";
 import ChooseSubdomain from "./pages/ChooseSubdomain";
@@ -22,6 +23,7 @@ import Dashboard from "./pages/Dashboard";
 import SectionEditor from "./pages/SectionEditor";
 import RequireAuth from "./components/RequireAuth";
 import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
 import GuestOnly from "./components/GuestOnly";
 import Profile from "./pages/Profile";
 import SelectLanguageMode from "./pages/SelectLanguageMode";
@@ -46,6 +48,7 @@ const App = () => (
               <Route path="/login" element={<GuestOnly><Login /></GuestOnly>} />
               <Route path="/signup" element={<GuestOnly><SignUp /></GuestOnly>} />
               <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/forgot-password" element={<GuestOnly><ForgotPassword /></GuestOnly>} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/choose-subdomain" element={<ChooseSubdomain />} />
               <Route path="/select-language-mode" element={<RequireAuth><SelectLanguageMode /></RequireAuth>} />
@@ -56,6 +59,7 @@ const App = () => (
               <Route path="/get-started" element={<GetStarted />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/refund-policy" element={<RefundPolicy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

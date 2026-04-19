@@ -75,6 +75,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'footer.legal': 'قانوني',
     'footer.terms': 'شروط الاستخدام',
     'footer.privacy': 'سياسة الخصوصية',
+    'footer.refund': 'سياسة الاسترداد',
     'footer.rights': 'جميع الحقوق محفوظة',
 
     // Auth
@@ -160,6 +161,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'footer.legal': 'Legal',
     'footer.terms': 'Terms of Use',
     'footer.privacy': 'Privacy Policy',
+    'footer.refund': 'Refund Policy',
     'footer.rights': 'All rights reserved',
 
     'auth.login': 'Log In',

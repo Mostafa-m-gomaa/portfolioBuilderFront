@@ -8,8 +8,10 @@ import type {
   ResendVerificationPayload,
   ResetPasswordPayload,
   SubdomainAvailabilityResponse,
+  UpdateProfilePayload,
   UpdateSubdomainPayload,
   UpdateTemplateNamePayload,
+  VerifyResetPasswordCodePayload,
   VerifyEmailPayload,
 } from "@/types/auth.types";
 
@@ -94,6 +96,13 @@ export const authService = {
     return response.data;
   },
 
+  async verifyResetPasswordCode(
+    payload: VerifyResetPasswordCodePayload,
+  ): Promise<{ message?: string }> {
+    const response = await apiClient.post("/auth/verify-reset-password-code", payload);
+    return response.data;
+  },
+
   async checkSubdomainAvailability(
     subdomain: string,
   ): Promise<SubdomainAvailabilityResponse> {
@@ -112,6 +121,11 @@ export const authService = {
     payload: UpdateTemplateNamePayload,
   ): Promise<AuthSuccess> {
     const response = await apiClient.patch("/portfolio/template-name", payload);
+    return normalizeAuthResponse(response.data);
+  },
+
+  async updateProfile(payload: UpdateProfilePayload): Promise<AuthSuccess> {
+    const response = await apiClient.patch("/auth/profile", payload);
     return normalizeAuthResponse(response.data);
   },
 

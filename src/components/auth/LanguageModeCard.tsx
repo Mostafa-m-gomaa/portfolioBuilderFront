@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { usePortfolioActions } from '@/hooks/usePortfolio';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type LanguageMode = 'ar' | 'en' | 'both';
 
@@ -10,7 +11,9 @@ type LanguageModeCardProps = {
 };
 
 const LanguageModeCard = ({ currentLanguageMode, currentDefaultLanguage, onSuccess }: LanguageModeCardProps) => {
+  const { lang } = useLanguage();
   const { updateLanguageModeMutation, updateDefaultLanguageMutation } = usePortfolioActions();
+  const isAr = lang === 'ar';
 
   const handleSelect = async (mode: LanguageMode) => {
     if (mode === currentLanguageMode) return;
@@ -23,9 +26,9 @@ const LanguageModeCard = ({ currentLanguageMode, currentDefaultLanguage, onSucce
   };
 
   const options: Array<{ value: LanguageMode; title: string; desc: string }> = [
-    { value: 'en', title: 'English', desc: 'English only' },
-    { value: 'ar', title: 'Arabic', desc: 'Arabic only' },
-    { value: 'both', title: 'Both', desc: 'Arabic + English' },
+    { value: 'en', title: isAr ? 'الإنجليزية' : 'English', desc: isAr ? 'الإنجليزية فقط' : 'English only' },
+    { value: 'ar', title: isAr ? 'العربية' : 'Arabic', desc: isAr ? 'العربية فقط' : 'Arabic only' },
+    { value: 'both', title: isAr ? 'الاثنان' : 'Both', desc: isAr ? 'العربية + الإنجليزية' : 'Arabic + English' },
   ];
 
   const handleDefaultSelect = async (language: 'ar' | 'en') => {
@@ -45,9 +48,9 @@ const LanguageModeCard = ({ currentLanguageMode, currentDefaultLanguage, onSucce
       animate={{ opacity: 1, y: 0 }}
       className="glass-strong rounded-3xl p-6 glow-border"
     >
-      <h3 className="font-heading text-xl font-semibold text-foreground">Language mode</h3>
+      <h3 className="font-heading text-xl font-semibold text-foreground">{isAr ? 'وضع اللغة' : 'Language mode'}</h3>
       <p className="text-sm text-muted-foreground mt-1 mb-4">
-        Select how your portfolio content is shown.
+        {isAr ? 'اختر كيفية عرض محتوى البورتفوليو.' : 'Select how your portfolio content is shown.'}
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -74,11 +77,11 @@ const LanguageModeCard = ({ currentLanguageMode, currentDefaultLanguage, onSucce
       </div>
 
       <p className="text-xs text-muted-foreground mt-3">
-        Current: {currentLanguageMode || 'Not selected yet'}
+        {isAr ? 'الحالي:' : 'Current:'} {currentLanguageMode || (isAr ? 'لم يتم الاختيار بعد' : 'Not selected yet')}
       </p>
       {currentLanguageMode === 'both' && (
         <div className="mt-4">
-          <p className="text-sm font-medium mb-2">Default display language</p>
+          <p className="text-sm font-medium mb-2">{isAr ? 'لغة العرض الافتراضية' : 'Default display language'}</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <button
               onClick={() => handleDefaultSelect('ar')}
@@ -89,7 +92,7 @@ const LanguageModeCard = ({ currentLanguageMode, currentDefaultLanguage, onSucce
                   : 'glass text-foreground hover:bg-foreground/5'
               }`}
             >
-              Arabic (ar)
+              {isAr ? 'العربية (ar)' : 'Arabic (ar)'}
             </button>
             <button
               onClick={() => handleDefaultSelect('en')}
@@ -100,11 +103,11 @@ const LanguageModeCard = ({ currentLanguageMode, currentDefaultLanguage, onSucce
                   : 'glass text-foreground hover:bg-foreground/5'
               }`}
             >
-              English (en)
+              {isAr ? 'الإنجليزية (en)' : 'English (en)'}
             </button>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            Current default: {currentDefaultLanguage || 'Not selected yet'}
+            {isAr ? 'الافتراضي الحالي:' : 'Current default:'} {currentDefaultLanguage || (isAr ? 'لم يتم الاختيار بعد' : 'Not selected yet')}
           </p>
         </div>
       )}

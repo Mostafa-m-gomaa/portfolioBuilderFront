@@ -1,8 +1,8 @@
-import axios, { AxiosError } from 'axios';
-import type { ApiErrorPayload } from '@/types/auth.types';
+import axios, { AxiosError } from "axios";
+import type { ApiErrorPayload } from "@/types/auth.types";
 
-const API_BASE_URL = 'http://localhost:9000';
-export const TOKEN_STORAGE_KEY = 'auth_token';
+const API_BASE_URL = "https://portfolioapi.booky.cloud";
+export const TOKEN_STORAGE_KEY = "auth_token";
 
 let onUnauthorized: (() => void) | null = null;
 
@@ -14,7 +14,7 @@ export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15000,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -36,9 +36,13 @@ apiClient.interceptors.response.use(
   },
 );
 
-export const parseApiError = (error: unknown, fallback = 'Something went wrong') => {
+export const parseApiError = (
+  error: unknown,
+  fallback = "Something went wrong",
+) => {
   if (axios.isAxiosError<ApiErrorPayload>(error)) {
-    const apiMessage = error.response?.data?.message || error.response?.data?.error;
+    const apiMessage =
+      error.response?.data?.message || error.response?.data?.error;
     if (apiMessage) return apiMessage;
     if (error.message) return error.message;
   }
@@ -46,3 +50,15 @@ export const parseApiError = (error: unknown, fallback = 'Something went wrong')
   return fallback;
 };
 
+export const resolveApiAssetUrl = (path?: string | null) => {
+  if (!path) return "";
+  if (
+    path.startsWith("http://") ||
+    path.startsWith("https://") ||
+    path.startsWith("data:")
+  ) {
+    return path;
+  }
+  if (path.startsWith("/")) return `${API_BASE_URL}${path}`;
+  return path;
+};

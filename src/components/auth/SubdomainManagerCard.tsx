@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth, useSubdomainAvailability } from '@/hooks/useAuth';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const sanitizeSubdomain = (value: string) => value.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 40);
 
@@ -20,32 +21,52 @@ const SubdomainManagerCard = ({
   onSuccess,
 }: SubdomainManagerCardProps) => {
   const { updateSubdomainMutation } = useAuth();
+  const { lang } = useLanguage();
+  const isAr = lang === 'ar';
   const [subdomain, setSubdomain] = useState(currentSubdomain || '');
   const cleanSubdomain = useMemo(() => sanitizeSubdomain(subdomain), [subdomain]);
+  const cleanCurrentSubdomain = useMemo(() => sanitizeSubdomain(currentSubdomain || ''), [currentSubdomain]);
   const availability = useSubdomainAvailability(cleanSubdomain);
 
   const isChecking = availability.isFetching;
   const isAvailable = availability.data?.available === true;
-  const hasChanged = cleanSubdomain !== (currentSubdomain || '');
+  const isCurrentSubdomain = cleanSubdomain.length >= 3 && cleanSubdomain === cleanCurrentSubdomain;
+  const hasChanged = cleanSubdomain !== cleanCurrentSubdomain;
   const canUpdate = cleanSubdomain.length >= 3 && isAvailable && hasChanged;
 
   const availabilityText =
     cleanSubdomain.length === 0
-      ? 'Type your subdomain to check availability.'
+      ? isAr
+        ? 'اكتب الدومين الفرعي للتحقق من التوفر.'
+        : 'Type your subdomain to check availability.'
       : cleanSubdomain.length < 3
-        ? 'Minimum 3 characters.'
-        : isChecking
-          ? 'Checking availability...'
-          : isAvailable
-            ? 'Available. You can use this subdomain.'
-            : 'Unavailable. Try another one.';
+        ? isAr
+          ? 'الحد الأدنى 3 أحرف.'
+          : 'Minimum 3 characters.'
+        : isCurrentSubdomain
+          ? isAr
+            ? 'هذا هو الدومين الفرعي الحالي.'
+            : 'This is your current subdomain.'
+          : isChecking
+            ? isAr
+              ? 'جار التحقق من التوفر...'
+              : 'Checking availability...'
+            : isAvailable
+              ? isAr
+                ? 'متاح. يمكنك استخدام هذا الدومين الفرعي.'
+                : 'Available. You can use this subdomain.'
+              : isAr
+                ? 'غير متاح. جرّب اسما آخر.'
+                : 'Unavailable. Try another one.';
 
   const availabilityClassName =
     cleanSubdomain.length < 3 || isChecking
       ? 'text-muted-foreground'
-      : isAvailable
+      : isCurrentSubdomain
         ? 'text-emerald-500'
-        : 'text-destructive';
+        : isAvailable
+          ? 'text-emerald-500'
+          : 'text-destructive';
 
   const handleUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -69,19 +90,19 @@ const SubdomainManagerCard = ({
 
       <form onSubmit={handleUpdate} className="space-y-4">
         <div>
-          <label className="block text-sm mb-2 text-muted-foreground">Subdomain</label>
-          <div className="glass rounded-xl px-3 py-2 flex items-center gap-1">
+          <label className="block text-sm mb-2 text-muted-foreground">{isAr ? 'الدومين الفرعي' : 'Subdomain'}</label>
+          <div className={`glass rounded-xl px-3 py-2 flex ${isAr ? 'flex-row-reverse' : 'flex-row'} items-center gap-1`}>
             <input
               value={subdomain}
               onChange={(e) => setSubdomain(sanitizeSubdomain(e.target.value))}
-              placeholder="yourname"
+              placeholder={isAr ? 'اسمك' : 'yourname'}
               className="bg-transparent flex-1 text-sm focus:outline-none"
             />
-            <span className="text-xs text-muted-foreground">.localhost</span>
+            <span className="text-xs text-muted-foreground">{isAr ? 'align-dev.com.' : '.align-dev.com'}</span>
           </div>
           <p className={`text-xs mt-2 ${availabilityClassName}`}>{availabilityText}</p>
           {currentSubdomain && (
-            <p className="text-xs mt-1 text-muted-foreground">Current: {currentSubdomain}</p>
+            <p className="text-xs mt-1 text-muted-foreground">{isAr ? 'الحالي:' : 'Current:'} {currentSubdomain}</p>
           )}
         </div>
 
@@ -90,7 +111,7 @@ const SubdomainManagerCard = ({
             disabled={updateSubdomainMutation.isPending}
             className="w-full gradient-bg py-3 rounded-xl text-primary-foreground font-semibold text-sm disabled:opacity-70"
           >
-            {updateSubdomainMutation.isPending ? 'Saving...' : buttonLabel}
+            {updateSubdomainMutation.isPending ? (isAr ? 'جار الحفظ...' : 'Saving...') : buttonLabel}
           </button>
         )}
       </form>

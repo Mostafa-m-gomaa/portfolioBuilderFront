@@ -6,6 +6,10 @@ export type AuthUser = {
   subdomain?: string | null;
   templateName?: string | null;
   logo?: string | null;
+  currency?: string | null;
+  allowWhatsapp?: boolean;
+  WhatsApp?: string | null;
+  whatsapp?: string | null;
   isVerified?: boolean;
 };
 
@@ -19,7 +23,7 @@ export type RegisterPayload = {
   name: string;
   email: string;
   password: string;
-  type?: 'freelancer' | 'agency' | string;
+  type?: "freelancer" | "agency" | string;
   subdomain?: string;
 };
 
@@ -30,7 +34,7 @@ export type LoginPayload = {
 
 export type GoogleAuthPayload = {
   idToken: string;
-  type?: 'freelancer' | 'agency' | string;
+  type?: "freelancer" | "agency" | string;
   subdomain?: string;
 };
 
@@ -47,8 +51,13 @@ export type ForgotPasswordPayload = {
   email: string;
 };
 
+export type VerifyResetPasswordCodePayload = {
+  email: string;
+  code: string;
+};
+
 export type ResetPasswordPayload = {
-  token: string;
+  email: string;
   newPassword: string;
 };
 
@@ -64,6 +73,12 @@ export type UpdateSubdomainPayload = {
 
 export type UpdateTemplateNamePayload = {
   templateName: string;
+};
+
+export type UpdateProfilePayload = {
+  currency: string;
+  allowWhatsapp: boolean;
+  whatsapp?: string;
 };
 
 export type ApiErrorPayload = {

@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const Footer = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const isAr = lang === 'ar';
 
   return (
     <footer className="border-t border-border py-12">
@@ -28,9 +29,40 @@ const Footer = () => {
           </div>
           <div>
             <h4 className="font-heading font-semibold text-foreground mb-4">{t('footer.legal')}</h4>
-            <div className="flex flex-col gap-2">
-              <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer.terms')}</Link>
-              <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('footer.privacy')}</Link>
+            <div className="flex flex-col gap-3">
+              <Link
+                to="/terms"
+                className="group glass rounded-xl px-3 py-2 border border-white/10 hover:border-primary/40 transition-all"
+              >
+                <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                  {t('footer.terms')}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {isAr ? 'شروط استخدام الخدمة والمنصة' : 'Rules for using our platform'}
+                </p>
+              </Link>
+              <Link
+                to="/privacy"
+                className="group glass rounded-xl px-3 py-2 border border-white/10 hover:border-primary/40 transition-all"
+              >
+                <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                  {t('footer.privacy')}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {isAr ? 'كيف نتعامل مع بياناتك الشخصية' : 'How we collect and process data'}
+                </p>
+              </Link>
+              <Link
+                to="/refund-policy"
+                className="group glass rounded-xl px-3 py-2 border border-white/10 hover:border-primary/40 transition-all"
+              >
+                <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                  {t('footer.refund')}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {isAr ? 'سياسة الاسترداد والاشتراكات عبر Paddle' : 'Refunds and subscription billing via Paddle'}
+                </p>
+              </Link>
             </div>
           </div>
         </div>
