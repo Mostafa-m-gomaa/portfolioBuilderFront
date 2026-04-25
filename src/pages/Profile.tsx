@@ -9,13 +9,8 @@ import TemplateManagerCard from '@/components/auth/TemplateManagerCard';
 import LogoManagerCard from '@/components/auth/LogoManagerCard';
 import ProfilePreferencesCard from '@/components/auth/ProfilePreferencesCard';
 import { useMyPortfolio } from '@/hooks/usePortfolio';
+import { resolveApiAssetUrl } from '@/api/axios';
 
-const imageFromPath = (path?: string | null) => {
-  if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path;
-  if (path.startsWith('/')) return `http://localhost:9000${path}`;
-  return path;
-};
 
 const Profile = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -35,7 +30,7 @@ const Profile = () => {
             <div className="flex items-center gap-4">
               {user?.logo ? (
                 <img
-                  src={imageFromPath(user.logo)}
+                  src={resolveApiAssetUrl(user.logo)}
                   alt="User logo"
                   className="w-16 h-16 rounded-2xl object-cover border border-border"
                 />

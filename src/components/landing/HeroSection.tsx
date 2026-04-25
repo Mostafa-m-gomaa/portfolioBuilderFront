@@ -3,6 +3,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion';
 import { Play } from 'lucide-react';
+import anotherLogo from '@/assets/anotherLogo.png';
 
 const HeroSection = () => {
   const { t } = useLanguage();
@@ -230,7 +231,7 @@ const HeroSection = () => {
                 animate={prefersReducedMotion ? undefined : { y: [0, -6, 0], rotate: [0, 2, 0] }}
                 transition={prefersReducedMotion ? undefined : { duration: 4, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <span className="text-2xl font-bold text-primary-foreground">P</span>
+                <img src={anotherLogo} alt="سيرتي" className="w-12 h-12 object-contain" />
               </motion.div>
               <p className="text-muted-foreground text-sm">Portfolio Preview</p>
             </div>

@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { portfolioService } from '@/services/portfolio.service';
 import { useAuthStore } from '@/store/auth.store';
+import anotherLogo from '@/assets/anotherLogo.png';
 
 const Login = () => {
   const { t } = useLanguage();
@@ -86,8 +87,8 @@ const Login = () => {
           className="glass-strong rounded-3xl p-8 w-full max-w-md relative z-10 glow-border"
         >
           <div className="text-center mb-8">
-            <div className="w-12 h-12 rounded-xl gradient-bg-full mx-auto mb-4 flex items-center justify-center">
-              <span className="text-lg font-bold text-primary-foreground">P</span>
+            <div className=" mx-auto mb-4 flex items-center justify-center">
+              <img src={anotherLogo} alt="سيرتي" className="w-16 h-16 object-contain" />
             </div>
             <h1 className="font-heading text-2xl font-bold text-foreground">{t('auth.login')}</h1>
           </div>

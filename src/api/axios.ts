@@ -1,7 +1,8 @@
 import axios, { AxiosError } from "axios";
 import type { ApiErrorPayload } from "@/types/auth.types";
 
-const API_BASE_URL = "https://portfolioapi.booky.cloud";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? "https://portfolioapi.booky.cloud";
 export const TOKEN_STORAGE_KEY = "auth_token";
 
 let onUnauthorized: (() => void) | null = null;

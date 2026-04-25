@@ -11,7 +11,7 @@ const Privacy = () => {
     ? [
         {
           title: 'نطاق السياسة',
-          text: 'توضح هذه السياسة كيف نقوم بجمع بياناتك الشخصية واستخدامها وحمايتها عند استخدامك منصة Portfolia.',
+          text: 'توضح هذه السياسة كيف نقوم بجمع بياناتك الشخصية واستخدامها وحمايتها عند استخدامك منصة سيرتي.',
         },
         {
           title: 'البيانات التي نجمعها',
@@ -45,7 +45,7 @@ const Privacy = () => {
     : [
         {
           title: 'Policy Scope',
-          text: 'This policy explains how we collect, use, and protect your personal data when you use Portfolia.',
+          text: 'This policy explains how we collect, use, and protect your personal data when you use سيرتي.',
         },
         {
           title: 'Data We Collect',

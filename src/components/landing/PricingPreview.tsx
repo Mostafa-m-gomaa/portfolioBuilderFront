@@ -10,7 +10,7 @@ const PricingPreview = () => {
     {
       name: t('pricing.free'),
       price: '$0',
-      features: ['1 Portfolio', '5 Pages', 'Basic Templates', 'Portfolia Subdomain'],
+      features: ['1 Portfolio', '5 Pages', 'Basic Templates', 'سيرتي Subdomain'],
       popular: false,
     },
     {

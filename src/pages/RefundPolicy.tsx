@@ -11,7 +11,7 @@ const RefundPolicy = () => {
     ? [
         {
           title: 'ملخص السياسة',
-          text: 'توضح هذه السياسة متى يمكن استرداد المبالغ المدفوعة مقابل الاشتراكات أو الخدمات الرقمية على Portfolia.',
+          text: 'توضح هذه السياسة متى يمكن استرداد المبالغ المدفوعة مقابل الاشتراكات أو الخدمات الرقمية على سيرتي.',
         },
         {
           title: 'معالجة الدفع عبر Paddle',
@@ -37,7 +37,7 @@ const RefundPolicy = () => {
     : [
         {
           title: 'Policy Summary',
-          text: 'This policy explains when payments for subscriptions or digital services on Portfolia may be refunded.',
+          text: 'This policy explains when payments for subscriptions or digital services on سيرتي may be refunded.',
         },
         {
           title: 'Payments Processed by Paddle',

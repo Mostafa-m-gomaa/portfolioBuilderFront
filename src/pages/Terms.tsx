@@ -11,11 +11,11 @@ const Terms = () => {
     ? [
         {
           title: 'قبول الشروط',
-          text: 'باستخدامك Portfolia أو إنشاء حساب، فإنك توافق على شروط الاستخدام هذه. إذا كنت لا توافق عليها، يرجى عدم استخدام المنصة.',
+          text: 'باستخدامك سيرتي أو إنشاء حساب، فإنك توافق على شروط الاستخدام هذه. إذا كنت لا توافق عليها، يرجى عدم استخدام المنصة.',
         },
         {
           title: 'وصف الخدمة',
-          text: 'Portfolia منصة لإنشاء وإدارة مواقع البورتفوليو. قد نقوم بتحديث الميزات أو تعديلها أو إيقاف أجزاء من الخدمة عند الحاجة التشغيلية.',
+          text: 'سيرتي منصة لإنشاء وإدارة مواقع البورتفوليو. قد نقوم بتحديث الميزات أو تعديلها أو إيقاف أجزاء من الخدمة عند الحاجة التشغيلية.',
         },
         {
           title: 'الحساب والمسؤولية',
@@ -35,7 +35,7 @@ const Terms = () => {
         },
         {
           title: 'الملكية الفكرية',
-          text: 'المحتوى والتصميمات والعلامات الخاصة بالمنصة مملوكة لـ Portfolia أو مرخصة لها. يظل المحتوى الذي ترفعه أنت ملكا لك، وتمنحنا ترخيصا ضروريا لعرضه وتقديم الخدمة.',
+          text: 'المحتوى والتصميمات والعلامات الخاصة بالمنصة مملوكة لـ سيرتي أو مرخصة لها. يظل المحتوى الذي ترفعه أنت ملكا لك، وتمنحنا ترخيصا ضروريا لعرضه وتقديم الخدمة.',
         },
         {
           title: 'تحديد المسؤولية',
@@ -49,11 +49,11 @@ const Terms = () => {
     : [
         {
           title: 'Acceptance of Terms',
-          text: 'By using Portfolia or creating an account, you agree to these Terms of Service. If you do not agree, please do not use the platform.',
+          text: 'By using سيرتي or creating an account, you agree to these Terms of Service. If you do not agree, please do not use the platform.',
         },
         {
           title: 'Service Description',
-          text: 'Portfolia is a platform for building and managing portfolio websites. We may update, modify, or discontinue parts of the service when operationally necessary.',
+          text: 'سيرتي is a platform for building and managing portfolio websites. We may update, modify, or discontinue parts of the service when operationally necessary.',
         },
         {
           title: 'Account and Responsibility',
@@ -73,7 +73,7 @@ const Terms = () => {
         },
         {
           title: 'Intellectual Property',
-          text: 'Platform content, design, and branding are owned by or licensed to Portfolia. Content you upload remains yours, and you grant us the limited rights needed to provide the service.',
+          text: 'Platform content, design, and branding are owned by or licensed to سيرتي. Content you upload remains yours, and you grant us the limited rights needed to provide the service.',
         },
         {
           title: 'Limitation of Liability',

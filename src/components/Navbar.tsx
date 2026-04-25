@@ -5,6 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { Moon, Sun, Globe, Menu, X, UserRound, LogOut, LayoutDashboard, UserCog } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/store/auth.store';
+import logo from '@/assets/logo.png';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { resolveApiAssetUrl } from '@/api/axios';
 
 const Navbar = () => {
   const { lang, setLang, t } = useLanguage();
@@ -24,12 +26,6 @@ const Navbar = () => {
   const logout = useAuthStore((state) => state.logout);
   const isAr = lang === 'ar';
 
-  const imageFromPath = (path?: string | null) => {
-    if (!path) return '';
-    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path;
-    if (path.startsWith('/')) return `http://localhost:9000${path}`;
-    return path;
-  };
 
   const navLinks = [
     { to: '/', label: t('nav.home') },
@@ -46,10 +42,10 @@ const Navbar = () => {
         <div className="glass-strong rounded-2xl px-6 py-3 flex items-center justify-between max-w-7xl mx-auto">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg gradient-bg-full flex items-center justify-center">
-              <span className="text-sm font-bold text-primary-foreground">P</span>
-            </div>
-            <span className="font-heading font-bold text-lg text-foreground">Portfolia</span>
+            <img src={logo} alt="سيرتي" className="w-12 h-12 rounded-xl object-contain" />
+            <span className="font-heading font-bold text-lg text-foreground">
+              {isAr ? 'سيرتي' : 'sirty'}
+            </span>
           </Link>
 
           {/* Desktop nav */}
@@ -91,7 +87,7 @@ const Navbar = () => {
                   <button className="glass rounded-xl p-2.5 text-foreground hover:text-primary transition-colors" aria-label="Open profile menu">
                     {user?.logo ? (
                       <img
-                        src={imageFromPath(user.logo)}
+                        src={resolveApiAssetUrl(user.logo)}
                         alt="Logo"
                         className="w-5 h-5 rounded object-cover"
                       />
