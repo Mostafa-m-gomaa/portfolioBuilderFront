@@ -2,11 +2,16 @@ import { useMemo, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
+import { getPostAuthEntryPath, needsSubscriptionOnboarding } from '@/lib/authRouting';
+import { startPackageCheckout } from '@/lib/startPackageCheckout';
+import { useAuthStore } from '@/store/auth.store';
 
 const VerifyEmail = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
   const { pendingEmail, verifyEmailMutation, resendVerificationMutation, isAuthenticated, user } = useAuth();
   const [emailInput, setEmailInput] = useState('');
   const [code, setCode] = useState('');
@@ -20,7 +25,22 @@ const VerifyEmail = () => {
     event.preventDefault();
     try {
       await verifyEmailMutation.mutateAsync({ email, code });
-      navigate('/choose-subdomain');
+      const u = useAuthStore.getState().user;
+      const pendingPkg =
+        typeof sessionStorage !== 'undefined'
+          ? sessionStorage.getItem('pending_checkout_package_id')
+          : null;
+      if (pendingPkg && u && !needsSubscriptionOnboarding(u)) {
+        const navigated = await startPackageCheckout(
+          pendingPkg,
+          t('payment.checkoutError'),
+        );
+        if (navigated) {
+          sessionStorage.removeItem('pending_checkout_package_id');
+          return;
+        }
+      }
+      navigate(getPostAuthEntryPath(u));
     } catch {
       // Error toast handled in hook.
     }
@@ -32,7 +52,7 @@ const VerifyEmail = () => {
   };
 
   if (isAuthenticated) {
-    return <Navigate to={user?.subdomain ? '/dashboard' : '/choose-subdomain'} replace />;
+    return <Navigate to={getPostAuthEntryPath(user)} replace />;
   }
 
   return (

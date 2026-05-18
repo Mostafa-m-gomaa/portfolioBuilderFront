@@ -21,9 +21,9 @@ const Contact = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
               {[
-                { icon: Mail, text: 'hello@portfolia.com' },
-                { icon: Phone, text: '+966 50 123 4567' },
-                { icon: MapPin, text: lang === 'ar' ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Saudi Arabia' },
+                { icon: Mail, text: 'info@getsirty.com' },
+                { icon: Phone, text: '+201091469974' },
+                { icon: MapPin, text: lang === 'ar' ? 'القاهرة، مصر' : 'Cairo, Egypt' },
               ].map((item, i) => (
                 <div key={i} className="glass-strong rounded-2xl p-4 flex items-center gap-4">
                   <div className="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center shrink-0">

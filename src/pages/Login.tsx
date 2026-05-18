@@ -1,21 +1,31 @@
 import { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
+import { isEmailNotVerifiedLoginError } from '@/lib/authErrors';
+import { getPostAuthEntryPath, isConfiguredSubdomain, needsSubscriptionOnboarding } from '@/lib/authRouting';
+import { startPackageCheckout } from '@/lib/startPackageCheckout';
 import { portfolioService } from '@/services/portfolio.service';
 import { useAuthStore } from '@/store/auth.store';
+import type { AuthUser } from '@/types/auth.types';
+import anotherLogo from '@/assets/anotherLogo.png';
 
 const Login = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { loginMutation, googleAuthMutation, isAuthenticated, user } = useAuth();
+  const {
+    loginMutation,
+    googleAuthMutation,
+    resendVerificationMutation,
+    setPendingEmail,
+    isAuthenticated,
+    user,
+  } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  const isConfiguredSubdomain = (subdomain?: string | null) =>
-    Boolean(subdomain && !subdomain.startsWith('temp-'));
+  const [searchParams] = useSearchParams();
 
   const resolvePortfolioOnboardingRoute = async (subdomain?: string | null) => {
     if (!isConfiguredSubdomain(subdomain)) {
@@ -41,18 +51,59 @@ const Login = () => {
     }
   };
 
+  const continueAfterAuth = async (authUser?: AuthUser | null) => {
+    if (needsSubscriptionOnboarding(authUser)) {
+      navigate('/select-subscription');
+      return;
+    }
+    await resolvePortfolioOnboardingRoute(authUser?.subdomain);
+  };
+
+  const goToVerifyWithResend = async (targetEmail: string) => {
+    const normalized = targetEmail.trim().toLowerCase();
+    setPendingEmail(normalized);
+    try {
+      await resendVerificationMutation.mutateAsync({ email: normalized });
+    } catch {
+      // Resend errors are toasted by the mutation; still send user to verify page.
+    }
+    navigate('/verify-email', { state: { email: normalized } });
+  };
+
+  const tryRedirectToPendingCheckout = async (
+    authUser: AuthUser | null | undefined,
+  ): Promise<boolean> => {
+    const pendingPkg =
+      searchParams.get('packageId') ??
+      (typeof sessionStorage !== 'undefined'
+        ? sessionStorage.getItem('pending_checkout_package_id')
+        : null);
+    if (!pendingPkg || needsSubscriptionOnboarding(authUser)) return false;
+    const navigated = await startPackageCheckout(
+      pendingPkg,
+      t('payment.checkoutError'),
+    );
+    if (navigated) sessionStorage.removeItem('pending_checkout_package_id');
+    return navigated;
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const result = await loginMutation.mutateAsync({ email, password });
       if (result.token) {
         const authUser = result.user ?? useAuthStore.getState().user;
-        await resolvePortfolioOnboardingRoute(authUser?.subdomain);
+        if (await tryRedirectToPendingCheckout(authUser)) return;
+        await continueAfterAuth(authUser);
       } else {
-        navigate('/verify-email', { state: { email } });
+        await goToVerifyWithResend(email);
       }
-    } catch {
-      // Error toasts are handled in the mutation.
+    } catch (err) {
+      if (isEmailNotVerifiedLoginError(err)) {
+        await goToVerifyWithResend(email);
+        return;
+      }
+      // Other errors: toast handled in loginMutation onError.
     }
   };
 
@@ -61,15 +112,23 @@ const Login = () => {
     if (!idToken) return;
     try {
       const result = await googleAuthMutation.mutateAsync({ idToken });
-      const authUser = result.user ?? useAuthStore.getState().user;
-      await resolvePortfolioOnboardingRoute(authUser?.subdomain);
-    } catch {
-      // Error toast handled in mutation hook.
+      if (result.token) {
+        const authUser = result.user ?? useAuthStore.getState().user;
+        if (await tryRedirectToPendingCheckout(authUser)) return;
+        await continueAfterAuth(authUser);
+      } else if (result.user?.email) {
+        await goToVerifyWithResend(result.user.email);
+      }
+    } catch (err) {
+      if (isEmailNotVerifiedLoginError(err) && email.trim()) {
+        await goToVerifyWithResend(email);
+        return;
+      }
     }
   };
 
   if (isAuthenticated) {
-    return <Navigate to={isConfiguredSubdomain(user?.subdomain) ? '/dashboard' : '/choose-subdomain'} replace />;
+    return <Navigate to={getPostAuthEntryPath(user)} replace />;
   }
 
   return (
@@ -86,8 +145,8 @@ const Login = () => {
           className="glass-strong rounded-3xl p-8 w-full max-w-md relative z-10 glow-border"
         >
           <div className="text-center mb-8">
-            <div className="w-12 h-12 rounded-xl gradient-bg-full mx-auto mb-4 flex items-center justify-center">
-              <span className="text-lg font-bold text-primary-foreground">P</span>
+            <div className=" mx-auto mb-4 flex items-center justify-center">
+              <img src={anotherLogo} alt="سيرتي" className="w-16 h-16 object-contain" />
             </div>
             <h1 className="font-heading text-2xl font-bold text-foreground">{t('auth.login')}</h1>
           </div>
@@ -146,7 +205,16 @@ const Login = () => {
 
           <p className="text-center mt-6 text-sm text-muted-foreground">
             {t('auth.noAccount')}{' '}
-            <Link to="/signup" className="text-primary hover:underline font-medium">{t('auth.signup')}</Link>
+            <Link
+              to={
+                searchParams.get('packageId')
+                  ? `/signup?packageId=${encodeURIComponent(searchParams.get('packageId')!)}`
+                  : '/signup'
+              }
+              className="text-primary hover:underline font-medium"
+            >
+              {t('auth.signup')}
+            </Link>
           </p>
         </motion.div>
       </div>

@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
+import { needsSubscriptionOnboarding } from '@/lib/authRouting';
 import SubdomainManagerCard from '@/components/auth/SubdomainManagerCard';
 import { useMyPortfolio } from '@/hooks/usePortfolio';
 
@@ -11,8 +11,12 @@ const ChooseSubdomain = () => {
   const { data: portfolio, isLoading: portfolioLoading } = useMyPortfolio();
   const hasTemporarySubdomain = Boolean(user?.subdomain?.startsWith('temp-'));
 
-  if (!isAuthenticated && !user) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (needsSubscriptionOnboarding(user)) {
+    return <Navigate to="/select-subscription" replace />;
   }
 
   if (user?.subdomain && !hasTemporarySubdomain) {
@@ -28,7 +32,7 @@ const ChooseSubdomain = () => {
           <SubdomainManagerCard
             title="Choose your subdomain"
             description="This checks availability live while you type. It does not reserve the name until you save it."
-            buttonLabel="Continue to language mode"
+            buttonLabel="Submit"
             onSuccess={() => navigate('/select-language-mode')}
           />
         </div>

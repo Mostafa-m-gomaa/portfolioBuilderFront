@@ -1,4 +1,5 @@
 import { useState, type ChangeEvent } from 'react';
+import { resolveApiAssetUrl } from '@/api/axios';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -6,12 +7,6 @@ type LogoManagerCardProps = {
   currentLogo?: string | null;
 };
 
-const imageFromPath = (path?: string | null) => {
-  if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path;
-  if (path.startsWith('/')) return `http://localhost:9000${path}`;
-  return path;
-};
 
 const LogoManagerCard = ({ currentLogo }: LogoManagerCardProps) => {
   const { updateLogoMutation, deleteLogoMutation } = useAuth();
@@ -38,7 +33,7 @@ const LogoManagerCard = ({ currentLogo }: LogoManagerCardProps) => {
       <div className="mt-4 glass rounded-2xl p-4">
         {activeLogo ? (
           <img
-            src={imageFromPath(activeLogo)}
+            src={resolveApiAssetUrl(activeLogo)}
             alt={isAr ? 'شعاري' : 'My logo'}
             className="w-full h-28 sm:h-36 md:h-40 object-contain rounded-xl bg-background/40"
           />

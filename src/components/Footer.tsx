@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import logo from '@/assets/logo.png';
 
 const Footer = () => {
   const { t, lang } = useLanguage();
@@ -11,10 +12,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg gradient-bg-full flex items-center justify-center">
-                <span className="text-sm font-bold text-primary-foreground">P</span>
-              </div>
-              <span className="font-heading font-bold text-lg text-foreground">Portfolia</span>
+              <img src={logo} alt="سيرتي" className="w-12 h-12 rounded-xl object-contain" />
+              <span className="font-heading font-bold text-lg text-foreground">سيرتي</span>
             </div>
             <p className="text-muted-foreground text-sm">{t('footer.description')}</p>
           </div>
@@ -67,7 +66,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-border text-center">
-          <p className="text-sm text-muted-foreground">© 2024 Portfolia. {t('footer.rights')}</p>
+          <p className="text-sm text-muted-foreground">© 2024 سيرتي. {t('footer.rights')}</p>
         </div>
       </div>
     </footer>

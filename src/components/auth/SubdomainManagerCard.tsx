@@ -98,7 +98,7 @@ const SubdomainManagerCard = ({
               placeholder={isAr ? 'اسمك' : 'yourname'}
               className="bg-transparent flex-1 text-sm focus:outline-none"
             />
-            <span className="text-xs text-muted-foreground">{isAr ? 'align-dev.com.' : '.align-dev.com'}</span>
+            <span className="text-xs text-muted-foreground">{isAr ? 'getsirty.com' : 'getsirty.com'}</span>
           </div>
           <p className={`text-xs mt-2 ${availabilityClassName}`}>{availabilityText}</p>
           {currentSubdomain && (

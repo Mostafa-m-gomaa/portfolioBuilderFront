@@ -6,26 +6,23 @@ const CTASection = () => {
   const { t } = useLanguage();
 
   return (
-    <section className="py-24 relative overflow-hidden">
-      <div className="floating-orb w-96 h-96 bg-primary/20 -top-20 start-1/4" />
-      <div className="floating-orb w-64 h-64 bg-accent/15 bottom-0 end-1/4" style={{ animation: 'float-delayed 10s ease-in-out infinite' }} />
-
+    <section className="relative overflow-hidden py-24">
       <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="glass-strong rounded-3xl p-12 md:p-16 glow-border"
+          className="rounded-3xl bg-primary p-10 text-primary-foreground shadow-2xl shadow-primary/20 md:p-16"
         >
-          <h2 className="font-heading text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h2 className="font-heading text-3xl font-bold md:text-5xl">
             {t('cta.title')}
           </h2>
-          <p className="text-muted-foreground text-lg mb-8 max-w-lg mx-auto">
+          <p className="mx-auto mb-8 mt-4 max-w-lg text-lg leading-8 text-primary-foreground/80">
             {t('cta.subtitle')}
           </p>
           <Link
             to="/signup"
-            className="inline-block gradient-bg-full px-10 py-4 rounded-2xl text-primary-foreground font-semibold text-lg hover:opacity-90 transition-all duration-300 hover:scale-105"
+            className="inline-flex rounded-xl bg-background px-9 py-4 text-base font-bold text-foreground transition hover:-translate-y-0.5 hover:bg-background/95"
           >
             {t('cta.button')}
           </Link>

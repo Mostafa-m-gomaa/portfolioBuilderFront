@@ -1,6 +1,7 @@
 import { apiClient } from "@/api/axios";
 import type {
   AuthSuccess,
+  AuthUser,
   ForgotPasswordPayload,
   GoogleAuthPayload,
   LoginPayload,
@@ -15,6 +16,33 @@ import type {
   VerifyEmailPayload,
 } from "@/types/auth.types";
 
+const normalizeUser = (raw: unknown): AuthUser | undefined => {
+  if (raw == null || typeof raw !== "object") return undefined;
+  const r = raw as Record<string, unknown>;
+  return {
+    id: (r.id ?? r._id) as string | undefined,
+    name: r.name as string | undefined,
+    email: r.email as string | undefined,
+    type: r.type as string | undefined,
+    subdomain: (r.subdomain as string | null | undefined) ?? null,
+    domain: (r.domain as string | null | undefined) ?? null,
+    templateName: (r.templateName as string | null | undefined) ?? null,
+    logo: (r.logo as string | null | undefined) ?? null,
+    currency: (r.currency as string | null | undefined) ?? null,
+    allowWhatsapp: r.allowWhatsapp as boolean | undefined,
+    WhatsApp: (r.WhatsApp as string | null | undefined) ?? null,
+    whatsapp:
+      (r.whatsapp as string | null | undefined) ??
+      (r.WhatsApp as string | null | undefined) ??
+      null,
+    isVerified: Boolean(r.isVerified ?? r.emailVerified),
+    emailVerified: Boolean(r.emailVerified ?? r.isVerified),
+    role: (r.role as string | null | undefined) ?? null,
+    authProvider: (r.authProvider as string | null | undefined) ?? null,
+    subscriptionStatus: (r.subscriptionStatus as string | null | undefined) ?? null,
+  };
+};
+
 const normalizeAuthResponse = (payload: any): AuthSuccess => {
   return {
     message: payload?.message,
@@ -23,7 +51,7 @@ const normalizeAuthResponse = (payload: any): AuthSuccess => {
       payload?.accessToken ??
       payload?.data?.token ??
       payload?.data?.accessToken,
-    user: payload?.user ?? payload?.data?.user,
+    user: normalizeUser(payload?.user ?? payload?.data?.user),
   };
 };
 
@@ -99,7 +127,10 @@ export const authService = {
   async verifyResetPasswordCode(
     payload: VerifyResetPasswordCodePayload,
   ): Promise<{ message?: string }> {
-    const response = await apiClient.post("/auth/verify-reset-password-code", payload);
+    const response = await apiClient.post(
+      "/auth/verify-reset-password-code",
+      payload,
+    );
     return response.data;
   },
 

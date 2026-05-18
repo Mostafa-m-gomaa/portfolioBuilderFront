@@ -18,7 +18,7 @@ const TemplateManagerCard = ({ currentTemplateName }: TemplateManagerCardProps) 
         <p className="font-medium">{currentTemplateName || (isAr ? 'لم يتم الاختيار بعد' : 'Not selected yet')}</p>
       </div>
       <Link
-        to="/templates"
+        to="/template-selector"
         className="mt-4 inline-flex items-center justify-center w-full gradient-bg py-3 rounded-xl text-primary-foreground font-semibold text-sm"
       >
         {isAr ? 'تغيير القالب' : 'Change template'}

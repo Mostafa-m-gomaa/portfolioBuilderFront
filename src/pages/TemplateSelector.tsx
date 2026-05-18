@@ -2,17 +2,14 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyPortfolio } from '@/hooks/usePortfolio';
-import { templateCatalog } from '@/constants/templateCatalog';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-const prettyTemplateName = (value: string) =>
-  value
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-
-const templatePreviewUrl = (templateName: string) =>
-  `https://${templateName}.align-dev.com`;
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  categoryLabel,
+  groupedTemplates,
+  prettyTemplateName,
+  templatePreviewUrl,
+} from '@/lib/templateCatalogView';
 
 const TemplateSelector = () => {
   const navigate = useNavigate();
@@ -42,47 +39,65 @@ const TemplateSelector = () => {
           </button>
         </div>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {templateCatalog.map((template) => {
-            const isActive = template.templateName === currentTemplateName;
-            return (
-              <article key={template.templateName} className="glass-strong rounded-2xl p-4 glow-border">
-                <img
-                  src={template.image}
-                  alt={template.templateName}
-                  className="w-full h-40 object-cover rounded-xl"
-                />
-                <h2 className="font-semibold mt-3">{prettyTemplateName(template.templateName)}</h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {isAr ? `وصف افتراضي لقالب ${prettyTemplateName(template.templateName)}.` : template.desc}
-                </p>
-                <div className="mt-4 grid grid-cols-1 gap-2">
-                  <a
-                    href={templatePreviewUrl(template.templateName)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full glass py-2.5 rounded-xl text-center text-sm font-semibold text-foreground hover:text-primary transition-colors"
-                  >
-                    {isAr ? 'عرض القالب' : 'View template'}
-                  </a>
-                  <button
-                    onClick={() => updateTemplateNameMutation.mutate(template.templateName)}
-                    disabled={updateTemplateNameMutation.isPending || isActive}
-                    className="w-full gradient-bg py-2.5 rounded-xl text-primary-foreground text-sm font-semibold disabled:opacity-60"
-                  >
-                    {isActive
-                      ? isAr
-                        ? 'القالب مفعّل'
-                        : 'Active template'
-                      : isAr
-                        ? 'تفعيل هذا القالب'
-                        : 'Activate this template'}
-                  </button>
-                </div>
-              </article>
-            );
-          })}
-        </section>
+        <Tabs defaultValue={groupedTemplates[0]?.category} className="space-y-4">
+          <TabsList className="h-auto flex w-full flex-wrap justify-start gap-2 rounded-2xl bg-transparent p-0">
+            {groupedTemplates.map((group) => (
+              <TabsTrigger
+                key={group.category}
+                value={group.category}
+                className="glass rounded-xl px-4 py-2 text-sm data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
+              >
+                {categoryLabel(group.category, isAr)}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {groupedTemplates.map((group) => (
+            <TabsContent key={group.category} value={group.category} className="mt-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {group.templates.map((template) => {
+                  const isActive = template.templateName === currentTemplateName;
+                  return (
+                    <article key={template.templateName} className="glass-strong rounded-2xl p-4 glow-border">
+                      <img
+                        src={template.image}
+                        alt={template.templateName}
+                        className="w-full h-40 object-cover rounded-xl"
+                      />
+                      <h2 className="font-semibold mt-3">{prettyTemplateName(template.templateName)}</h2>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {isAr ? `قالب ${prettyTemplateName(template.templateName)} مناسب لفئة ${categoryLabel(group.category, isAr)}.` : template.desc}
+                      </p>
+                      <div className="mt-4 grid grid-cols-1 gap-2">
+                        <a
+                          href={templatePreviewUrl(template.templateName)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full glass py-2.5 rounded-xl text-center text-sm font-semibold text-foreground hover:text-primary transition-colors"
+                        >
+                          {isAr ? 'عرض القالب' : 'View template'}
+                        </a>
+                        <button
+                          onClick={() => updateTemplateNameMutation.mutate(template.templateName)}
+                          disabled={updateTemplateNameMutation.isPending || isActive}
+                          className="w-full gradient-bg py-2.5 rounded-xl text-primary-foreground text-sm font-semibold disabled:opacity-60"
+                        >
+                          {isActive
+                            ? isAr
+                              ? 'القالب مفعّل'
+                              : 'Active template'
+                            : isAr
+                              ? 'تفعيل هذا القالب'
+                              : 'Activate this template'}
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
       </main>
     </div>
   );

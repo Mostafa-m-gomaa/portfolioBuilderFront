@@ -1,28 +1,29 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
-import { Palette, Settings2, Rocket, BarChart3 } from 'lucide-react';
+import { BarChart3, LayoutTemplate, Rocket, Settings2 } from 'lucide-react';
 
 const FeaturesSection = () => {
   const { t } = useLanguage();
 
   const features = [
-    { icon: Palette, titleKey: 'features.1.title', descKey: 'features.1.desc', gradient: 'from-primary to-secondary' },
-    { icon: Settings2, titleKey: 'features.2.title', descKey: 'features.2.desc', gradient: 'from-secondary to-accent' },
-    { icon: Rocket, titleKey: 'features.3.title', descKey: 'features.3.desc', gradient: 'from-accent to-primary' },
-    { icon: BarChart3, titleKey: 'features.4.title', descKey: 'features.4.desc', gradient: 'from-primary to-accent' },
+    { icon: LayoutTemplate, titleKey: 'features.1.title', descKey: 'features.1.desc' },
+    { icon: Settings2, titleKey: 'features.2.title', descKey: 'features.2.desc' },
+    { icon: Rocket, titleKey: 'features.3.title', descKey: 'features.3.desc' },
+    { icon: BarChart3, titleKey: 'features.4.title', descKey: 'features.4.desc' },
   ];
 
   return (
-    <section className="py-24 relative">
+    <section className="relative py-24">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="mx-auto mb-14 max-w-3xl text-center"
         >
-          <h2 className="font-heading text-4xl md:text-5xl font-bold text-foreground mb-4">{t('features.title')}</h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">{t('features.subtitle')}</p>
+          <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary">{t('features.kicker')}</span>
+          <h2 className="mt-3 font-heading text-3xl font-bold text-foreground md:text-5xl">{t('features.title')}</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-muted-foreground">{t('features.subtitle')}</p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -33,14 +34,14 @@ const FeaturesSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              whileHover={{ y: -8, transition: { duration: 0.3 } }}
-              className="glass-strong rounded-2xl p-6 glow-border group cursor-default"
+              whileHover={{ y: -6, transition: { duration: 0.25 } }}
+              className="group cursor-default rounded-2xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-xl hover:shadow-foreground/5"
             >
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                <feature.icon className="w-6 h-6 text-primary-foreground" />
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                <feature.icon className="w-6 h-6" />
               </div>
-              <h3 className="font-heading font-semibold text-lg text-foreground mb-2">{t(feature.titleKey)}</h3>
-              <p className="text-muted-foreground text-sm">{t(feature.descKey)}</p>
+              <h3 className="mb-3 font-heading text-lg font-semibold text-foreground">{t(feature.titleKey)}</h3>
+              <p className="text-sm leading-7 text-muted-foreground">{t(feature.descKey)}</p>
             </motion.div>
           ))}
         </div>
