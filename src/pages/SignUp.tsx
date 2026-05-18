@@ -1,24 +1,38 @@
-import { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { portfolioService } from '@/services/portfolio.service';
 import { useAuthStore } from '@/store/auth.store';
+import type { AuthUser } from '@/types/auth.types';
+import {
+  getPostAuthEntryPath,
+  isConfiguredSubdomain,
+  needsSubscriptionOnboarding,
+} from '@/lib/authRouting';
 import anotherLogo from '@/assets/anotherLogo.png';
+import {
+  ACCOUNT_TYPE_OPTIONS,
+  type AccountTypeValue,
+} from '@/constants/accountTypes';
 
 const SignUp = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const isAr = lang === 'ar';
   const navigate = useNavigate();
   const { registerMutation, googleAuthMutation, isAuthenticated, user } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [type, setType] = useState<'freelancer' | 'agency'>('freelancer');
+  const [type, setType] = useState<AccountTypeValue>('freelancer');
+  const [searchParams] = useSearchParams();
 
-  const isConfiguredSubdomain = (subdomain?: string | null) =>
-    Boolean(subdomain && !subdomain.startsWith('temp-'));
+  useEffect(() => {
+    const id = searchParams.get('packageId');
+    if (id) sessionStorage.setItem('pending_checkout_package_id', id);
+  }, [searchParams]);
 
   const resolvePortfolioOnboardingRoute = async (subdomain?: string | null) => {
     if (!isConfiguredSubdomain(subdomain)) {
@@ -43,6 +57,14 @@ const SignUp = () => {
     }
   };
 
+  const continueAfterAuth = async (authUser?: AuthUser | null) => {
+    if (needsSubscriptionOnboarding(authUser)) {
+      navigate('/select-subscription');
+      return;
+    }
+    await resolvePortfolioOnboardingRoute(authUser?.subdomain);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -64,14 +86,14 @@ const SignUp = () => {
     try {
       const result = await googleAuthMutation.mutateAsync({ idToken, type });
       const authUser = result.user ?? useAuthStore.getState().user;
-      await resolvePortfolioOnboardingRoute(authUser?.subdomain);
+      await continueAfterAuth(authUser);
     } catch {
       // Error toast handled in mutation hook.
     }
   };
 
   if (isAuthenticated) {
-    return <Navigate to={isConfiguredSubdomain(user?.subdomain) ? '/dashboard' : '/choose-subdomain'} replace />;
+    return <Navigate to={getPostAuthEntryPath(user)} replace />;
   }
 
   return (
@@ -122,14 +144,19 @@ const SignUp = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Account Type</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">
+                {t('auth.accountType')}
+              </label>
               <select
                 value={type}
-                onChange={(e) => setType(e.target.value as 'freelancer' | 'agency')}
+                onChange={(e) => setType(e.target.value as AccountTypeValue)}
                 className="w-full glass rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 bg-transparent"
               >
-                <option value="freelancer">Freelancer</option>
-                <option value="agency">Agency</option>
+                {ACCOUNT_TYPE_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {isAr ? opt.labelAr : opt.labelEn}
+                  </option>
+                ))}
               </select>
             </div>
             <div>

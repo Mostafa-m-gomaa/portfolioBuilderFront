@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { parseApiError, setUnauthorizedHandler } from "@/api/axios";
+import { isEmailNotVerifiedLoginError } from "@/lib/authErrors";
 import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 import type {
@@ -55,10 +56,13 @@ export const useAuth = () => {
     onSuccess: (data) => {
       if (data.token) {
         login({ token: data.token, user: data.user });
+        toast.success("Welcome back.");
       }
-      toast.success("Welcome back.");
     },
-    onError: (error) => toast.error(parseApiError(error, "Failed to login")),
+    onError: (error) => {
+      if (isEmailNotVerifiedLoginError(error)) return;
+      toast.error(parseApiError(error, "Failed to login"));
+    },
   });
 
   const googleAuthMutation = useMutation({
@@ -66,11 +70,13 @@ export const useAuth = () => {
     onSuccess: (data) => {
       if (data.token) {
         login({ token: data.token, user: data.user });
+        toast.success("Signed in with Google.");
       }
-      toast.success("Signed in with Google.");
     },
-    onError: (error) =>
-      toast.error(parseApiError(error, "Failed to sign in with Google")),
+    onError: (error) => {
+      if (isEmailNotVerifiedLoginError(error)) return;
+      toast.error(parseApiError(error, "Failed to sign in with Google"));
+    },
   });
 
   const verifyEmailMutation = useMutation({

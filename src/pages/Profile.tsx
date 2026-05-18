@@ -10,9 +10,13 @@ import LogoManagerCard from '@/components/auth/LogoManagerCard';
 import ProfilePreferencesCard from '@/components/auth/ProfilePreferencesCard';
 import { useMyPortfolio } from '@/hooks/usePortfolio';
 import { resolveApiAssetUrl } from '@/api/axios';
+import SubscriptionSummaryPanel from '@/components/subscription/SubscriptionSummaryPanel';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { getAccountTypeLabel } from '@/constants/accountTypes';
 
 
 const Profile = () => {
+  const { lang } = useLanguage();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const { data: portfolio } = useMyPortfolio();
@@ -41,7 +45,9 @@ const Profile = () => {
               )}
               <div>
                 <h1 className="font-heading text-3xl font-bold text-foreground">{user?.name || 'Portfolio User'}</h1>
-                <p className="text-sm text-muted-foreground capitalize">{user?.type || 'Creator'}</p>
+                <p className="text-sm text-muted-foreground">
+                  {getAccountTypeLabel(user?.type, lang)}
+                </p>
               </div>
             </div>
             <div className="text-xs px-3 py-1.5 rounded-full glass border border-white/20">
@@ -71,7 +77,7 @@ const Profile = () => {
             <div className="glass rounded-2xl p-4">
               <p className="text-xs text-muted-foreground mb-2">Public URL</p>
               <p className="font-medium break-all">
-                {user?.subdomain ? `${user.subdomain}.align-dev.com` : '-'}
+                {user?.subdomain ? `${user.subdomain}.getsirty.com` : '-'}
               </p>
             </div>
             <div className="glass rounded-2xl p-4">
@@ -80,6 +86,8 @@ const Profile = () => {
             </div>
           </div>
         </motion.div>
+
+        <SubscriptionSummaryPanel />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           <div className="space-y-4">

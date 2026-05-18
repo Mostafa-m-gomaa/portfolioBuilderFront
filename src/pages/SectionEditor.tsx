@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, ImagePlus, Plus, RotateCcw, Save, Trash2, UploadCloud } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { useAllSections, useMyPortfolio, usePortfolioActions, useSection, useSectionItems } from '@/hooks/usePortfolio';
@@ -94,6 +94,20 @@ const PLATFORM_OPTIONS = [
   'Pinterest',
   'Website',
 ] as const;
+
+const fieldShellClass = (compact: boolean) =>
+  compact
+    ? 'rounded-2xl border border-border bg-background p-3'
+    : 'rounded-2xl border border-border bg-card p-5 shadow-sm';
+
+const inputClass =
+  'w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-950 shadow-sm transition placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500';
+
+const ghostButtonClass =
+  'inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background px-3 py-2 text-sm font-semibold text-foreground transition hover:border-primary/30 hover:text-primary disabled:opacity-60';
+
+const primaryButtonClass =
+  'inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-sm shadow-primary/20 transition hover:bg-primary/90 disabled:opacity-60';
 
 const ensureLocalized = (value?: unknown): JsonValue => {
   if (isObject(value) && ('ar' in value || 'en' in value)) return value;
@@ -487,6 +501,7 @@ type DynamicFieldProps = {
   compact?: boolean;
   languageMode?: LanguageMode;
   uiLang?: UiLang;
+  disabled?: boolean;
 };
 
 const DynamicField = ({
@@ -498,8 +513,9 @@ const DynamicField = ({
   compact = false,
   languageMode = 'both',
   uiLang = 'en',
+  disabled = false,
 }: DynamicFieldProps) => {
-  const shellClass = compact ? 'glass rounded-xl p-3' : 'glass rounded-xl p-4';
+  const shellClass = fieldShellClass(compact);
   const [uploading, setUploading] = useState(false);
 
   if (Array.isArray(value)) {
@@ -519,52 +535,150 @@ const DynamicField = ({
       isImageKey(fieldKey) &&
       value.every((entry) => typeof entry === 'string');
 
+    if (arrayIsImageList) {
+      return (
+        <div className={shellClass}>
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-foreground">{label}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {uiLang === 'ar'
+                  ? 'ارفع الصور وستظهر كمعاينات صغيرة هنا.'
+                  : 'Upload images and review them as small previews here.'}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {onUploadImage && (
+                <label className={`${ghostButtonClass} ${disabled ? 'pointer-events-none opacity-50' : ''}`}>
+                  <UploadCloud className="h-4 w-4" />
+                  {uploading ? (uiLang === 'ar' ? 'جار الرفع...' : 'Uploading...') : uiLang === 'ar' ? 'رفع صورة' : 'Upload image'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={uploading || disabled}
+                    onChange={async (event) => {
+                      const file = event.target.files?.[0];
+                      if (!file) return;
+                      try {
+                        setUploading(true);
+                        const path = await onUploadImage(file);
+                        if (path) onChange([...value, path]);
+                      } finally {
+                        setUploading(false);
+                        event.currentTarget.value = '';
+                      }
+                    }}
+                  />
+                </label>
+              )}
+            </div>
+          </div>
+
+          {value.length === 0 ? (
+            <div className="flex min-h-40 items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 p-6 text-center">
+              <div>
+                <ImagePlus className="mx-auto h-8 w-8 text-muted-foreground" />
+                <p className="mt-3 text-sm font-medium text-foreground">
+                  {uiLang === 'ar' ? 'لا توجد صور بعد' : 'No images yet'}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {uiLang === 'ar' ? 'ابدأ برفع صورة.' : 'Start by uploading an image.'}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {value.map((item, index) => {
+                const imagePath = String(item ?? '');
+                return (
+                  <div key={`${label}-${index}`} className="rounded-2xl border border-border bg-background p-3">
+                    <div className="overflow-hidden rounded-xl border border-border bg-muted/30">
+                      {imagePath ? (
+                        <img
+                          src={imageFromPath(imagePath)}
+                          alt=""
+                          className="h-32 w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-32 items-center justify-center text-xs text-muted-foreground">
+                          {uiLang === 'ar' ? 'أضف رابط الصورة' : 'Add image URL'}
+                        </div>
+                      )}
+                    </div>
+                    <div className="mt-3 grid gap-2">
+                      {onUploadImage && (
+                        <label className={`${ghostButtonClass} ${disabled ? 'pointer-events-none opacity-50' : ''}`}>
+                          <UploadCloud className="h-4 w-4" />
+                          {uploading ? (uiLang === 'ar' ? 'جار الرفع...' : 'Uploading...') : imagePath ? (uiLang === 'ar' ? 'تغيير الصورة' : 'Change image') : (uiLang === 'ar' ? 'رفع صورة' : 'Upload image')}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            disabled={uploading || disabled}
+                            onChange={async (event) => {
+                              const file = event.target.files?.[0];
+                              if (!file) return;
+                              try {
+                                setUploading(true);
+                                const path = await onUploadImage(file);
+                                if (path) {
+                                  const clone = [...value];
+                                  clone[index] = path;
+                                  onChange(clone);
+                                }
+                              } finally {
+                                setUploading(false);
+                                event.currentTarget.value = '';
+                              }
+                            }}
+                          />
+                        </label>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => onChange(value.filter((_, i) => i !== index))}
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs font-semibold text-destructive transition hover:bg-destructive/10"
+                        disabled={disabled}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        {uiLang === 'ar' ? 'إزالة الصورة' : 'Remove image'}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    }
+
     return (
       <div className={shellClass}>
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-medium">{label}</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-sm font-semibold text-foreground">{label}</p>
           <div className="flex items-center gap-2">
-            {arrayIsImageList && onUploadImage && (
-              <label className="text-xs glass px-2 py-1 rounded-lg cursor-pointer">
-                {uploading ? (uiLang === 'ar' ? 'جار الرفع...' : 'Uploading...') : uiLang === 'ar' ? 'رفع صورة' : 'Upload image'}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  disabled={uploading}
-                  onChange={async (event) => {
-                    const file = event.target.files?.[0];
-                    if (!file) return;
-                    try {
-                      setUploading(true);
-                      const path = await onUploadImage(file);
-                      if (path) onChange([...value, path]);
-                    } finally {
-                      setUploading(false);
-                      event.currentTarget.value = '';
-                    }
-                  }}
-                />
-              </label>
-            )}
             <button
               type="button"
               onClick={() => onChange([...value, defaultNext])}
-              className="text-xs glass px-2 py-1 rounded-lg flex items-center gap-1"
+              className={ghostButtonClass}
+              disabled={disabled}
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4" />
               {uiLang === 'ar' ? 'إضافة' : 'Add'}
             </button>
           </div>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {value.map((item, index) => (
-            <div key={`${label}-${index}`} className="rounded-xl border border-border p-3">
+            <div key={`${label}-${index}`} className="rounded-2xl border border-border bg-background p-3">
               <div className="flex justify-end mb-2">
                 <button
                   type="button"
                   onClick={() => onChange(value.filter((_, i) => i !== index))}
-                  className="text-xs text-destructive glass px-2 py-1 rounded-lg flex items-center gap-1"
+                  className="inline-flex items-center gap-1 rounded-lg border border-destructive/20 bg-destructive/5 px-2 py-1 text-xs text-destructive"
+                  disabled={disabled}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   {uiLang === 'ar' ? 'إزالة' : 'Remove'}
@@ -578,6 +692,7 @@ const DynamicField = ({
                 onUploadImage={onUploadImage}
                 languageMode={languageMode}
                 uiLang={uiLang}
+                disabled={disabled}
                 onChange={(next) => {
                   const clone = [...value];
                   clone[index] = next;
@@ -595,7 +710,7 @@ const DynamicField = ({
   if (isObject(value)) {
     return (
       <div className={shellClass}>
-        <p className="text-sm font-medium mb-2">{label}</p>
+        <p className="mb-3 text-sm font-semibold text-foreground">{label}</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {Object.entries(value).map(([key, nestedValue]) => (
             <DynamicField
@@ -607,6 +722,7 @@ const DynamicField = ({
               onUploadImage={onUploadImage}
               languageMode={languageMode}
               uiLang={uiLang}
+              disabled={disabled}
               onChange={(next) => onChange({ ...value, [key]: next })}
             />
           ))}
@@ -618,8 +734,8 @@ const DynamicField = ({
   if (typeof value === 'boolean') {
     return (
       <div className={`${shellClass} flex items-center justify-between`}>
-        <p className="text-sm font-medium">{label}</p>
-        <Switch checked={value} onCheckedChange={(checked) => onChange(checked)} />
+        <p className="text-sm font-semibold text-foreground">{label}</p>
+        <Switch checked={value} disabled={disabled} onCheckedChange={(checked) => onChange(checked)} />
       </div>
     );
   }
@@ -627,13 +743,14 @@ const DynamicField = ({
   if (typeof value === 'number') {
     return (
       <div className={shellClass}>
-        <label className="block text-sm font-medium mb-2">{label}</label>
+        <label className="block text-sm font-semibold text-foreground mb-2">{label}</label>
         <input
           type="number"
           value={Number.isFinite(value) ? value : 0}
           onChange={(e) => onChange(Number(e.target.value || 0))}
           placeholder={getInputPlaceholder(fieldKey, label, uiLang, 'number')}
-          className="w-full glass rounded-xl px-3 py-2 text-sm bg-transparent focus:outline-none"
+          className={inputClass}
+          disabled={disabled}
         />
       </div>
     );
@@ -647,41 +764,67 @@ const DynamicField = ({
     const multiline = value.length > 80 || value.includes('\n');
     return (
       <div className={shellClass}>
-        <label className="block text-sm font-medium mb-2">{label}</label>
+        <label className="block text-sm font-semibold text-foreground mb-2">{label}</label>
         {imageLike ? (
-          <div className="space-y-2">
-            {onUploadImage && (
-              <label className="inline-block text-xs glass px-3 py-1.5 rounded-lg cursor-pointer">
-                {uploading ? (uiLang === 'ar' ? 'جار الرفع...' : 'Uploading...') : uiLang === 'ar' ? 'رفع صورة' : 'Upload image'}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  disabled={uploading}
-                  onChange={async (event) => {
-                    const file = event.target.files?.[0];
-                    if (!file) return;
-                    try {
-                      setUploading(true);
-                      const path = await onUploadImage(file);
-                      if (path) onChange(path);
-                    } finally {
-                      setUploading(false);
-                      event.currentTarget.value = '';
-                    }
-                  }}
+          <div className="grid gap-4 md:grid-cols-[180px_1fr]">
+            <div className="overflow-hidden rounded-2xl border border-border bg-muted/30">
+              {value ? (
+                <img
+                  src={imageFromPath(value)}
+                  alt=""
+                  className="h-36 w-full object-cover"
                 />
-              </label>
-            )}
-            {value ? (
-              <img
-                src={imageFromPath(value)}
-                alt=""
-                className="w-full max-h-40 object-cover rounded-xl border border-border"
-              />
-            ) : (
-              <p className="text-xs text-muted-foreground">{uiLang === 'ar' ? 'لم يتم اختيار صورة بعد.' : 'No image selected yet.'}</p>
-            )}
+              ) : (
+                <div className="flex h-36 items-center justify-center p-4 text-center">
+                  <div>
+                    <ImagePlus className="mx-auto h-7 w-7 text-muted-foreground" />
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {uiLang === 'ar' ? 'لا توجد صورة' : 'No image'}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="space-y-3">
+              {onUploadImage && (
+                <label className={`${ghostButtonClass} ${disabled ? 'pointer-events-none opacity-50' : ''}`}>
+                  <UploadCloud className="h-4 w-4" />
+                  {uploading ? (uiLang === 'ar' ? 'جار الرفع...' : 'Uploading...') : value ? (uiLang === 'ar' ? 'تغيير الصورة' : 'Change image') : uiLang === 'ar' ? 'رفع صورة' : 'Upload image'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={uploading || disabled}
+                    onChange={async (event) => {
+                      const file = event.target.files?.[0];
+                      if (!file) return;
+                      try {
+                        setUploading(true);
+                        const path = await onUploadImage(file);
+                        if (path) onChange(path);
+                      } finally {
+                        setUploading(false);
+                        event.currentTarget.value = '';
+                      }
+                    }}
+                  />
+                </label>
+              )}
+              <p className="text-xs text-muted-foreground">
+                {uiLang === 'ar' ? 'ارفع صورة جديدة لتغيير الصورة الحالية.' : 'Upload a new image to replace the current one.'}
+              </p>
+              {value && (
+                <button
+                  type="button"
+                  onClick={() => onChange('')}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-destructive/20 bg-destructive/5 px-3 py-2 text-xs font-semibold text-destructive transition hover:bg-destructive/10"
+                  disabled={disabled}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  {uiLang === 'ar' ? 'إزالة الصورة' : 'Remove image'}
+                </button>
+              )}
+            </div>
           </div>
         ) : dateLike ? (
           <input
@@ -689,14 +832,16 @@ const DynamicField = ({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={getInputPlaceholder(fieldKey, label, uiLang, 'date')}
-            className="w-full glass rounded-xl px-3 py-2 text-sm bg-transparent focus:outline-none"
+            className={inputClass}
+            disabled={disabled}
           />
         ) : multiline ? (
           <textarea
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={getInputPlaceholder(fieldKey, label, uiLang, 'textarea')}
-            className="w-full min-h-24 glass rounded-xl px-3 py-2 text-sm bg-transparent focus:outline-none"
+            className={`${inputClass} min-h-28 resize-y`}
+            disabled={disabled}
           />
         ) : platformLike ? (
           <>
@@ -705,7 +850,8 @@ const DynamicField = ({
               value={value}
               onChange={(e) => onChange(e.target.value)}
               placeholder={getInputPlaceholder(fieldKey, label, uiLang, 'text')}
-              className="w-full glass rounded-xl px-3 py-2 text-sm bg-transparent focus:outline-none"
+              className={inputClass}
+              disabled={disabled}
             />
             <datalist id={datalistId}>
               {PLATFORM_OPTIONS.map((platform) => (
@@ -718,7 +864,8 @@ const DynamicField = ({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={getInputPlaceholder(fieldKey, label, uiLang, 'text')}
-            className="w-full glass rounded-xl px-3 py-2 text-sm bg-transparent focus:outline-none"
+            className={inputClass}
+            disabled={disabled}
           />
         )}
       </div>
@@ -795,6 +942,7 @@ const SectionEditor = () => {
     typeof (sectionData as { active?: unknown }).active === 'boolean' &&
     (sectionData as { active: boolean }).active,
   );
+  const isEditingLocked = !isSectionActive;
 
   useEffect(() => {
     if (!sectionData || !isObject(sectionData)) return;
@@ -949,40 +1097,67 @@ const SectionEditor = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted/20">
       <Navbar />
-      <main className="pt-28 pb-16 px-6 max-w-6xl mx-auto space-y-6">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h1 className="font-heading text-3xl font-bold capitalize">{isAr ? `محرر قسم ${sectionName}` : `${sectionName} section editor`}</h1>
-            <p className="text-muted-foreground text-sm">{isAr ? 'محرر نموذج بسيط مع رفع الصور والمعاينة والتحقق.' : 'Simple form editor with uploads, previews, and validation.'}</p>
-            <p className="text-muted-foreground text-xs mt-1">
-              {isAr ? 'القالب النشط:' : 'Active template:'} {String(myPortfolio?.templateName ?? (isAr ? 'لم يتم الاختيار بعد' : 'Not selected yet'))}
-            </p>
+      <main className="mx-auto max-w-7xl space-y-6 px-6 pb-16 pt-32">
+        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-3xl">
+              <span className="inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                {isAr ? 'محرر المحتوى' : 'Content editor'}
+              </span>
+              <h1 className="mt-4 font-heading text-3xl font-bold capitalize text-foreground md:text-4xl">
+                {isAr ? `تعديل قسم ${titleCase(sectionName, lang)}` : `Edit ${sectionName} section`}
+              </h1>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground md:text-base">
+                {isAr
+                  ? 'املأ الحقول بالترتيب، ارفع الصور من مكانها داخل الحقل، ثم اضغط حفظ. كل خانة مكتوب فيها مثال يساعدك تعرف المطلوب.'
+                  : 'Fill the fields in order, upload images directly inside their field, then save. Each input includes a helpful placeholder.'}
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
+              <Link to="/dashboard" className={ghostButtonClass}>
+                <ArrowLeft className="h-4 w-4" />
+                {isAr ? 'العودة للوحة التحكم' : 'Back to dashboard'}
+              </Link>
+              <div className="rounded-2xl border border-border bg-background p-3 text-sm">
+                <p className="text-xs text-muted-foreground">{isAr ? 'القالب النشط' : 'Active template'}</p>
+                <p className="mt-1 font-semibold text-foreground">
+                  {String(myPortfolio?.templateName ?? (isAr ? 'لم يتم الاختيار بعد' : 'Not selected yet'))}
+                </p>
+              </div>
+            </div>
           </div>
-          <Link to="/dashboard" className="glass px-4 py-2 rounded-xl text-sm">
-            {isAr ? 'العودة إلى لوحة التحكم' : 'Back to dashboard'}
-          </Link>
         </div>
 
-        <section className="glass-strong rounded-3xl p-5">
-          <div className="flex flex-wrap items-center gap-2 mb-4">
+        <section className="rounded-3xl border border-border bg-card p-5 shadow-sm md:p-6">
+          <div className="mb-6 flex flex-col gap-4 border-b border-border pb-5 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h2 className="font-heading text-xl font-bold text-foreground">
+                {isAr ? 'بيانات القسم الأساسية' : 'Main section content'}
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {isAr ? 'هذه البيانات تظهر مباشرة داخل السيكشن في موقعك.' : 'These fields are shown directly inside this section on your site.'}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={onSaveSection}
-              disabled={upsertSectionMutation.isPending}
-              className="gradient-bg px-4 py-2 rounded-xl text-sm text-primary-foreground disabled:opacity-70"
+              disabled={upsertSectionMutation.isPending || isEditingLocked}
+              className={primaryButtonClass}
             >
+              <Save className="h-4 w-4" />
               {upsertSectionMutation.isPending ? (isAr ? 'جار الحفظ...' : 'Saving...') : isAr ? 'حفظ القسم' : 'Save section'}
             </button>
-            <div className="flex items-center gap-2 glass px-3 py-2 rounded-xl">
-              <span className="text-xs text-muted-foreground">
+            <div className="flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2">
+              <span className="text-xs font-medium text-muted-foreground">
                 {setSectionActiveMutation.isPending
                   ? isAr
                     ? 'جار التحديث...'
                     : 'Updating...'
                   : isAr
-                    ? `الحالة: ${isSectionActive ? 'مفتوح' : 'مغلق'}`
-                    : `Active: ${isSectionActive ? 'Open' : 'Closed'}`}
+                    ? `ظهور القسم: ${isSectionActive ? 'مفتوح' : 'مغلق'}`
+                    : `Visibility: ${isSectionActive ? 'Visible' : 'Hidden'}`}
               </span>
               <Switch
                 checked={isSectionActive}
@@ -992,21 +1167,39 @@ const SectionEditor = () => {
             </div>
             <button
               onClick={() => clearSectionMutation.mutate(sectionName)}
-              disabled={clearSectionMutation.isPending}
-              className="glass px-4 py-2 rounded-xl text-sm disabled:opacity-70"
+              disabled={clearSectionMutation.isPending || isEditingLocked}
+              className={ghostButtonClass}
             >
+              <RotateCcw className="h-4 w-4" />
               {clearSectionMutation.isPending ? (isAr ? 'جار المسح...' : 'Clearing...') : isAr ? 'مسح القسم' : 'Clear section'}
             </button>
-            {requiredKeys.length > 0 && (
-              <p className="text-xs text-muted-foreground">
-                {isAr ? 'مطلوب:' : 'Required:'} {requiredKeys.join(', ')}
-              </p>
-            )}
+            </div>
           </div>
+
+          {requiredKeys.length > 0 && (
+            <div className="mb-5 flex items-start gap-2 rounded-2xl border border-primary/15 bg-primary/5 p-4 text-sm text-muted-foreground">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <p>
+                <span className="font-semibold text-foreground">{isAr ? 'حقول مطلوبة: ' : 'Required fields: '}</span>
+                {requiredKeys.map((key) => titleCase(key, lang)).join(', ')}
+              </p>
+            </div>
+          )}
+
+          {isEditingLocked && (
+            <div className="mb-5 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" />
+              <p>
+                {isAr
+                  ? 'هذا السيكشن غير مفعّل حالياً. لتعديل الحقول أو البيانات، فعّل السيكشن أولاً من زر الظهور بالأعلى.'
+                  : 'This section is currently inactive. Activate it from the visibility switch above before editing fields or data.'}
+              </p>
+            </div>
+          )}
 
           {sectionLoading && <p className="text-xs text-muted-foreground mb-3">{isAr ? 'جار تحميل بيانات القسم...' : 'Loading section data...'}</p>}
 
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 gap-4">
             {(restrictedSectionConfig
               ? restrictedSectionConfig.allowedKeys.map(
                 (key) =>
@@ -1026,24 +1219,28 @@ const SectionEditor = () => {
                 onUploadImage={uploadImageAndGetPath}
                 languageMode={languageMode}
                 uiLang={lang}
+                disabled={isEditingLocked}
                 onChange={(next) => setSectionForm((prev) => ({ ...prev, [key]: next }))}
               />
             ))}
             {Object.keys(sectionForm).length === 0 && (
-              <p className="text-sm text-muted-foreground">{isAr ? 'لا توجد حقول للقسم بعد. احفظ للتهيئة.' : 'No section fields returned yet. Save to initialize.'}</p>
+              <div className="rounded-2xl border border-dashed border-border bg-background p-8 text-center">
+                <p className="text-sm text-muted-foreground">{isAr ? 'لا توجد حقول للقسم بعد. اضغط حفظ للتهيئة.' : 'No section fields returned yet. Save to initialize.'}</p>
+              </div>
             )}
           </div>
 
           {!isRestrictedSection && Array.isArray(sectionForm.images) && sectionForm.images.length > 0 && (
-            <div className="mt-4">
-              <p className="text-sm font-medium mb-2">{isAr ? 'صور القسم' : 'Section images'}</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="mt-6 rounded-2xl border border-border bg-background p-4">
+              <p className="text-sm font-semibold text-foreground mb-3">{isAr ? 'صور القسم الحالية' : 'Current section images'}</p>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 {sectionForm.images.map((imgPath, index) => (
-                  <div key={`${imgPath}-${index}`} className="glass rounded-xl p-2">
+                  <div key={`${imgPath}-${index}`} className="rounded-xl border border-border bg-card p-2">
                     <img src={imageFromPath(String(imgPath))} alt="" className="w-full h-24 object-cover rounded-lg" />
                     <button
                       onClick={() => removeImageFromSection(String(imgPath))}
-                      className="w-full mt-2 text-xs glass rounded-lg py-1 text-destructive"
+                      className="w-full mt-2 rounded-lg border border-destructive/20 bg-destructive/5 py-1.5 text-xs font-semibold text-destructive"
+                      disabled={isEditingLocked}
                     >
                       {isAr ? 'إزالة من القسم' : 'Remove from section'}
                     </button>
@@ -1054,33 +1251,42 @@ const SectionEditor = () => {
           )}
         </section>
 
-        {!isRestrictedSection && <section className="glass-strong rounded-3xl p-5">
-          <h2 className="font-heading text-xl font-semibold mb-3">{isAr ? 'رفع الصور' : 'Image uploads'}</h2>
+        {!isRestrictedSection && <section className="rounded-3xl border border-border bg-card p-5 shadow-sm md:p-6">
+          <div className="mb-5 flex flex-col gap-2 border-b border-border pb-5">
+            <h2 className="font-heading text-xl font-bold text-foreground">{isAr ? 'مكتبة الصور المؤقتة' : 'Temporary image library'}</h2>
+            <p className="text-sm text-muted-foreground">
+              {isAr
+                ? 'ارفع الصور هنا لو عايز تستخدمها في القسم أو في عنصر من العناصر. الصور ستظهر ككروت صغيرة بدل ما تاخد عرض الصفحة.'
+                : 'Upload images here if you want to reuse them in the section or an item. They appear as small cards instead of stretching across the page.'}
+            </p>
+          </div>
           <div className="flex flex-wrap items-center gap-3">
-            <label className="glass px-4 py-2 rounded-xl text-sm cursor-pointer">
+            <label className={`${ghostButtonClass} ${isEditingLocked ? 'pointer-events-none opacity-50' : ''}`}>
+              <UploadCloud className="h-4 w-4" />
               {isAr ? 'رفع صورة واحدة' : 'Upload one image'}
-              <input type="file" accept="image/*" onChange={onUploadSingle} className="hidden" />
+              <input type="file" accept="image/*" onChange={onUploadSingle} className="hidden" disabled={isEditingLocked} />
             </label>
-            <label className="glass px-4 py-2 rounded-xl text-sm cursor-pointer">
+            <label className={`${ghostButtonClass} ${isEditingLocked ? 'pointer-events-none opacity-50' : ''}`}>
+              <ImagePlus className="h-4 w-4" />
               {isAr ? 'رفع عدة صور' : 'Upload many images'}
-              <input type="file" accept="image/*" multiple onChange={onUploadMultiple} className="hidden" />
+              <input type="file" accept="image/*" multiple onChange={onUploadMultiple} className="hidden" disabled={isEditingLocked} />
             </label>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
             {uploadedPaths.map((path) => (
-              <div key={path} className="glass rounded-xl p-2">
+              <div key={path} className="rounded-2xl border border-border bg-background p-2">
                 <img src={imageFromPath(path)} alt="" className="w-full h-24 object-cover rounded-lg" />
                 <div className="mt-2 flex flex-col gap-1">
-                  <button onClick={() => addImageToSection(path)} className="text-xs glass rounded-lg py-1">
+                  <button onClick={() => addImageToSection(path)} className="rounded-lg border border-border bg-card py-1.5 text-xs font-semibold hover:text-primary disabled:opacity-50" disabled={isEditingLocked}>
                     {isAr ? 'استخدم في القسم' : 'Use in section'}
                   </button>
-                  <button onClick={() => addImageToNewItem(path)} className="text-xs glass rounded-lg py-1">
+                  <button onClick={() => addImageToNewItem(path)} className="rounded-lg border border-border bg-card py-1.5 text-xs font-semibold hover:text-primary disabled:opacity-50" disabled={isEditingLocked}>
                     {isAr ? 'استخدم في العنصر' : 'Use in item'}
                   </button>
                   <button
                     onClick={() => deleteUploaded(path)}
-                    className="text-xs glass rounded-lg py-1 text-destructive"
-                    disabled={deleteUploadedImageMutation.isPending}
+                    className="rounded-lg border border-destructive/20 bg-destructive/5 py-1.5 text-xs font-semibold text-destructive"
+                    disabled={deleteUploadedImageMutation.isPending || isEditingLocked}
                   >
                     {isAr ? 'حذف' : 'Delete'}
                   </button>
@@ -1088,20 +1294,28 @@ const SectionEditor = () => {
               </div>
             ))}
             {uploadedPaths.length === 0 && (
-              <p className="text-xs text-muted-foreground col-span-full">{isAr ? 'ارفع الصور وستظهر هنا مع المعاينة.' : 'Upload images and they will appear here with preview.'}</p>
+              <div className="col-span-full rounded-2xl border border-dashed border-border bg-background p-8 text-center">
+                <ImagePlus className="mx-auto h-8 w-8 text-muted-foreground" />
+                <p className="mt-3 text-sm text-muted-foreground">{isAr ? 'ارفع الصور وستظهر هنا كمعاينات صغيرة.' : 'Upload images and they will appear here as small previews.'}</p>
+              </div>
             )}
           </div>
         </section>}
 
-        {!isRestrictedSection && <section className="glass-strong rounded-3xl p-5">
-          <h2 className="font-heading text-xl font-semibold mb-3">{isAr ? 'عناصر القسم' : 'Section items'}</h2>
+        {!isRestrictedSection && <section className="rounded-3xl border border-border bg-card p-5 shadow-sm md:p-6">
+          <div className="mb-5 border-b border-border pb-5">
+            <h2 className="font-heading text-xl font-bold text-foreground">{isAr ? 'عناصر القسم' : 'Section items'}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {isAr ? 'استخدم العناصر لما يكون السيكشن فيه أكثر من بطاقة، مشروع، خدمة، أو صورة.' : 'Use items when this section contains multiple cards, projects, services, or images.'}
+            </p>
+          </div>
           {itemsLoading && <p className="text-xs text-muted-foreground mb-3">{isAr ? 'جار تحميل العناصر...' : 'Loading items...'}</p>}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
             {items.map((item) => {
               const itemId = String(item.id || item._id || '');
               return (
-                <div key={itemId} className="glass rounded-xl p-3">
-                  <p className="text-sm font-medium">{isAr ? 'عنصر' : 'Item'} {itemId.slice(0, 8) || '#'}</p>
+                <div key={itemId} className="rounded-2xl border border-border bg-background p-4">
+                  <p className="text-sm font-semibold text-foreground">{isAr ? 'عنصر' : 'Item'} {itemId.slice(0, 8) || '#'}</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {Object.keys(item)
                       .filter((k) => !['_id', 'id'].includes(k))
@@ -1110,13 +1324,13 @@ const SectionEditor = () => {
                       .join(' | ') || (isAr ? 'لا توجد حقول' : 'No fields')}
                   </p>
                   <div className="mt-3 flex gap-2">
-                    <button onClick={() => onEditItem(item)} className="glass px-3 py-1.5 rounded-lg text-xs">
+                    <button onClick={() => onEditItem(item)} className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:text-primary disabled:opacity-50" disabled={isEditingLocked}>
                       {isAr ? 'تعديل' : 'Edit'}
                     </button>
                     <button
                       onClick={() => deleteItemMutation.mutate({ sectionName, itemId })}
-                      disabled={deleteItemMutation.isPending || !itemId}
-                      className="glass px-3 py-1.5 rounded-lg text-xs text-destructive disabled:opacity-50"
+                      disabled={deleteItemMutation.isPending || !itemId || isEditingLocked}
+                      className="rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-1.5 text-xs font-semibold text-destructive disabled:opacity-50"
                     >
                       {isAr ? 'حذف' : 'Delete'}
                     </button>
@@ -1124,12 +1338,16 @@ const SectionEditor = () => {
                 </div>
               );
             })}
-            {items.length === 0 && <p className="text-sm text-muted-foreground">{isAr ? 'لا توجد عناصر بعد.' : 'No items yet.'}</p>}
+            {items.length === 0 && (
+              <div className="rounded-2xl border border-dashed border-border bg-background p-6 text-center md:col-span-2">
+                <p className="text-sm text-muted-foreground">{isAr ? 'لا توجد عناصر بعد. ابدأ بإضافة عنصر جديد من النموذج بالأسفل.' : 'No items yet. Start by adding a new item from the form below.'}</p>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="glass rounded-2xl p-4">
-              <h3 className="font-medium mb-3">{isAr ? 'إضافة عنصر جديد' : 'Add new item'}</h3>
+            <div className="rounded-2xl border border-border bg-background p-4">
+              <h3 className="font-heading text-lg font-bold text-foreground mb-3">{isAr ? 'إضافة عنصر جديد' : 'Add new item'}</h3>
               <div className="space-y-3">
                 {Object.entries(newItemForm).map(([key, value]) => (
                   <DynamicField
@@ -1140,26 +1358,29 @@ const SectionEditor = () => {
                     onUploadImage={uploadImageAndGetPath}
                     languageMode={languageMode}
                     uiLang={lang}
+                    disabled={isEditingLocked}
                     onChange={(next) => setNewItemForm((prev) => ({ ...prev, [key]: next }))}
                   />
                 ))}
               </div>
               <button
                 onClick={onCreateItem}
-                disabled={createItemMutation.isPending}
-                className="mt-4 gradient-bg px-4 py-2 rounded-xl text-sm text-primary-foreground disabled:opacity-70"
+                disabled={createItemMutation.isPending || isEditingLocked}
+                className={`${primaryButtonClass} mt-4`}
               >
+                <Plus className="h-4 w-4" />
                 {createItemMutation.isPending ? (isAr ? 'جار الإنشاء...' : 'Creating...') : isAr ? 'إضافة عنصر' : 'Add item'}
               </button>
             </div>
 
-            <div className="glass rounded-2xl p-4">
-              <h3 className="font-medium mb-3">{isAr ? 'تعديل العنصر المحدد' : 'Edit selected item'}</h3>
+            <div className="rounded-2xl border border-border bg-background p-4">
+              <h3 className="font-heading text-lg font-bold text-foreground mb-3">{isAr ? 'تعديل العنصر المحدد' : 'Edit selected item'}</h3>
               <input
                 value={editingItemId}
                 onChange={(e) => setEditingItemId(e.target.value)}
                 placeholder={isAr ? 'معرّف العنصر' : 'Item ID'}
-                className="w-full glass rounded-xl px-3 py-2 text-xs bg-transparent mb-3 focus:outline-none"
+                className={`${inputClass} mb-3 text-xs`}
+                disabled={isEditingLocked}
               />
               <div className="space-y-3">
                 {Object.entries(editingItemForm).map(([key, value]) => (
@@ -1171,6 +1392,7 @@ const SectionEditor = () => {
                     onUploadImage={uploadImageAndGetPath}
                     languageMode={languageMode}
                     uiLang={lang}
+                    disabled={isEditingLocked}
                     onChange={(next) => setEditingItemForm((prev) => ({ ...prev, [key]: next }))}
                   />
                 ))}
@@ -1180,9 +1402,10 @@ const SectionEditor = () => {
               </div>
               <button
                 onClick={onUpdateItem}
-                disabled={updateItemMutation.isPending || !editingItemId}
-                className="mt-4 gradient-bg px-4 py-2 rounded-xl text-sm text-primary-foreground disabled:opacity-70"
+                disabled={updateItemMutation.isPending || !editingItemId || isEditingLocked}
+                className={`${primaryButtonClass} mt-4`}
               >
+                <Save className="h-4 w-4" />
                 {updateItemMutation.isPending ? (isAr ? 'جار التحديث...' : 'Updating...') : isAr ? 'تحديث العنصر' : 'Update item'}
               </button>
             </div>

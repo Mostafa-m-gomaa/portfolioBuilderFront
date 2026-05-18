@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import About from "./pages/About";
 import Services from "./pages/Services";
 import Pricing from "./pages/Pricing";
+import PackageDetail from "./pages/PackageDetail";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
@@ -27,7 +28,9 @@ import ForgotPassword from "./pages/ForgotPassword";
 import GuestOnly from "./components/GuestOnly";
 import Profile from "./pages/Profile";
 import SelectLanguageMode from "./pages/SelectLanguageMode";
+import SelectSubscription from "./pages/SelectSubscription";
 import TemplateSelector from "./pages/TemplateSelector";
+import PublicTemplates from "./pages/PublicTemplates";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +47,7 @@ const App = () => (
               <Route path="/about" element={<About />} />
               <Route path="/services" element={<Services />} />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/pricing/:packageId" element={<PackageDetail />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<GuestOnly><Login /></GuestOnly>} />
               <Route path="/signup" element={<GuestOnly><SignUp /></GuestOnly>} />
@@ -51,10 +55,12 @@ const App = () => (
               <Route path="/forgot-password" element={<GuestOnly><ForgotPassword /></GuestOnly>} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/choose-subdomain" element={<ChooseSubdomain />} />
+              <Route path="/select-subscription" element={<RequireAuth><SelectSubscription /></RequireAuth>} />
               <Route path="/select-language-mode" element={<RequireAuth><SelectLanguageMode /></RequireAuth>} />
               <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
               <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
-              <Route path="/templates" element={<RequireAuth><TemplateSelector /></RequireAuth>} />
+              <Route path="/templates" element={<PublicTemplates />} />
+              <Route path="/template-selector" element={<RequireAuth><TemplateSelector /></RequireAuth>} />
               <Route path="/section/:sectionName/editor" element={<RequireAuth><SectionEditor /></RequireAuth>} />
               <Route path="/get-started" element={<GetStarted />} />
               <Route path="/terms" element={<Terms />} />

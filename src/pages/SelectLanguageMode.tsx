@@ -2,6 +2,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
+import { needsSubscriptionOnboarding } from '@/lib/authRouting';
 import { useMyPortfolio, usePortfolioActions, usePortfolioBootstrap } from '@/hooks/usePortfolio';
 
 const SelectLanguageMode = () => {
@@ -13,6 +14,10 @@ const SelectLanguageMode = () => {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (needsSubscriptionOnboarding(user)) {
+    return <Navigate to="/select-subscription" replace />;
   }
 
   if (!user?.subdomain) {

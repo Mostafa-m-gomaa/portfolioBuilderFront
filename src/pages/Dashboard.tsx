@@ -1,7 +1,11 @@
 import { Link, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { AlertTriangle, Loader2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
+import { needsSubscriptionOnboarding } from '@/lib/authRouting';
+import { useSubscriptionSummary } from '@/hooks/useSubscriptionSummary';
+import SubscriptionSummaryPanel from '@/components/subscription/SubscriptionSummaryPanel';
 import { useAllSections, useMyPortfolio, usePortfolioActions, usePortfolioBootstrap } from '@/hooks/usePortfolio';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
@@ -14,11 +18,12 @@ import ProfilePreferencesCard from '@/components/auth/ProfilePreferencesCard';
 
 const Dashboard = () => {
   const { user, isAuthenticated, logout } = useAuth();
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const bootstrapMutation = usePortfolioBootstrap();
   const { data: portfolio, isLoading: portfolioLoading } = useMyPortfolio();
   const { data: sections, isLoading: sectionsLoading } = useAllSections();
   const { publishMutation, unpublishMutation, setSectionActiveMutation } = usePortfolioActions();
+  const { data: subSummary, isFetched: subSumFetched } = useSubscriptionSummary();
   const isAr = lang === 'ar';
 
   useEffect(() => {
@@ -31,6 +36,23 @@ const Dashboard = () => {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (needsSubscriptionOnboarding(user)) {
+    if (!subSumFetched) {
+      return (
+        <div className="min-h-screen bg-background">
+          <Navbar />
+          <main className="mx-auto flex max-w-6xl flex-col items-center justify-center gap-3 px-6 pt-32 pb-16 text-sm text-muted-foreground">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden />
+            {t('subscription.summary.syncing')}
+          </main>
+        </div>
+      );
+    }
+    if (!subSummary || subSummary.subscriptionStatus === 'NOT_DETECTED') {
+      return <Navigate to="/select-subscription" replace />;
+    }
   }
 
   const effectiveSubdomain = user?.subdomain || portfolio?.subdomain;
@@ -46,10 +68,42 @@ const Dashboard = () => {
     ? sections.map((section) => [String(section), { active: false }] as const)
     : Object.entries((sections ?? {}) as Record<string, unknown>).map(([key, value]) => [key, value] as const);
 
+  const freeTrialExpired = subSumFetched && subSummary
+    ? subSummary.subscriptionStatus === 'FREE_TRIAL_EXPIRED'
+    : user?.subscriptionStatus === 'FREE_TRIAL_EXPIRED';
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-28 pb-16 px-6 max-w-6xl mx-auto">
+        {freeTrialExpired ? (
+          <div
+            role="alert"
+            className="mb-8 flex flex-col gap-4 rounded-2xl border border-amber-500/45 bg-amber-500/10 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-6 dark:bg-amber-950/25"
+          >
+            <div className="flex min-w-0 flex-1 gap-3">
+              <AlertTriangle
+                className="mt-0.5 h-6 w-6 shrink-0 text-amber-600 dark:text-amber-500"
+                aria-hidden
+              />
+              <div className="min-w-0">
+                <p className="font-heading font-semibold text-foreground">
+                  {t('subscription.banner.freeTrialExpired.title')}
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                  {t('subscription.banner.freeTrialExpired.description')}
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/pricing"
+              className="shrink-0 rounded-xl bg-primary px-4 py-2.5 text-center text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 sm:min-w-[10rem]"
+            >
+              {t('subscription.banner.freeTrialExpired.cta')}
+            </Link>
+          </div>
+        ) : null}
+        <SubscriptionSummaryPanel />
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="font-heading text-3xl font-bold">{isAr ? 'لوحة التحكم' : 'Portfolio Dashboard'}</h1>
@@ -81,7 +135,7 @@ const Dashboard = () => {
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="glass-strong rounded-3xl p-6 mb-8">
           <p className="text-sm text-muted-foreground">{isAr ? 'الدومين الفرعي' : 'Subdomain'}</p>
           <p className="text-lg font-semibold">{user?.subdomain || portfolio?.subdomain || (isAr ? 'غير محدد بعد' : 'Not set yet')}</p>
-          <a href={`https://${user?.subdomain || portfolio?.subdomain || ''}.align-dev.com`} target='_blank' rel='noopener noreferrer' className="text-xxs text-primary hover:underline">
+          <a href={`https://${user?.subdomain || portfolio?.subdomain || ''}.getsirty.com`} target='_blank' rel='noopener noreferrer' className="text-xxs text-primary hover:underline">
             {isAr ? 'اذهب الي الويبسايت الخاص بك' : 'Go to your website'}
           </a>
           <p className="text-xs text-muted-foreground mt-2">

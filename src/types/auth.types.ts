@@ -4,6 +4,7 @@ export type AuthUser = {
   email?: string;
   type?: string;
   subdomain?: string | null;
+  domain?: string | null;
   templateName?: string | null;
   logo?: string | null;
   currency?: string | null;
@@ -11,6 +12,10 @@ export type AuthUser = {
   WhatsApp?: string | null;
   whatsapp?: string | null;
   isVerified?: boolean;
+  emailVerified?: boolean;
+  role?: string | null;
+  authProvider?: string | null;
+  subscriptionStatus?: string | null;
 };
 
 export type AuthSuccess = {
@@ -81,8 +86,17 @@ export type UpdateProfilePayload = {
   whatsapp?: string;
 };
 
+/** express-validator style item on 400 responses */
+export type ApiValidationErrorItem = {
+  type?: string;
+  msg?: string;
+  path?: string;
+  location?: string;
+  value?: unknown;
+};
+
 export type ApiErrorPayload = {
   message?: string;
   error?: string;
-  errors?: Record<string, string[] | string>;
+  errors?: Record<string, string[] | string> | ApiValidationErrorItem[];
 };
