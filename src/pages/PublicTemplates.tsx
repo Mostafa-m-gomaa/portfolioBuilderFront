@@ -7,13 +7,16 @@ import {
   categoryLabel,
   groupedTemplates,
   prettyTemplateName,
+  publicTemplateCardDescription,
+  templateDescription,
   templatePreviewUrl,
 } from '@/lib/templateCatalogView';
 import { ArrowUpRight, Eye } from 'lucide-react';
+import { TemplatePreviewImage } from '@/components/templates/TemplatePreviewImage';
+import { toLatinDigits } from '@/lib/latinDigits';
 
 const PublicTemplates = () => {
-  const { lang } = useLanguage();
-  const isAr = lang === 'ar';
+  const { lang, t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-background">
@@ -24,29 +27,27 @@ const PublicTemplates = () => {
           <div className="relative mx-auto max-w-7xl px-6">
             <div className="max-w-3xl text-start">
               <span className="inline-flex rounded-full border border-primary/15 bg-primary/10 px-4 py-2 text-sm font-bold text-primary">
-                {isAr ? 'مكتبة القوالب' : 'Template library'}
+                {t('templates.library.badge')}
               </span>
               <h1 className="mt-6 font-heading text-4xl font-bold tracking-tight text-foreground md:text-6xl">
-                {isAr ? 'تصفح القوالب قبل إنشاء حسابك' : 'Browse templates before creating an account'}
+                {t('templates.library.title')}
               </h1>
               <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
-                {isAr
-                  ? 'شاهد كل القوالب المتاحة حسب المجال، وافتح أي قالب في صفحة مستقلة لمعاينته. التفعيل متاح فقط بعد تسجيل الدخول.'
-                  : 'Explore all available templates by category and open any template in a separate preview. Activation is only available after signing in.'}
+                {t('templates.library.subtitle')}
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   to="/signup"
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition hover:bg-primary/90"
                 >
-                  {isAr ? 'ابدأ بموقعك' : 'Start your site'}
+                  {t('templates.library.startSite')}
                   <ArrowUpRight className="h-4 w-4" />
                 </Link>
                 <Link
                   to="/contact"
                   className="inline-flex items-center justify-center rounded-xl border border-border bg-card px-6 py-3 text-sm font-bold text-foreground transition hover:border-primary/30 hover:text-primary"
                 >
-                  {isAr ? 'اسألنا عن قالب مناسب' : 'Ask about a suitable template'}
+                  {t('templates.library.askTemplate')}
                 </Link>
               </div>
             </div>
@@ -62,7 +63,7 @@ const PublicTemplates = () => {
                   value={group.category}
                   className="rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold text-muted-foreground data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  {categoryLabel(group.category, isAr)}
+                  {categoryLabel(group.category, lang)}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -72,12 +73,10 @@ const PublicTemplates = () => {
                 <div className="mb-5 flex items-end justify-between gap-4">
                   <div>
                     <h2 className="font-heading text-2xl font-bold text-foreground">
-                      {categoryLabel(group.category, isAr)}
+                      {categoryLabel(group.category, lang)}
                     </h2>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {isAr
-                        ? `${group.templates.length} قالب متاح في هذا القسم`
-                        : `${group.templates.length} templates available in this category`}
+                      {toLatinDigits(String(group.templates.length))} {t('templates.library.countSuffix')}
                     </p>
                   </div>
                 </div>
@@ -88,19 +87,19 @@ const PublicTemplates = () => {
                       key={template.templateName}
                       className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-foreground/5"
                     >
-                      <img
+                      <TemplatePreviewImage
                         src={template.image}
-                        alt={prettyTemplateName(template.templateName)}
-                        className="h-52 w-full object-cover"
+                        alt={prettyTemplateName(template.templateName, lang)}
+                        className="h-52 w-full"
                       />
                       <div className="p-5">
                         <h3 className="font-heading text-lg font-semibold text-foreground">
-                          {prettyTemplateName(template.templateName)}
+                          {prettyTemplateName(template.templateName, lang)}
                         </h3>
                         <p className="mt-2 text-sm leading-7 text-muted-foreground">
-                          {isAr
-                            ? `قالب مناسب لقسم ${categoryLabel(group.category, isAr)}، يمكنك معاينته قبل اختيار الخطة المناسبة.`
-                            : template.desc}
+                          {lang === 'ar'
+                            ? publicTemplateCardDescription(group.category, lang, t)
+                            : templateDescription(template, lang)}
                         </p>
                         <a
                           href={templatePreviewUrl(template.templateName)}
@@ -109,7 +108,7 @@ const PublicTemplates = () => {
                           className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-3 text-sm font-bold text-foreground transition hover:border-primary/30 hover:text-primary"
                         >
                           <Eye className="h-4 w-4" />
-                          {isAr ? 'زيارة القالب' : 'Visit template'}
+                          {t('templates.library.visit')}
                         </a>
                       </div>
                     </article>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
@@ -13,6 +13,9 @@ import {
   needsSubscriptionOnboarding,
 } from '@/lib/authRouting';
 import anotherLogo from '@/assets/anotherLogo.png';
+import { PasswordInput } from '@/components/auth/PasswordInput';
+import { EmailInput, type EmailInputHandle } from '@/components/auth/EmailInput';
+import { normalizeEmail } from '@/lib/emailValidation';
 import {
   ACCOUNT_TYPE_OPTIONS,
   type AccountTypeValue,
@@ -28,6 +31,7 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [type, setType] = useState<AccountTypeValue>('freelancer');
   const [searchParams] = useSearchParams();
+  const emailRef = useRef<EmailInputHandle>(null);
 
   useEffect(() => {
     const id = searchParams.get('packageId');
@@ -67,14 +71,16 @@ const SignUp = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!emailRef.current?.validate()) return;
+    const normalizedEmail = normalizeEmail(email);
     try {
       await registerMutation.mutateAsync({
         name,
-        email,
+        email: normalizedEmail,
         password,
         type,
       });
-      navigate('/verify-email', { state: { email } });
+      navigate('/verify-email', { state: { email: normalizedEmail } });
     } catch {
       // Error toast is handled in the mutation.
     }
@@ -111,7 +117,7 @@ const SignUp = () => {
         >
           <div className="text-center mb-8">
             <div className=" mx-auto mb-4 flex items-center justify-center">
-              <img src={anotherLogo} alt="سيرتي" className="w-16 h-16 object-contain" />
+              <img src={anotherLogo} alt={t('brand.logoAlt')} className="w-16 h-16 object-contain" />
             </div>
             <h1 className="font-heading text-2xl font-bold text-foreground">{t('auth.signup')}</h1>
           </div>
@@ -132,7 +138,7 @@ const SignUp = () => {
             <div className="flex-1 h-px bg-border" />
           </div> */}
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-4" onSubmit={handleSubmit} noValidate>
             <div>
               <label className="block text-sm font-medium text-foreground mb-1.5">{t('auth.name')}</label>
               <input
@@ -161,31 +167,28 @@ const SignUp = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-foreground mb-1.5">{t('auth.email')}</label>
-              <input
-                type="email"
+              <EmailInput
+                ref={emailRef}
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full glass rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 bg-transparent"
-                placeholder="name@example.com"
+                onChange={setEmail}
+                placeholder={t('auth.placeholderEmail')}
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-foreground mb-1.5">{t('auth.password')}</label>
-              <input
-                type="password"
+              <PasswordInput
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full glass rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 bg-transparent"
-                placeholder="••••••••"
+                placeholder={t('auth.placeholderPassword')}
               />
             </div>
             <button
               disabled={registerMutation.isPending}
               className="w-full gradient-bg-full py-3 rounded-xl text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-70"
             >
-              {registerMutation.isPending ? 'Creating account...' : t('auth.signup')}
+              {registerMutation.isPending ? t('auth.creatingAccount') : t('auth.signup')}
             </button>
           </form>
 

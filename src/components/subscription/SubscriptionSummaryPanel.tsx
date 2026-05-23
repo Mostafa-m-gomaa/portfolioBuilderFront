@@ -24,6 +24,12 @@ const formatSummaryDate = (iso: string, _lang: Lang) => {
 
 const formatDays = (n: number) => toLatinDigits(String(n));
 
+const subscriptionStatusLabel = (status: string, t: (key: string) => string) => {
+  const key = `subscription.status.${status}`;
+  const label = t(key);
+  return label === key ? status : label;
+};
+
 /**
  * Dashboard / profile: current plan, trial, or inactive state from GET /subscriptions/me/summary.
  */
@@ -90,7 +96,7 @@ const SubscriptionSummaryPanel = () => {
               <p className="mt-1 text-sm text-muted-foreground">
                 {t("subscription.summary.status")}:{" "}
                 <span className="font-medium text-foreground">
-                  {data.subscriptionStatus}
+                  {subscriptionStatusLabel(data.subscriptionStatus, t)}
                 </span>
               </p>
               <p className="mt-2 text-sm text-foreground">

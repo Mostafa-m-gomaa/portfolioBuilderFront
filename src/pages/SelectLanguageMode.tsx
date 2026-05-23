@@ -4,9 +4,11 @@ import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { needsSubscriptionOnboarding } from '@/lib/authRouting';
 import { useMyPortfolio, usePortfolioActions, usePortfolioBootstrap } from '@/hooks/usePortfolio';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const SelectLanguageMode = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const { isAuthenticated, user } = useAuth();
   const bootstrap = usePortfolioBootstrap();
   const { data: portfolio, isLoading } = useMyPortfolio();
@@ -49,10 +51,10 @@ const SelectLanguageMode = () => {
           animate={{ opacity: 1, y: 0 }}
           className="glass-strong rounded-3xl p-8 w-full max-w-xl glow-border"
         >
-          <h1 className="font-heading text-3xl font-bold text-foreground mb-2">Choose portfolio language mode</h1>
-          <p className="text-sm text-muted-foreground mb-6">
-            Pick how your portfolio content should be displayed. You can update this later.
-          </p>
+          <h1 className="font-heading text-3xl font-bold text-foreground mb-2">
+            {t('onboarding.languageMode.title')}
+          </h1>
+          <p className="text-sm text-muted-foreground mb-6">{t('onboarding.languageMode.subtitle')}</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <button
@@ -60,28 +62,28 @@ const SelectLanguageMode = () => {
               disabled={updateLanguageModeMutation.isPending}
               className="glass rounded-2xl p-4 text-start hover:bg-foreground/5 transition-colors disabled:opacity-60"
             >
-              <p className="font-semibold">English</p>
-              <p className="text-xs text-muted-foreground mt-1">Show content in English only.</p>
+              <p className="font-semibold">{t('onboarding.languageMode.enTitle')}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t('onboarding.languageMode.enDesc')}</p>
             </button>
             <button
               onClick={() => handleSelect('ar')}
               disabled={updateLanguageModeMutation.isPending}
               className="glass rounded-2xl p-4 text-start hover:bg-foreground/5 transition-colors disabled:opacity-60"
             >
-              <p className="font-semibold">Arabic</p>
-              <p className="text-xs text-muted-foreground mt-1">Show content in Arabic only.</p>
+              <p className="font-semibold">{t('onboarding.languageMode.arTitle')}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t('onboarding.languageMode.arDesc')}</p>
             </button>
             <button
               onClick={() => handleSelect('both')}
               disabled={updateLanguageModeMutation.isPending}
               className="gradient-bg rounded-2xl p-4 text-start text-primary-foreground disabled:opacity-70"
             >
-              <p className="font-semibold">Both</p>
-              <p className="text-xs text-primary-foreground/85 mt-1">Show both Arabic and English.</p>
+              <p className="font-semibold">{t('onboarding.languageMode.bothTitle')}</p>
+              <p className="text-xs text-primary-foreground/85 mt-1">{t('onboarding.languageMode.bothDesc')}</p>
             </button>
           </div>
           {updateLanguageModeMutation.isPending && (
-            <p className="text-xs text-muted-foreground mt-4">Saving language mode...</p>
+            <p className="text-xs text-muted-foreground mt-4">{t('onboarding.languageMode.saving')}</p>
           )}
         </motion.div>
       </div>
@@ -90,4 +92,3 @@ const SelectLanguageMode = () => {
 };
 
 export default SelectLanguageMode;
-

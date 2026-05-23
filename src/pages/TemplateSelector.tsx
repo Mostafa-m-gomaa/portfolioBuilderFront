@@ -9,15 +9,16 @@ import {
   groupedTemplates,
   prettyTemplateName,
   templatePreviewUrl,
+  templateSelectorDescription,
 } from '@/lib/templateCatalogView';
+import { TemplatePreviewImage } from '@/components/templates/TemplatePreviewImage';
 
 const TemplateSelector = () => {
   const navigate = useNavigate();
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const { isAuthenticated, user, updateTemplateNameMutation } = useAuth();
   const { data: portfolio } = useMyPortfolio();
   const currentTemplateName = user?.templateName || String(portfolio?.templateName ?? '');
-  const isAr = lang === 'ar';
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -29,13 +30,16 @@ const TemplateSelector = () => {
       <main className="pt-28 pb-16 px-6 max-w-6xl mx-auto">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div>
-            <h1 className="font-heading text-3xl font-bold">{isAr ? 'اختر القالب' : 'Choose template'}</h1>
+            <h1 className="font-heading text-3xl font-bold">{t('templates.choose.title')}</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              {isAr ? 'القالب الحالي:' : 'Current template:'} {currentTemplateName || (isAr ? 'لم يتم الاختيار بعد' : 'Not selected yet')}
+              {t('templates.choose.current')}{' '}
+              {currentTemplateName
+                ? prettyTemplateName(currentTemplateName, lang)
+                : t('templates.choose.notSelected')}
             </p>
           </div>
           <button onClick={() => navigate(-1)} className="glass px-4 py-2 rounded-xl text-sm">
-            {isAr ? 'رجوع' : 'Back'}
+            {t('templates.choose.back')}
           </button>
         </div>
 
@@ -47,7 +51,7 @@ const TemplateSelector = () => {
                 value={group.category}
                 className="glass rounded-xl px-4 py-2 text-sm data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
               >
-                {categoryLabel(group.category, isAr)}
+                {categoryLabel(group.category, lang)}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -59,14 +63,16 @@ const TemplateSelector = () => {
                   const isActive = template.templateName === currentTemplateName;
                   return (
                     <article key={template.templateName} className="glass-strong rounded-2xl p-4 glow-border">
-                      <img
+                      <TemplatePreviewImage
                         src={template.image}
-                        alt={template.templateName}
-                        className="w-full h-40 object-cover rounded-xl"
+                        alt={prettyTemplateName(template.templateName, lang)}
+                        className="h-40 w-full rounded-xl"
                       />
-                      <h2 className="font-semibold mt-3">{prettyTemplateName(template.templateName)}</h2>
+                      <h2 className="font-semibold mt-3">
+                        {prettyTemplateName(template.templateName, lang)}
+                      </h2>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {isAr ? `قالب ${prettyTemplateName(template.templateName)} مناسب لفئة ${categoryLabel(group.category, isAr)}.` : template.desc}
+                        {templateSelectorDescription(template, group.category, lang)}
                       </p>
                       <div className="mt-4 grid grid-cols-1 gap-2">
                         <a
@@ -75,20 +81,14 @@ const TemplateSelector = () => {
                           rel="noopener noreferrer"
                           className="w-full glass py-2.5 rounded-xl text-center text-sm font-semibold text-foreground hover:text-primary transition-colors"
                         >
-                          {isAr ? 'عرض القالب' : 'View template'}
+                          {t('templates.choose.view')}
                         </a>
                         <button
                           onClick={() => updateTemplateNameMutation.mutate(template.templateName)}
                           disabled={updateTemplateNameMutation.isPending || isActive}
                           className="w-full gradient-bg py-2.5 rounded-xl text-primary-foreground text-sm font-semibold disabled:opacity-60"
                         >
-                          {isActive
-                            ? isAr
-                              ? 'القالب مفعّل'
-                              : 'Active template'
-                            : isAr
-                              ? 'تفعيل هذا القالب'
-                              : 'Activate this template'}
+                          {isActive ? t('templates.choose.active') : t('templates.choose.activate')}
                         </button>
                       </div>
                     </article>
@@ -104,4 +104,3 @@ const TemplateSelector = () => {
 };
 
 export default TemplateSelector;
-

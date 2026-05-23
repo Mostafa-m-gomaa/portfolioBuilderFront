@@ -114,7 +114,7 @@ const HeroSection = () => {
                     <div className="rounded-2xl border border-border bg-card p-5">
                       <div className="mb-4 flex items-center gap-3">
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
-                          <img src={anotherLogo} alt="سيرتي" className="h-8 w-8 object-contain" />
+                          <img src={anotherLogo} alt={t('brand.logoAlt')} className="h-8 w-8 object-contain" />
                         </div>
                         <div>
                           <p className="font-semibold text-foreground">{t('hero.previewTitle')}</p>

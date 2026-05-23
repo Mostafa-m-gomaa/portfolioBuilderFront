@@ -3,8 +3,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import logo from '@/assets/logo.png';
 
 const Footer = () => {
-  const { t, lang } = useLanguage();
-  const isAr = lang === 'ar';
+  const { t } = useLanguage();
 
   return (
     <footer className="border-t border-border py-12">
@@ -12,8 +11,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src={logo} alt="سيرتي" className="w-12 h-12 rounded-xl object-contain" />
-              <span className="font-heading font-bold text-lg text-foreground">سيرتي</span>
+              <img src={logo} alt={t('brand.logoAlt')} className="w-12 h-12 rounded-xl object-contain" />
+              <span className="font-heading font-bold text-lg text-foreground">{t('brand.name')}</span>
             </div>
             <p className="text-muted-foreground text-sm">{t('footer.description')}</p>
           </div>
@@ -37,7 +36,7 @@ const Footer = () => {
                   {t('footer.terms')}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {isAr ? 'شروط استخدام الخدمة والمنصة' : 'Rules for using our platform'}
+                  {t('footer.termsDesc')}
                 </p>
               </Link>
               <Link
@@ -48,7 +47,7 @@ const Footer = () => {
                   {t('footer.privacy')}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {isAr ? 'كيف نتعامل مع بياناتك الشخصية' : 'How we collect and process data'}
+                  {t('footer.privacyDesc')}
                 </p>
               </Link>
               <Link
@@ -59,14 +58,14 @@ const Footer = () => {
                   {t('footer.refund')}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {isAr ? 'سياسة الاسترداد والاشتراكات عبر Paddle' : 'Refunds and subscription billing via Paddle'}
+                  {t('footer.refundDesc')}
                 </p>
               </Link>
             </div>
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-border text-center">
-          <p className="text-sm text-muted-foreground">© 2024 سيرتي. {t('footer.rights')}</p>
+          <p className="text-sm text-muted-foreground">{t('footer.copyright')}</p>
         </div>
       </div>
     </footer>

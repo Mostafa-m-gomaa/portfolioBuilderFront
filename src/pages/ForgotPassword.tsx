@@ -1,23 +1,28 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { EmailInput, type EmailInputHandle } from '@/components/auth/EmailInput';
+import { normalizeEmail } from '@/lib/emailValidation';
 
 const ForgotPassword = () => {
   const { lang, t } = useLanguage();
   const { forgotPasswordMutation } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
+  const emailRef = useRef<EmailInputHandle>(null);
 
   const isAr = lang === 'ar';
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!emailRef.current?.validate()) return;
+    const normalizedEmail = normalizeEmail(email);
     try {
-      await forgotPasswordMutation.mutateAsync({ email });
-      navigate(`/reset-password?email=${encodeURIComponent(email)}`);
+      await forgotPasswordMutation.mutateAsync({ email: normalizedEmail });
+      navigate(`/reset-password?email=${encodeURIComponent(normalizedEmail)}`);
     } catch {
       // Error toast handled in mutation hook.
     }
@@ -41,18 +46,17 @@ const ForgotPassword = () => {
               : 'Enter your email and we will send you a password reset code.'}
           </p>
 
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={onSubmit} className="space-y-4" noValidate>
             <div>
               <label className="block text-sm font-medium text-foreground mb-1.5">
                 {t('auth.email')}
               </label>
-              <input
-                type="email"
+              <EmailInput
+                ref={emailRef}
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full glass rounded-xl px-4 py-3 text-sm bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50"
-                placeholder="name@example.com"
+                onChange={setEmail}
+                placeholder={t('auth.placeholderEmail')}
               />
             </div>
             <button

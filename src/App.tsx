@@ -31,6 +31,9 @@ import SelectLanguageMode from "./pages/SelectLanguageMode";
 import SelectSubscription from "./pages/SelectSubscription";
 import TemplateSelector from "./pages/TemplateSelector";
 import PublicTemplates from "./pages/PublicTemplates";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailure from "./pages/PaymentFailure";
+import PaymentStatusRedirect from "./components/payment/PaymentStatusRedirect";
 
 const queryClient = new QueryClient();
 
@@ -42,12 +45,15 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <PaymentStatusRedirect />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/about" element={<About />} />
               <Route path="/services" element={<Services />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/pricing/:packageId" element={<PackageDetail />} />
+              <Route path="/payment/success" element={<PaymentSuccess />} />
+              <Route path="/payment/failure" element={<PaymentFailure />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<GuestOnly><Login /></GuestOnly>} />
               <Route path="/signup" element={<GuestOnly><SignUp /></GuestOnly>} />

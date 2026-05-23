@@ -4,6 +4,7 @@ import { parseApiError } from '@/api/axios';
 import { portfolioService } from '@/services/portfolio.service';
 import { uploadService } from '@/services/upload.service';
 import { usePortfolioStore } from '@/store/portfolio.store';
+import { tToast } from '@/lib/i18n';
 
 const portfolioKeys = {
   me: ['portfolio', 'me'] as const,
@@ -29,7 +30,7 @@ export const usePortfolioBootstrap = () => {
       setPortfolio(portfolio);
       queryClient.setQueryData(portfolioKeys.me, portfolio);
     },
-    onError: (error) => toast.error(parseApiError(error, 'Failed to initialize portfolio')),
+    onError: (error) => toast.error(parseApiError(error, tToast('toast.portfolio.initError'))),
   });
 };
 
@@ -82,18 +83,18 @@ export const usePortfolioActions = (section?: string) => {
       portfolioService.upsertSection(sectionName, payload),
     onSuccess: async (_data, variables) => {
       await refreshSection(variables.sectionName);
-      toast.success('Section saved.');
+      toast.success(tToast('toast.portfolio.sectionSaved'));
     },
-    onError: (error) => toast.error(parseApiError(error, 'Failed to save section')),
+    onError: (error) => toast.error(parseApiError(error, tToast('toast.portfolio.sectionSaveError'))),
   });
 
   const clearSectionMutation = useMutation({
     mutationFn: (sectionName: string) => portfolioService.clearSection(sectionName),
     onSuccess: async (_data, sectionName) => {
       await refreshSection(sectionName);
-      toast.success('Section cleared.');
+      toast.success(tToast('toast.portfolio.sectionCleared'));
     },
-    onError: (error) => toast.error(parseApiError(error, 'Failed to clear section')),
+    onError: (error) => toast.error(parseApiError(error, tToast('toast.portfolio.sectionClearError'))),
   });
 
   const createItemMutation = useMutation({
@@ -101,9 +102,9 @@ export const usePortfolioActions = (section?: string) => {
       portfolioService.createSectionItem(sectionName, payload),
     onSuccess: async (_data, variables) => {
       await refreshSection(variables.sectionName);
-      toast.success('Item created.');
+      toast.success(tToast('toast.portfolio.itemCreated'));
     },
-    onError: (error) => toast.error(parseApiError(error, 'Failed to create item')),
+    onError: (error) => toast.error(parseApiError(error, tToast('toast.portfolio.itemCreateError'))),
   });
 
   const updateItemMutation = useMutation({
@@ -118,9 +119,9 @@ export const usePortfolioActions = (section?: string) => {
     }) => portfolioService.updateSectionItem(sectionName, itemId, payload),
     onSuccess: async (_data, variables) => {
       await refreshSection(variables.sectionName);
-      toast.success('Item updated.');
+      toast.success(tToast('toast.portfolio.itemUpdated'));
     },
-    onError: (error) => toast.error(parseApiError(error, 'Failed to update item')),
+    onError: (error) => toast.error(parseApiError(error, tToast('toast.portfolio.itemUpdateError'))),
   });
 
   const deleteItemMutation = useMutation({
@@ -128,9 +129,9 @@ export const usePortfolioActions = (section?: string) => {
       portfolioService.deleteSectionItem(sectionName, itemId),
     onSuccess: async (_data, variables) => {
       await refreshSection(variables.sectionName);
-      toast.success('Item deleted.');
+      toast.success(tToast('toast.portfolio.itemDeleted'));
     },
-    onError: (error) => toast.error(parseApiError(error, 'Failed to delete item')),
+    onError: (error) => toast.error(parseApiError(error, tToast('toast.portfolio.itemDeleteError'))),
   });
 
   const setSectionActiveMutation = useMutation({
@@ -138,72 +139,74 @@ export const usePortfolioActions = (section?: string) => {
       portfolioService.setSectionActive(sectionName, active),
     onSuccess: async (_data, variables) => {
       await refreshSection(variables.sectionName);
-      toast.success(`Section is now ${variables.active ? 'open' : 'closed'}.`);
+      toast.success(
+        tToast(variables.active ? 'toast.portfolio.sectionOpen' : 'toast.portfolio.sectionClosed'),
+      );
     },
-    onError: (error) => toast.error(parseApiError(error, 'Failed to update section active state')),
+    onError: (error) => toast.error(parseApiError(error, tToast('toast.portfolio.sectionActiveError'))),
   });
 
   const updateLanguageModeMutation = useMutation({
     mutationFn: (languageMode: 'ar' | 'en' | 'both') => portfolioService.updateLanguageMode(languageMode),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: portfolioKeys.me });
-      toast.success('Language mode updated.');
+      toast.success(tToast('toast.portfolio.languageModeUpdated'));
     },
-    onError: (error) => toast.error(parseApiError(error, 'Failed to update language mode')),
+    onError: (error) => toast.error(parseApiError(error, tToast('toast.portfolio.languageModeError'))),
   });
 
   const updateDefaultLanguageMutation = useMutation({
     mutationFn: (defaultLanguage: 'ar' | 'en') => portfolioService.updateDefaultLanguage(defaultLanguage),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: portfolioKeys.me });
-      toast.success('Default language updated.');
+      toast.success(tToast('toast.portfolio.defaultLanguageUpdated'));
     },
-    onError: (error) => toast.error(parseApiError(error, 'Failed to update default language')),
+    onError: (error) => toast.error(parseApiError(error, tToast('toast.portfolio.defaultLanguageError'))),
   });
 
   const publishMutation = useMutation({
     mutationFn: portfolioService.publishPortfolio,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: portfolioKeys.me });
-      toast.success('Portfolio published.');
+      toast.success(tToast('toast.portfolio.published'));
     },
-    onError: (error) => toast.error(parseApiError(error, 'Failed to publish portfolio')),
+    onError: (error) => toast.error(parseApiError(error, tToast('toast.portfolio.publishError'))),
   });
 
   const unpublishMutation = useMutation({
     mutationFn: portfolioService.unpublishPortfolio,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: portfolioKeys.me });
-      toast.success('Portfolio unpublished.');
+      toast.success(tToast('toast.portfolio.unpublished'));
     },
-    onError: (error) => toast.error(parseApiError(error, 'Failed to unpublish portfolio')),
+    onError: (error) => toast.error(parseApiError(error, tToast('toast.portfolio.unpublishError'))),
   });
 
   const uploadSingleMutation = useMutation({
     mutationFn: (file: File) => uploadService.uploadSingleImage(file),
     onSuccess: async () => {
       if (section) await refreshSection(section);
-      toast.success('Image uploaded.');
+      toast.success(tToast('toast.portfolio.imageUploaded'));
     },
-    onError: (error) => toast.error(parseApiError(error, 'Failed to upload image')),
+    onError: (error) => toast.error(parseApiError(error, tToast('toast.portfolio.imageUploadError'))),
   });
 
   const uploadMultipleMutation = useMutation({
     mutationFn: (files: File[]) => uploadService.uploadMultipleImages(files),
     onSuccess: async () => {
       if (section) await refreshSection(section);
-      toast.success('Images uploaded.');
+      toast.success(tToast('toast.portfolio.imagesUploaded'));
     },
-    onError: (error) => toast.error(parseApiError(error, 'Failed to upload images')),
+    onError: (error) => toast.error(parseApiError(error, tToast('toast.portfolio.imagesUploadError'))),
   });
 
   const deleteUploadedImageMutation = useMutation({
     mutationFn: (filePath: string) => uploadService.deleteImage(filePath),
     onSuccess: async () => {
       if (section) await refreshSection(section);
-      toast.success('Image deleted.');
+      toast.success(tToast('toast.portfolio.imageDeleted'));
     },
-    onError: (error) => toast.error(parseApiError(error, 'Failed to delete image')),
+    onError: (error) => toast.error(parseApiError(error, tToast('toast.portfolio.imageDeleteError'))),
   });
 
   return {

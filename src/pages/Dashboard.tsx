@@ -15,6 +15,7 @@ import LanguageModeCard from '@/components/auth/LanguageModeCard';
 import TemplateManagerCard from '@/components/auth/TemplateManagerCard';
 import LogoManagerCard from '@/components/auth/LogoManagerCard';
 import ProfilePreferencesCard from '@/components/auth/ProfilePreferencesCard';
+import { prettyTemplateName, sectionLabel } from '@/lib/templateCatalogView';
 
 const Dashboard = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -24,7 +25,6 @@ const Dashboard = () => {
   const { data: sections, isLoading: sectionsLoading } = useAllSections();
   const { publishMutation, unpublishMutation, setSectionActiveMutation } = usePortfolioActions();
   const { data: subSummary, isFetched: subSumFetched } = useSubscriptionSummary();
-  const isAr = lang === 'ar';
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -106,9 +106,9 @@ const Dashboard = () => {
         <SubscriptionSummaryPanel />
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="font-heading text-3xl font-bold">{isAr ? 'لوحة التحكم' : 'Portfolio Dashboard'}</h1>
+            <h1 className="font-heading text-3xl font-bold">{t('dashboard.title')}</h1>
             <p className="text-muted-foreground text-sm">
-              {isAr ? 'مرحبا' : 'Welcome'} {user?.name || user?.email || (isAr ? 'منشئ المحتوى' : 'creator')}
+              {t('dashboard.welcome')} {user?.name || user?.email || t('dashboard.creatorFallback')}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -117,45 +117,45 @@ const Dashboard = () => {
               disabled={publishMutation.isPending}
               className="gradient-bg px-4 py-2 rounded-xl text-primary-foreground text-sm disabled:opacity-70"
             >
-              {publishMutation.isPending ? (isAr ? 'جار النشر...' : 'Publishing...') : isAr ? 'نشر' : 'Publish'}
+              {publishMutation.isPending ? t('dashboard.publishing') : t('dashboard.publish')}
             </button>
             <button
               onClick={() => unpublishMutation.mutate()}
               disabled={unpublishMutation.isPending}
               className="glass px-4 py-2 rounded-xl text-sm disabled:opacity-70"
             >
-              {unpublishMutation.isPending ? (isAr ? 'جار إلغاء النشر...' : 'Unpublishing...') : isAr ? 'إلغاء النشر' : 'Unpublish'}
+              {unpublishMutation.isPending ? t('dashboard.unpublishing') : t('dashboard.unpublish')}
             </button>
             <button onClick={logout} className="glass px-4 py-2 rounded-xl text-sm">
-              {isAr ? 'تسجيل الخروج' : 'Logout'}
+              {t('dashboard.logout')}
             </button>
           </div>
         </div>
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="glass-strong rounded-3xl p-6 mb-8">
-          <p className="text-sm text-muted-foreground">{isAr ? 'الدومين الفرعي' : 'Subdomain'}</p>
-          <p className="text-lg font-semibold">{user?.subdomain || portfolio?.subdomain || (isAr ? 'غير محدد بعد' : 'Not set yet')}</p>
+          <p className="text-sm text-muted-foreground">{t('dashboard.subdomain')}</p>
+          <p className="text-lg font-semibold">{user?.subdomain || portfolio?.subdomain || t('dashboard.notSet')}</p>
           <a href={`https://${user?.subdomain || portfolio?.subdomain || ''}.getsirty.com`} target='_blank' rel='noopener noreferrer' className="text-xxs text-primary hover:underline">
-            {isAr ? 'اذهب الي الويبسايت الخاص بك' : 'Go to your website'}
+            {t('dashboard.goToSite')}
           </a>
           <p className="text-xs text-muted-foreground mt-2">
-            {isAr ? 'القالب:' : 'Template:'} {user?.templateName || String(portfolio?.templateName ?? (isAr ? 'لم يتم الاختيار بعد' : 'Not selected yet'))}
+            {t('dashboard.template')}{' '}
+            {user?.templateName || portfolio?.templateName
+              ? prettyTemplateName(String(user?.templateName || portfolio?.templateName), lang)
+              : t('templates.choose.notSelected')}
           </p>
           <p className="text-xs text-muted-foreground mt-2">
-            {isAr ? 'الحالة:' : 'Status:'} {portfolio?.isPublished ? (isAr ? 'منشور' : 'Published') : (isAr ? 'مسودة' : 'Draft')}
+            {t('dashboard.status')}{' '}
+            {portfolio?.isPublished ? t('dashboard.published') : t('dashboard.draft')}
           </p>
         </motion.div>
 
         <div className="mb-8 grid grid-cols-1 xl:grid-cols-2 gap-4">
           <div className="space-y-4">
             <SubdomainManagerCard
-              title={isAr ? 'تحديث الدومين الفرعي' : 'Update subdomain'}
-              description={
-                isAr
-                  ? 'اكتب أي اسم وسنقوم بفحص التوفر أثناء الكتابة. يظهر زر الحفظ فقط عندما يكون الاسم متاحا.'
-                  : 'Type any name and we will check availability as you write. Save is enabled only when available.'
-              }
-              buttonLabel={isAr ? 'تحديث الدومين الفرعي' : 'Update subdomain'}
+              title={t('profile.updateSubdomain.title')}
+              description={t('profile.updateSubdomain.description')}
+              buttonLabel={t('profile.updateSubdomain.button')}
               currentSubdomain={user?.subdomain || portfolio?.subdomain || ''}
             />
             <TemplateManagerCard currentTemplateName={user?.templateName || String(portfolio?.templateName ?? '')} />
@@ -175,12 +175,12 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <h2 className="font-heading text-2xl font-semibold mb-4">{isAr ? 'الأقسام' : 'Sections'}</h2>
+        <h2 className="font-heading text-2xl font-semibold mb-4">{t('dashboard.sections')}</h2>
         {(sectionsLoading || portfolioLoading) && (
-          <div className="glass-strong rounded-2xl p-6 text-sm text-muted-foreground">{isAr ? 'جار تحميل لوحة التحكم...' : 'Loading dashboard...'}</div>
+          <div className="glass-strong rounded-2xl p-6 text-sm text-muted-foreground">{t('dashboard.loading')}</div>
         )}
         {!sectionsLoading && sectionEntries.length === 0 && (
-          <div className="glass-strong rounded-2xl p-6 text-sm text-muted-foreground">{isAr ? 'لا توجد أقسام متاحة من واجهة البرمجة بعد.' : 'No sections available from API yet.'}</div>
+          <div className="glass-strong rounded-2xl p-6 text-sm text-muted-foreground">{t('dashboard.noSections')}</div>
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {sectionEntries.map(([section, value]) => {
@@ -200,11 +200,17 @@ const Dashboard = () => {
               <div key={sectionName} className="glass-strong rounded-2xl p-5 glow-border">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h3 className="font-heading font-semibold capitalize">{sectionName}</h3>
-                    <p className="text-xs text-muted-foreground mt-1">{isAr ? 'تعديل محتوى القسم والعناصر' : 'Edit section content and items'}</p>
+                    <h3 className="font-heading font-semibold">{sectionLabel(sectionName, lang)}</h3>
+                    <p className="text-xs text-muted-foreground mt-1">{t('dashboard.editSection')}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-muted-foreground">{isToggling ? (isAr ? 'جار التحديث...' : 'Updating...') : active ? (isAr ? 'مفتوح' : 'Open') : (isAr ? 'مغلق' : 'Closed')}</span>
+                    <span className="text-[11px] text-muted-foreground">
+                      {isToggling
+                        ? t('dashboard.sectionUpdating')
+                        : active
+                          ? t('dashboard.sectionOpen')
+                          : t('dashboard.sectionClosed')}
+                    </span>
                     <Switch
                       checked={active}
                       disabled={isToggling}
@@ -217,7 +223,7 @@ const Dashboard = () => {
                   to={`/section/${sectionName}/editor`}
                   className="inline-block mt-4 text-sm text-primary hover:underline"
                 >
-                  {isAr ? 'فتح المحرر' : 'Open editor'}
+                  {t('dashboard.openEditor')}
                 </Link>
               </div>
             )

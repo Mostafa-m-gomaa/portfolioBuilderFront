@@ -5,6 +5,7 @@ import { parseApiError, setUnauthorizedHandler } from "@/api/axios";
 import { isEmailNotVerifiedLoginError } from "@/lib/authErrors";
 import { authService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
+import { tToast } from "@/lib/i18n";
 import type {
   ForgotPasswordPayload,
   GoogleAuthPayload,
@@ -46,9 +47,9 @@ export const useAuth = () => {
     mutationFn: (payload: RegisterPayload) => authService.register(payload),
     onSuccess: (_data, variables) => {
       setPendingEmail(variables.email);
-      toast.success("Registered successfully. Please verify your email.");
+      toast.success(tToast("toast.auth.registerSuccess"));
     },
-    onError: (error) => toast.error(parseApiError(error, "Failed to register")),
+    onError: (error) => toast.error(parseApiError(error, tToast("toast.auth.registerError"))),
   });
 
   const loginMutation = useMutation({
@@ -56,12 +57,12 @@ export const useAuth = () => {
     onSuccess: (data) => {
       if (data.token) {
         login({ token: data.token, user: data.user });
-        toast.success("Welcome back.");
+        toast.success(tToast("toast.auth.welcomeBack"));
       }
     },
     onError: (error) => {
       if (isEmailNotVerifiedLoginError(error)) return;
-      toast.error(parseApiError(error, "Failed to login"));
+      toast.error(parseApiError(error, tToast("toast.auth.loginError")));
     },
   });
 
@@ -70,12 +71,12 @@ export const useAuth = () => {
     onSuccess: (data) => {
       if (data.token) {
         login({ token: data.token, user: data.user });
-        toast.success("Signed in with Google.");
+        toast.success(tToast("toast.auth.googleSuccess"));
       }
     },
     onError: (error) => {
       if (isEmailNotVerifiedLoginError(error)) return;
-      toast.error(parseApiError(error, "Failed to sign in with Google"));
+      toast.error(parseApiError(error, tToast("toast.auth.googleError")));
     },
   });
 
@@ -89,42 +90,42 @@ export const useAuth = () => {
         setAuth({ user: data.user });
       }
       setPendingEmail(null);
-      toast.success("Email verified successfully.");
+      toast.success(tToast("toast.auth.emailVerified"));
     },
     onError: (error) =>
-      toast.error(parseApiError(error, "Failed to verify email")),
+      toast.error(parseApiError(error, tToast("toast.auth.verifyError"))),
   });
 
   const resendVerificationMutation = useMutation({
     mutationFn: (payload: ResendVerificationPayload) =>
       authService.resendVerification(payload),
-    onSuccess: () => toast.success("Verification code sent."),
+    onSuccess: () => toast.success(tToast("toast.auth.verificationSent")),
     onError: (error) =>
-      toast.error(parseApiError(error, "Failed to resend verification code")),
+      toast.error(parseApiError(error, tToast("toast.auth.resendError"))),
   });
 
   const forgotPasswordMutation = useMutation({
     mutationFn: (payload: ForgotPasswordPayload) =>
       authService.forgotPassword(payload),
-    onSuccess: () => toast.success("Password reset email sent."),
+    onSuccess: () => toast.success(tToast("toast.auth.resetEmailSent")),
     onError: (error) =>
-      toast.error(parseApiError(error, "Failed to send reset email")),
+      toast.error(parseApiError(error, tToast("toast.auth.resetEmailError"))),
   });
 
   const resetPasswordMutation = useMutation({
     mutationFn: (payload: ResetPasswordPayload) =>
       authService.resetPassword(payload),
-    onSuccess: () => toast.success("Password reset successfully."),
+    onSuccess: () => toast.success(tToast("toast.auth.passwordReset")),
     onError: (error) =>
-      toast.error(parseApiError(error, "Failed to reset password")),
+      toast.error(parseApiError(error, tToast("toast.auth.passwordResetError"))),
   });
 
   const verifyResetPasswordCodeMutation = useMutation({
     mutationFn: (payload: VerifyResetPasswordCodePayload) =>
       authService.verifyResetPasswordCode(payload),
-    onSuccess: () => toast.success("Reset code verified successfully."),
+    onSuccess: () => toast.success(tToast("toast.auth.resetCodeVerified")),
     onError: (error) =>
-      toast.error(parseApiError(error, "Failed to verify reset code")),
+      toast.error(parseApiError(error, tToast("toast.auth.resetCodeError"))),
   });
 
   const updateSubdomainMutation = useMutation({
@@ -137,10 +138,10 @@ export const useAuth = () => {
         setAuth({ user: { ...user, subdomain } });
       }
       if (data.token) setAuth({ token: data.token });
-      toast.success("Subdomain updated successfully.");
+      toast.success(tToast("toast.auth.subdomainUpdated"));
     },
     onError: (error) =>
-      toast.error(parseApiError(error, "Failed to update subdomain")),
+      toast.error(parseApiError(error, tToast("toast.auth.subdomainError"))),
   });
 
   const updateTemplateNameMutation = useMutation({
@@ -153,10 +154,10 @@ export const useAuth = () => {
         setAuth({ user: { ...user, templateName } });
       }
       if (data.token) setAuth({ token: data.token });
-      toast.success("Template updated successfully.");
+      toast.success(tToast("toast.auth.templateUpdated"));
     },
     onError: (error) =>
-      toast.error(parseApiError(error, "Failed to update template")),
+      toast.error(parseApiError(error, tToast("toast.auth.templateError"))),
   });
 
   const updateLogoMutation = useMutation({
@@ -168,10 +169,10 @@ export const useAuth = () => {
         setAuth({ user: { ...user } });
       }
       if (data.token) setAuth({ token: data.token });
-      toast.success("Logo updated successfully.");
+      toast.success(tToast("toast.auth.logoUpdated"));
     },
     onError: (error) =>
-      toast.error(parseApiError(error, "Failed to update logo")),
+      toast.error(parseApiError(error, tToast("toast.auth.logoError"))),
   });
 
   const deleteLogoMutation = useMutation({
@@ -183,10 +184,10 @@ export const useAuth = () => {
         setAuth({ user: { ...user, logo: null } });
       }
       if (data.token) setAuth({ token: data.token });
-      toast.success("Logo deleted successfully.");
+      toast.success(tToast("toast.auth.logoDeleted"));
     },
     onError: (error) =>
-      toast.error(parseApiError(error, "Failed to delete logo")),
+      toast.error(parseApiError(error, tToast("toast.auth.logoDeleteError"))),
   });
 
   const updateProfileMutation = useMutation({
@@ -207,10 +208,10 @@ export const useAuth = () => {
         });
       }
       if (data.token) setAuth({ token: data.token });
-      toast.success("Profile updated successfully.");
+      toast.success(tToast("toast.auth.profileUpdated"));
     },
     onError: (error) =>
-      toast.error(parseApiError(error, "Failed to update profile")),
+      toast.error(parseApiError(error, tToast("toast.auth.profileError"))),
   });
 
   return {

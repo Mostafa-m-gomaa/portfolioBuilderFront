@@ -24,9 +24,6 @@ const Navbar = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
-  const isAr = lang === 'ar';
-
-
   const navLinks = [
     { to: '/', label: t('nav.home') },
     { to: '/about', label: t('nav.about') },
@@ -34,7 +31,7 @@ const Navbar = () => {
     { to: '/templates', label: t('nav.templates') },
     { to: '/pricing', label: t('nav.pricing') },
     { to: '/contact', label: t('nav.contact') },
-    ...(isAuthenticated ? [{ to: '/dashboard', label: isAr ? 'لوحة التحكم' : 'Dashboard' }] : []),
+    ...(isAuthenticated ? [{ to: '/dashboard', label: t('nav.dashboard') }] : []),
   ];
 
   return (
@@ -43,15 +40,15 @@ const Navbar = () => {
         <div className="mx-auto flex max-w-7xl items-center justify-between rounded-2xl border border-border bg-background/90 px-6 py-3 shadow-sm backdrop-blur-xl">
           {/* Logo */}
           <Link to="/" className="group flex items-center gap-3">
-            <img src={logo} alt="سيرتي" className="w-12 h-12 rounded-xl object-contain" />
+            <img src={logo} alt={t('brand.logoAlt')} className="w-12 h-12 rounded-xl object-contain" />
             <span
               className={`bg-gradient-to-br from-foreground via-primary to-foreground bg-clip-text font-heading font-black leading-none text-transparent transition group-hover:from-primary group-hover:via-primary group-hover:to-secondary ${
-                isAr
+                lang === 'ar'
                   ? 'text-[1.35rem] tracking-[-0.045em]'
                   : 'text-[1.45rem] tracking-[-0.055em]'
               }`}
             >
-              {isAr ? 'سيرتي' : 'sirty'}
+              {t('brand.name')}
             </span>
           </Link>
 
@@ -76,7 +73,7 @@ const Navbar = () => {
             <button
               onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
               className="flex rounded-xl border border-border bg-card p-2 text-muted-foreground transition-colors hover:text-foreground"
-              aria-label="Switch language"
+              aria-label={t('a11y.switchLanguage')}
             >
               <Globe className="w-4 h-4" />
               <span className="text-xs ms-1">{lang === 'ar' ? 'EN' : 'AR'}</span>
@@ -84,18 +81,18 @@ const Navbar = () => {
             <button
               onClick={toggleTheme}
               className="rounded-xl border border-border bg-card p-2 text-muted-foreground transition-colors hover:text-foreground"
-              aria-label="Toggle theme"
+              aria-label={t('a11y.toggleTheme')}
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="rounded-xl border border-border bg-card p-2.5 text-foreground transition-colors hover:text-primary" aria-label="Open profile menu">
+                  <button className="rounded-xl border border-border bg-card p-2.5 text-foreground transition-colors hover:text-primary" aria-label={t('a11y.openProfileMenu')}>
                     {user?.logo ? (
                       <img
                         src={resolveApiAssetUrl(user.logo)}
-                        alt="Logo"
+                        alt={t('brand.logoAlt')}
                         className="w-5 h-5 rounded object-cover"
                       />
                     ) : (
@@ -106,7 +103,7 @@ const Navbar = () => {
                 <DropdownMenuContent align="end" className="w-56 glass-strong border-white/20">
                   <DropdownMenuLabel>
                     <div className="flex flex-col">
-                      <span className="font-semibold">{user?.name || 'My Account'}</span>
+                      <span className="font-semibold">{user?.name || t('nav.myAccount')}</span>
                       <span className="text-xs text-muted-foreground">{user?.email || ''}</span>
                     </div>
                   </DropdownMenuLabel>
@@ -114,13 +111,13 @@ const Navbar = () => {
                   <DropdownMenuItem asChild>
                     <Link to="/profile" className="cursor-pointer">
                       <UserCog className="w-4 h-4 me-2" />
-                      Profile Data
+                      {t('nav.profile')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/dashboard" className="cursor-pointer">
                       <LayoutDashboard className="w-4 h-4 me-2" />
-                      Dashboard
+                      {t('nav.dashboard')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -129,7 +126,7 @@ const Navbar = () => {
                     className="cursor-pointer text-destructive focus:text-destructive"
                   >
                     <LogOut className="w-4 h-4 me-2" />
-                    Logout
+                    {t('nav.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -199,7 +196,7 @@ const Navbar = () => {
                     onClick={() => setMobileOpen(false)}
                     className="w-full rounded-xl border border-border bg-card px-4 py-3 text-center text-sm font-medium text-foreground"
                   >
-                    Profile Data
+                    {t('nav.profile')}
                   </Link>
                   <button
                     onClick={() => {
@@ -208,7 +205,7 @@ const Navbar = () => {
                     }}
                     className="w-full rounded-xl border border-border bg-card px-4 py-3 text-center text-sm font-medium text-destructive"
                   >
-                    Logout
+                    {t('nav.logout')}
                   </button>
                 </div>
               ) : (

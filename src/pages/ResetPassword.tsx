@@ -1,9 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { PasswordInput } from '@/components/auth/PasswordInput';
+import { EmailInput, type EmailInputHandle } from '@/components/auth/EmailInput';
+import { normalizeEmail } from '@/lib/emailValidation';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -14,12 +17,15 @@ const ResetPassword = () => {
   const [code, setCode] = useState('');
   const [step, setStep] = useState<'verify' | 'reset'>('verify');
   const [newPassword, setNewPassword] = useState('');
+  const emailRef = useRef<EmailInputHandle>(null);
   const isAr = lang === 'ar';
 
   const onVerifyCode = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!emailRef.current?.validate()) return;
+    const normalizedEmail = normalizeEmail(email);
     try {
-      await verifyResetPasswordCodeMutation.mutateAsync({ email, code });
+      await verifyResetPasswordCodeMutation.mutateAsync({ email: normalizedEmail, code });
       setStep('reset');
     } catch {
       // Error toast handled in mutation hook.
@@ -30,7 +36,7 @@ const ResetPassword = () => {
     event.preventDefault();
     if (step !== 'reset') return;
     try {
-      await resetPasswordMutation.mutateAsync({ email, newPassword });
+      await resetPasswordMutation.mutateAsync({ email: normalizeEmail(email), newPassword });
       setNewPassword('');
     } catch {
       // Error toast handled in mutation hook.
@@ -56,14 +62,13 @@ const ResetPassword = () => {
                   ? 'الخطوة 1 من 2: أدخل البريد الإلكتروني ورمز الاستعادة.'
                   : 'Step 1 of 2: Enter your email and reset code.'}
               </p>
-              <form onSubmit={onVerifyCode} className="space-y-4">
-                <input
-                  type="email"
+              <form onSubmit={onVerifyCode} className="space-y-4" noValidate>
+                <EmailInput
+                  ref={emailRef}
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={setEmail}
                   placeholder={isAr ? 'البريد الإلكتروني' : 'Email'}
                   required
-                  className="w-full glass rounded-xl px-4 py-3 text-sm bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
                 <input
                   value={code}
@@ -94,15 +99,13 @@ const ResetPassword = () => {
                   ? 'الخطوة 2 من 2: أدخل كلمة المرور الجديدة.'
                   : 'Step 2 of 2: Enter your new password.'}
               </p>
-              <form onSubmit={onResetPassword} className="space-y-4">
-                <input
-                  type="password"
+              <form onSubmit={onResetPassword} className="space-y-4" noValidate>
+                <PasswordInput
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder={isAr ? 'كلمة المرور الجديدة' : 'New password'}
                   required
                   minLength={8}
-                  className="w-full glass rounded-xl px-4 py-3 text-sm bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
                 <button
                   disabled={resetPasswordMutation.isPending}
@@ -116,13 +119,7 @@ const ResetPassword = () => {
                       ? 'تحديث كلمة المرور'
                       : 'Update password'}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setStep('verify')}
-                  className="w-full glass py-3 rounded-xl text-foreground font-semibold text-sm"
-                >
-                  {isAr ? 'الرجوع لخطوة التحقق' : 'Back to verification'}
-                </button>
+
               </form>
             </>
           )}

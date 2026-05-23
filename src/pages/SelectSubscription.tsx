@@ -257,7 +257,7 @@ const SelectSubscription = () => {
                     )}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {isAr ? "مدة الاشتراك: " : "Subscription: "}
+                    {t('pricing.subscriptionDuration')}
                     {formatDurationMonths(pkg.durationMonths, lang)}
                   </p>
                   {pkg.description ? (

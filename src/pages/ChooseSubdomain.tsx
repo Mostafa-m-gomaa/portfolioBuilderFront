@@ -4,9 +4,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { needsSubscriptionOnboarding } from '@/lib/authRouting';
 import SubdomainManagerCard from '@/components/auth/SubdomainManagerCard';
 import { useMyPortfolio } from '@/hooks/usePortfolio';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const ChooseSubdomain = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const { isAuthenticated, user } = useAuth();
   const { data: portfolio, isLoading: portfolioLoading } = useMyPortfolio();
   const hasTemporarySubdomain = Boolean(user?.subdomain?.startsWith('temp-'));
@@ -30,9 +32,9 @@ const ChooseSubdomain = () => {
       <div className="flex items-center justify-center min-h-screen px-6 pt-24">
         <div className="w-full max-w-md">
           <SubdomainManagerCard
-            title="Choose your subdomain"
-            description="This checks availability live while you type. It does not reserve the name until you save it."
-            buttonLabel="Submit"
+            title={t('onboarding.subdomain.title')}
+            description={t('onboarding.subdomain.description')}
+            buttonLabel={t('onboarding.subdomain.submit')}
             onSuccess={() => navigate('/select-language-mode')}
           />
         </div>
@@ -42,4 +44,3 @@ const ChooseSubdomain = () => {
 };
 
 export default ChooseSubdomain;
-

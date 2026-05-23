@@ -1,13 +1,21 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone } from 'lucide-react';
+import { EmailInput, type EmailInputHandle } from '@/components/auth/EmailInput';
 
 const Contact = () => {
   const { t, lang } = useLanguage();
   const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const emailRef = useRef<EmailInputHandle>(null);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!emailRef.current?.validate()) return;
+    // TODO: wire contact API when available
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -33,17 +41,18 @@ const Contact = () => {
                 </div>
               ))}
             </motion.div>
-            <motion.form initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="glass-strong rounded-2xl p-6 glow-border space-y-4" onSubmit={e => e.preventDefault()}>
+            <motion.form initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="glass-strong rounded-2xl p-6 glow-border space-y-4" onSubmit={handleSubmit} noValidate>
               <input
                 value={form.name}
                 onChange={e => setForm({ ...form, name: e.target.value })}
                 className="w-full glass rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 bg-transparent"
                 placeholder={t('auth.name')}
               />
-              <input
+              <EmailInput
+                ref={emailRef}
+                required
                 value={form.email}
-                onChange={e => setForm({ ...form, email: e.target.value })}
-                className="w-full glass rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 bg-transparent"
+                onChange={(email) => setForm({ ...form, email })}
                 placeholder={t('auth.email')}
               />
               <textarea

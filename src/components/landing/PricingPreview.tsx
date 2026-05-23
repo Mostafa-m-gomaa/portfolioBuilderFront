@@ -12,7 +12,6 @@ import { useDisplayCurrency } from '@/hooks/useDisplayCurrency';
 
 const PricingPreview = () => {
   const { t, lang } = useLanguage();
-  const isAr = lang === 'ar';
   const { displayCurrency, setDisplayCurrency } = useDisplayCurrency();
 
   const { data, isPending, isError, error, refetch } = useQuery({
@@ -97,7 +96,7 @@ const PricingPreview = () => {
                     {formatConvertedPackagePrice(pkg.price, pkg.currency, displayCurrency, lang)}
                   </span>
                   <p className={`mt-2 text-sm ${isPopular ? 'opacity-90' : 'text-muted-foreground'}`}>
-                    {isAr ? 'مدة الاشتراك: ' : 'Subscription: '}
+                    {t('pricing.subscriptionDuration')}
                     {formatDurationMonths(pkg.durationMonths, lang)}
                   </p>
                   {pkg.description ? (
