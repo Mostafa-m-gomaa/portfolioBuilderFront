@@ -127,7 +127,7 @@ const Login = () => {
       }
     } catch (err) {
       if (isEmailNotVerifiedLoginError(err) && email.trim()) {
-        await goToVerifyWithResend(normalizedEmail);
+        await goToVerifyWithResend(normalizeEmail(email));
         return;
       }
     }
