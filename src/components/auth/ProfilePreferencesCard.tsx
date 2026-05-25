@@ -3,57 +3,21 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { Switch } from '@/components/ui/switch';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-const CURRENCY_OPTIONS = [
-  'USD',
-  'EUR',
-  'GBP',
-  'SAR',
-  'AED',
-  'EGP',
-  'KWD',
-  'QAR',
-] as const;
+import { COUNTRY_OPTIONS, sortCountriesForDisplay } from '@/constants/countries';
+import {
+  defaultProfileCurrency,
+  isProfileCurrencyCode,
+  PROFILE_CURRENCY_OPTIONS,
+  type ProfileCurrencyCode,
+} from '@/constants/profileCurrencies';
 
 type ProfilePreferencesCardProps = {
+  currentCountry?: string | null;
   currentCurrency?: string | null;
   currentAllowWhatsapp?: boolean;
   currentWhatsApp?: string | null;
   currentWhatsapp?: string | null;
 };
-
-type CountryOption = {
-  iso2: string;
-  dialCode: string; // digits only, no +
-  nameAr: string;
-  nameEn: string;
-};
-
-const COUNTRY_OPTIONS: CountryOption[] = [
-  { iso2: 'EG', dialCode: '20', nameAr: 'مصر', nameEn: 'Egypt' },
-  { iso2: 'SA', dialCode: '966', nameAr: 'السعودية', nameEn: 'Saudi Arabia' },
-  { iso2: 'AE', dialCode: '971', nameAr: 'الإمارات', nameEn: 'United Arab Emirates' },
-  { iso2: 'KW', dialCode: '965', nameAr: 'الكويت', nameEn: 'Kuwait' },
-  { iso2: 'QA', dialCode: '974', nameAr: 'قطر', nameEn: 'Qatar' },
-  { iso2: 'BH', dialCode: '973', nameAr: 'البحرين', nameEn: 'Bahrain' },
-  { iso2: 'OM', dialCode: '968', nameAr: 'عُمان', nameEn: 'Oman' },
-  { iso2: 'JO', dialCode: '962', nameAr: 'الأردن', nameEn: 'Jordan' },
-  { iso2: 'LB', dialCode: '961', nameAr: 'لبنان', nameEn: 'Lebanon' },
-  { iso2: 'IQ', dialCode: '964', nameAr: 'العراق', nameEn: 'Iraq' },
-  { iso2: 'MA', dialCode: '212', nameAr: 'المغرب', nameEn: 'Morocco' },
-  { iso2: 'DZ', dialCode: '213', nameAr: 'الجزائر', nameEn: 'Algeria' },
-  { iso2: 'TN', dialCode: '216', nameAr: 'تونس', nameEn: 'Tunisia' },
-  { iso2: 'LY', dialCode: '218', nameAr: 'ليبيا', nameEn: 'Libya' },
-  { iso2: 'SD', dialCode: '249', nameAr: 'السودان', nameEn: 'Sudan' },
-  { iso2: 'US', dialCode: '1', nameAr: 'الولايات المتحدة', nameEn: 'United States' },
-  { iso2: 'CA', dialCode: '1', nameAr: 'كندا', nameEn: 'Canada' },
-  { iso2: 'GB', dialCode: '44', nameAr: 'المملكة المتحدة', nameEn: 'United Kingdom' },
-  { iso2: 'DE', dialCode: '49', nameAr: 'ألمانيا', nameEn: 'Germany' },
-  { iso2: 'FR', dialCode: '33', nameAr: 'فرنسا', nameEn: 'France' },
-  { iso2: 'TR', dialCode: '90', nameAr: 'تركيا', nameEn: 'Turkey' },
-  { iso2: 'IN', dialCode: '91', nameAr: 'الهند', nameEn: 'India' },
-  { iso2: 'PK', dialCode: '92', nameAr: 'باكستان', nameEn: 'Pakistan' },
-];
 
 const digitsOnly = (value: string) => value.replace(/\D/g, '');
 
@@ -101,17 +65,21 @@ const parseWhatsAppUrlToPhone = (value: string | null | undefined) => {
 };
 
 const ProfilePreferencesCard = ({
+  currentCountry,
   currentCurrency,
   currentAllowWhatsapp = false,
   currentWhatsApp,
   currentWhatsapp,
 }: ProfilePreferencesCardProps) => {
   const { updateProfileMutation } = useAuth();
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const isAr = lang === 'ar';
 
   const defaultCurrency = useMemo(
-    () => (currentCurrency && CURRENCY_OPTIONS.includes(currentCurrency as (typeof CURRENCY_OPTIONS)[number]) ? currentCurrency : 'USD'),
+    () =>
+      currentCurrency && isProfileCurrencyCode(currentCurrency)
+        ? currentCurrency
+        : defaultProfileCurrency(),
     [currentCurrency],
   );
 
@@ -124,11 +92,17 @@ const ProfilePreferencesCard = ({
     [existingWhatsappValue],
   );
 
-  const [currency, setCurrency] = useState(defaultCurrency);
+  const [country, setCountry] = useState(() => {
+    const code = String(currentCountry ?? '').toUpperCase();
+    return COUNTRY_OPTIONS.some((c) => c.iso2 === code) ? code : 'EG';
+  });
+  const [currency, setCurrency] = useState<ProfileCurrencyCode>(defaultCurrency);
   const [allowWhatsapp, setAllowWhatsapp] = useState(Boolean(currentAllowWhatsapp));
   const [whatsappCountry, setWhatsappCountry] = useState<string>(parsedWhatsapp?.countryIso2 || 'EG');
   const [whatsappNumber, setWhatsappNumber] = useState<string>(parsedWhatsapp?.localNumber || '');
   const [validationError, setValidationError] = useState('');
+
+  const sortedCountries = useMemo(() => sortCountriesForDisplay(lang), [lang]);
 
   const selectedCountry = useMemo(
     () => COUNTRY_OPTIONS.find((c) => c.iso2 === whatsappCountry) || COUNTRY_OPTIONS[0],
@@ -161,6 +135,7 @@ const ProfilePreferencesCard = ({
 
     try {
       await updateProfileMutation.mutateAsync({
+        country,
         currency,
         allowWhatsapp,
         whatsapp: whatsappLink,
@@ -183,13 +158,30 @@ const ProfilePreferencesCard = ({
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div>
+          <label className="block text-sm mb-2 text-muted-foreground">{t('auth.country')}</label>
+          <select
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            className="w-full glass rounded-xl px-3 py-2 text-sm bg-transparent focus:outline-none"
+          >
+            {sortedCountries.map((option) => (
+              <option key={option.iso2} value={option.iso2}>
+                {isAr ? option.nameAr : option.nameEn}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
           <label className="block text-sm mb-2 text-muted-foreground">{isAr ? 'عملة العرض' : 'Display currency'}</label>
           <select
             value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
+            onChange={(e) => {
+              const next = e.target.value;
+              if (isProfileCurrencyCode(next)) setCurrency(next);
+            }}
             className="w-full glass rounded-xl px-3 py-2 text-sm bg-transparent focus:outline-none"
           >
-            {CURRENCY_OPTIONS.map((option) => (
+            {PROFILE_CURRENCY_OPTIONS.map((option) => (
               <option key={option} value={option}>
                 {option}
               </option>
@@ -213,9 +205,9 @@ const ProfilePreferencesCard = ({
               onChange={(e) => setWhatsappCountry(e.target.value)}
               className="w-full glass rounded-xl px-3 py-2 text-sm bg-transparent focus:outline-none"
             >
-              {COUNTRY_OPTIONS.map((country) => (
-                <option key={country.iso2} value={country.iso2}>
-                  {isAr ? country.nameAr : country.nameEn} (+{country.dialCode})
+              {sortedCountries.map((option) => (
+                <option key={option.iso2} value={option.iso2}>
+                  {isAr ? option.nameAr : option.nameEn} (+{option.dialCode})
                 </option>
               ))}
             </select>

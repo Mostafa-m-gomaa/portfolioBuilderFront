@@ -1,3 +1,5 @@
+import type { LocalizedString } from "@/types/package.types";
+
 export type SubscriptionRecord = {
   _id: string;
   userId?: string;
@@ -13,12 +15,18 @@ export type SubscriptionRecord = {
   __v?: number;
 };
 
+/** Populated package on GET /subscriptions/me/summary */
 export type SubscriptionPackageSummary = {
   id: string;
-  name: string;
-  price: number;
-  currency: string;
+  name: LocalizedString;
+  description: LocalizedString;
+  priceEgp: number;
+  priceUsd: number;
+  features: LocalizedString[];
   durationMonths: number;
+  /** Present only if the API includes the amount actually charged */
+  price?: number;
+  currency?: string;
 };
 
 export type SubscriptionDetailSummary = {

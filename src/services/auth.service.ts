@@ -40,6 +40,7 @@ const normalizeUser = (raw: unknown): AuthUser | undefined => {
     role: (r.role as string | null | undefined) ?? null,
     authProvider: (r.authProvider as string | null | undefined) ?? null,
     subscriptionStatus: (r.subscriptionStatus as string | null | undefined) ?? null,
+    country: (r.country as string | null | undefined) ?? null,
   };
 };
 

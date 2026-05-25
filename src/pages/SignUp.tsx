@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
@@ -20,6 +20,7 @@ import {
   ACCOUNT_TYPE_OPTIONS,
   type AccountTypeValue,
 } from '@/constants/accountTypes';
+import { COUNTRY_OPTIONS, sortCountriesForDisplay } from '@/constants/countries';
 
 const SignUp = () => {
   const { t, lang } = useLanguage();
@@ -30,7 +31,9 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [type, setType] = useState<AccountTypeValue>('freelancer');
+  const [country, setCountry] = useState('EG');
   const [searchParams] = useSearchParams();
+  const sortedCountries = useMemo(() => sortCountriesForDisplay(lang), [lang]);
   const emailRef = useRef<EmailInputHandle>(null);
 
   useEffect(() => {
@@ -72,12 +75,14 @@ const SignUp = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!emailRef.current?.validate()) return;
+    if (!country) return;
     const normalizedEmail = normalizeEmail(email);
     try {
       await registerMutation.mutateAsync({
         name,
         email: normalizedEmail,
         password,
+        country,
         type,
       });
       navigate('/verify-email', { state: { email: normalizedEmail } });
@@ -90,7 +95,11 @@ const SignUp = () => {
     const idToken = window.prompt('Paste Google ID token');
     if (!idToken) return;
     try {
-      const result = await googleAuthMutation.mutateAsync({ idToken, type });
+      const result = await googleAuthMutation.mutateAsync({
+        idToken,
+        type,
+        ...(country ? { country } : {}),
+      });
       const authUser = result.user ?? useAuthStore.getState().user;
       await continueAfterAuth(authUser);
     } catch {
@@ -148,6 +157,21 @@ const SignUp = () => {
                 onChange={(e) => setName(e.target.value)}
                 className="w-full glass rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 bg-transparent"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1.5">{t('auth.country')}</label>
+              <select
+                required
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="w-full glass rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 bg-transparent"
+              >
+                {sortedCountries.map((option) => (
+                  <option key={option.iso2} value={option.iso2}>
+                    {isAr ? option.nameAr : option.nameEn}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-foreground mb-1.5">

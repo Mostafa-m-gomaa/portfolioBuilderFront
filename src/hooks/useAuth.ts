@@ -200,10 +200,12 @@ export const useAuth = () => {
         setAuth({
           user: {
             ...user,
-            currency: payload.currency,
-            allowWhatsapp: payload.allowWhatsapp,
-            WhatsApp: payload.whatsapp ?? null,
-            whatsapp: payload.whatsapp ?? null,
+            ...(payload.country !== undefined ? { country: payload.country } : {}),
+            ...(payload.currency !== undefined ? { currency: payload.currency } : {}),
+            ...(payload.allowWhatsapp !== undefined ? { allowWhatsapp: payload.allowWhatsapp } : {}),
+            ...(payload.whatsapp !== undefined
+              ? { WhatsApp: payload.whatsapp ?? null, whatsapp: payload.whatsapp ?? null }
+              : {}),
           },
         });
       }

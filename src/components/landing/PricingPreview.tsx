@@ -5,7 +5,16 @@ import { Check, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPackages } from '@/api/packages';
 import { parseApiError } from '@/api/axios';
-import { formatDurationMonths, formatConvertedPackagePrice, reorderTwelveMonthToCenter, isTwelveMonthPopularPlan } from '@/lib/packageDisplay';
+import {
+  formatDurationMonths,
+  formatPackageDisplayPrice,
+  getPackagePrice,
+  packageDescription,
+  packageFeatureText,
+  packageName,
+  reorderTwelveMonthToCenter,
+  isTwelveMonthPopularPlan,
+} from '@/lib/packageDisplay';
 import SubscribePackageCta from '@/components/pricing/SubscribePackageCta';
 import DisplayCurrencySelect from '@/components/pricing/DisplayCurrencySelect';
 import { useDisplayCurrency } from '@/hooks/useDisplayCurrency';
@@ -71,71 +80,70 @@ const PricingPreview = () => {
           >
             {packages.map((pkg, i) => {
               const isPopular = isTwelveMonthPopularPlan(pkg);
+              const { price, currency } = getPackagePrice(pkg, displayCurrency);
               return (
-              <motion.div
-                key={pkg._id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                whileHover={{ y: -6, transition: { duration: 0.25 } }}
-                className={`relative flex flex-col rounded-2xl border p-6 ${
-                  isPopular
-                    ? 'border-primary bg-primary text-primary-foreground shadow-xl shadow-primary/25 md:z-10 md:-my-1 md:py-7 xl:scale-[1.03]'
-                    : 'border-border bg-card text-foreground shadow-sm'
-                }`}
-              >
-                {isPopular ? (
-                  <span className="absolute -top-3 start-1/2 -translate-x-1/2 rounded-full bg-background px-3 py-1 text-xs font-semibold text-primary shadow-sm">
-                    {t('pricing.popular')}
-                  </span>
-                ) : null}
-                <h3 className={`mb-2 font-heading text-xl font-semibold ${isPopular ? '' : 'text-foreground'}`}>{pkg.name}</h3>
-                <div className="mb-6">
-                  <span className={`font-heading text-4xl font-bold ${isPopular ? '' : 'text-foreground'}`}>
-                    {formatConvertedPackagePrice(pkg.price, pkg.currency, displayCurrency, lang)}
-                  </span>
-                  <p className={`mt-2 text-sm ${isPopular ? 'opacity-90' : 'text-muted-foreground'}`}>
-                    {t('pricing.subscriptionDuration')}
-                    {formatDurationMonths(pkg.durationMonths, lang)}
-                  </p>
-                  {pkg.description ? (
-                    <p className={`mt-3 text-sm leading-relaxed line-clamp-3 ${isPopular ? 'opacity-90' : 'text-muted-foreground'}`}>{pkg.description}</p>
+                <motion.div
+                  key={pkg._id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08 }}
+                  whileHover={{ y: -6, transition: { duration: 0.25 } }}
+                  className={`relative flex flex-col rounded-2xl border p-6 ${isPopular
+                      ? 'border-primary bg-primary text-primary-foreground shadow-xl shadow-primary/25 md:z-10 md:-my-1 md:py-7 xl:scale-[1.03]'
+                      : 'border-border bg-card text-foreground shadow-sm'
+                    }`}
+                >
+                  {isPopular ? (
+                    <span className="absolute -top-3 start-1/2 -translate-x-1/2 rounded-full bg-background px-3 py-1 text-xs font-semibold text-primary shadow-sm">
+                      {t('pricing.popular')}
+                    </span>
                   ) : null}
-                </div>
-                <ul className="mb-4 flex-1 space-y-3">
-                  {pkg.features.map((f, j) => (
-                    <li key={j} className={`flex items-center gap-2 text-sm ${isPopular ? 'text-primary-foreground/95' : 'text-foreground'}`}>
-                      <Check className={`h-4 w-4 shrink-0 ${isPopular ? 'text-primary-foreground' : 'text-primary'}`} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-auto flex w-full min-w-0 flex-col gap-3">
-                  <SubscribePackageCta
-                    packageId={pkg._id}
-                    couponEnabled
-                    packagePrice={pkg.price}
-                    packageCurrency={pkg.currency}
-                    className={`block w-full rounded-xl px-4 py-3 text-center text-sm font-medium transition-opacity hover:opacity-90 ${
-                      isPopular ? 'bg-background text-foreground' : 'bg-primary text-primary-foreground'
-                    }`}
-                  >
-                    {t('pricing.cta')}
-                  </SubscribePackageCta>
-                  <Link
-                    to={`/pricing/${pkg._id}`}
-                    className={`block w-full rounded-xl border px-4 py-3 text-center text-sm font-medium transition-colors ${
-                      isPopular
-                        ? 'border-primary-foreground/40 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20'
-                        : 'border-border bg-background text-foreground hover:bg-muted/60'
-                    }`}
-                  >
-                    {t('package.details')}
-                  </Link>
-                </div>
-              </motion.div>
-            );
+                  <h3 className={`mb-2 font-heading text-xl font-semibold ${isPopular ? '' : 'text-foreground'}`}>{packageName(pkg, lang)}</h3>
+                  <div className="mb-6">
+                    <span className={`font-heading text-4xl font-bold ${isPopular ? '' : 'text-foreground'}`}>
+                      {formatPackageDisplayPrice(pkg, displayCurrency, lang)}
+                    </span>
+                    <p className={`mt-2 text-sm ${isPopular ? 'opacity-90' : 'text-muted-foreground'}`}>
+                      {t('pricing.subscriptionDuration')}
+                      {formatDurationMonths(pkg.durationMonths, lang)}
+                    </p>
+                    {packageDescription(pkg, lang) ? (
+                      <p className={`mt-3 text-sm leading-relaxed line-clamp-3 ${isPopular ? 'opacity-90' : 'text-muted-foreground'}`}>{packageDescription(pkg, lang)}</p>
+                    ) : null}
+                  </div>
+                  <ul className="mb-4 flex-1 space-y-3">
+                    {pkg.features.map((f, j) => (
+                      <li key={j} className={`flex items-center gap-2 text-sm ${isPopular ? 'text-primary-foreground/95' : 'text-foreground'}`}>
+                        <Check className={`h-4 w-4 shrink-0 ${isPopular ? 'text-primary-foreground' : 'text-primary'}`} />
+                        {packageFeatureText(f, lang)}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-auto flex w-full min-w-0 flex-col gap-3">
+                    <SubscribePackageCta
+                      packageId={pkg._id}
+                      couponEnabled
+                      packagePrice={price}
+                      packageCurrency={currency}
+                      selectedDisplayCurrency={displayCurrency}
+                      className={`block w-full rounded-xl px-4 py-3 text-center text-sm font-medium transition-opacity hover:opacity-90 ${isPopular ? 'bg-background text-foreground' : 'bg-primary text-primary-foreground'
+                        }`}
+                    >
+                      {t('pricing.cta')}
+                    </SubscribePackageCta>
+                    <Link
+                      to={`/pricing/${pkg._id}`}
+                      className={`block w-full rounded-xl border px-4 py-3 text-center text-sm font-medium transition-colors ${isPopular
+                          ? 'border-primary-foreground/40 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20'
+                          : 'border-border bg-background text-foreground hover:bg-muted/60'
+                        }`}
+                    >
+                      {t('package.details')}
+                    </Link>
+                  </div>
+                </motion.div>
+              );
             })}
           </div>
         )}

@@ -1,5 +1,5 @@
 import { templateCatalog, type TemplateCatalogEntry } from "@/constants/templateCatalog";
-import type { Lang } from "@/i18n/translations";
+import { translations, type Lang } from "@/i18n/translations";
 
 export const CATEGORY_ORDER = [
   "general",
@@ -41,22 +41,13 @@ const TEMPLATE_NAMES_AR: Record<string, string> = {
   "bright-modern": "عصري مشرق",
 };
 
-const SECTION_LABELS: Record<string, { ar: string; en: string }> = {
-  hero: { ar: "الواجهة", en: "Hero" },
-  about: { ar: "نبذة", en: "About" },
-  services: { ar: "الخدمات", en: "Services" },
-  portfolio: { ar: "الأعمال", en: "Portfolio" },
-  projects: { ar: "المشاريع", en: "Projects" },
-  contact: { ar: "التواصل", en: "Contact" },
-  testimonials: { ar: "آراء العملاء", en: "Testimonials" },
-  skills: { ar: "المهارات", en: "Skills" },
-  experience: { ar: "الخبرة", en: "Experience" },
-  education: { ar: "التعليم", en: "Education" },
-  gallery: { ar: "المعرض", en: "Gallery" },
-  blog: { ar: "المدونة", en: "Blog" },
-  faq: { ar: "الأسئلة الشائعة", en: "FAQ" },
-  team: { ar: "الفريق", en: "Team" },
-  pricing: { ar: "الأسعار", en: "Pricing" },
+const SECTION_ALIASES: Record<string, string> = {
+  testimonials: "testimonial",
+};
+
+const normalizeSectionKey = (sectionName: string) => {
+  const key = sectionName.toLowerCase().trim().replace(/_/g, "-");
+  return SECTION_ALIASES[key] ?? key;
 };
 
 export const prettyTemplateName = (value: string, lang: Lang = "en") => {
@@ -87,9 +78,21 @@ export const publicTemplateCardDescription = (category: string, lang: Lang, t: (
   t("templates.cardDesc.public").replace("{category}", categoryLabel(category, lang));
 
 export const sectionLabel = (sectionName: string, lang: Lang) => {
-  const key = sectionName.toLowerCase();
-  const entry = SECTION_LABELS[key];
-  if (entry) return lang === "ar" ? entry.ar : entry.en;
+  const normalized = normalizeSectionKey(sectionName);
+  const translationKey = `section.${normalized}`;
+  const translated = translations[lang][translationKey];
+  if (translated) return translated;
+
+  const rawKey = `section.${sectionName.toLowerCase().trim().replace(/_/g, "-")}`;
+  if (rawKey !== translationKey && translations[lang][rawKey]) {
+    return translations[lang][rawKey];
+  }
+
+  const fallback = translations[lang]["section.fallback"];
+  if (fallback) {
+    return fallback.replace("{name}", prettyTemplateName(sectionName, lang));
+  }
+
   return prettyTemplateName(sectionName, lang);
 };
 

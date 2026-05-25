@@ -1,5 +1,6 @@
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { normalizeSubscriptionSummary } from "@/lib/normalizeSubscriptionSummary";
+import { applySubscriptionSummaryToAuth } from "@/lib/syncSubscriptionAuth";
 import { subscriptionsService } from "@/services/subscriptions.service";
 import { useAuthStore } from "@/store/auth.store";
 
@@ -7,25 +8,16 @@ import { useAuthStore } from "@/store/auth.store";
 export const useSubscriptionSummary = () => {
   const token = useAuthStore((s) => s.token);
 
-  const query = useQuery({
+  return useQuery({
     queryKey: ["subscription-summary"],
-    queryFn: () => subscriptionsService.getMeSummary(),
+    queryFn: async () => {
+      const raw = await subscriptionsService.getMeSummary();
+      const data = normalizeSubscriptionSummary(raw);
+      applySubscriptionSummaryToAuth(data);
+      return data;
+    },
     enabled: Boolean(token),
     staleTime: 30_000,
     refetchOnWindowFocus: true,
   });
-
-  useEffect(() => {
-    const data = query.data;
-    if (!data) return;
-    const u = useAuthStore.getState().user;
-    if (!u) return;
-    if (u.subscriptionStatus !== data.subscriptionStatus) {
-      useAuthStore.getState().setAuth({
-        user: { ...u, subscriptionStatus: data.subscriptionStatus },
-      });
-    }
-  }, [query.data]);
-
-  return query;
 };

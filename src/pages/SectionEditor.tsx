@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, ImagePlus, Plus, RotateCcw, Save, Trash2, UploadCloud } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -8,6 +8,8 @@ import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { resolveApiAssetUrl } from '@/api/axios';
+import { resolvePortfolioDisplayLang } from '@/lib/portfolioDisplayLang';
+import { sectionLabel } from '@/lib/templateCatalogView';
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
@@ -42,6 +44,10 @@ const AR_FIELD_LABELS: Record<string, string> = {
   certificates: 'الشهادات',
   products: 'المنتجات',
   courses: 'الدورات',
+  packageName: 'اسم الباقة',
+  packages: 'الباقات',
+  menuLink: 'رابط القائمة',
+  menus: 'عناصر القائمة',
   clients: 'العملاء',
   faqs: 'الأسئلة الشائعة',
   testimonials: 'آراء العملاء',
@@ -149,6 +155,10 @@ const GALLERY_ALLOWED_KEYS = ['title', 'desc', 'gallery'] as const;
 const GALLERY_LOCALIZED_KEYS = new Set(['title', 'desc']);
 const BRANCHES_ALLOWED_KEYS = ['title', 'desc', 'branches'] as const;
 const BRANCHES_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const PACKAGES_ALLOWED_KEYS = ['title', 'desc', 'packages'] as const;
+const PACKAGES_LOCALIZED_KEYS = new Set(['title', 'desc']);
+const MENUS_ALLOWED_KEYS = ['title', 'desc', 'menuLink', 'menus'] as const;
+const MENUS_LOCALIZED_KEYS = new Set(['title', 'desc']);
 
 const RESTRICTED_ARRAY_KEYS = new Set([
   'images',
@@ -165,6 +175,8 @@ const RESTRICTED_ARRAY_KEYS = new Set([
   'testimonials',
   'gallery',
   'branches',
+  'packages',
+  'menus',
 ]);
 
 type RestrictedSectionConfig = {
@@ -189,6 +201,8 @@ const RESTRICTED_SECTION_CONFIGS: Record<string, RestrictedSectionConfig> = {
   testimonial: { allowedKeys: TESTIMONIAL_ALLOWED_KEYS, localizedKeys: TESTIMONIAL_LOCALIZED_KEYS },
   gallery: { allowedKeys: GALLERY_ALLOWED_KEYS, localizedKeys: GALLERY_LOCALIZED_KEYS },
   branches: { allowedKeys: BRANCHES_ALLOWED_KEYS, localizedKeys: BRANCHES_LOCALIZED_KEYS },
+  packages: { allowedKeys: PACKAGES_ALLOWED_KEYS, localizedKeys: PACKAGES_LOCALIZED_KEYS },
+  menus: { allowedKeys: MENUS_ALLOWED_KEYS, localizedKeys: MENUS_LOCALIZED_KEYS },
 };
 
 const localizedForMode = (value: unknown, mode: LanguageMode): JsonValue => {
@@ -281,6 +295,25 @@ const normalizeCatalogItem = (value: unknown, mode: LanguageMode): Record<string
   };
 };
 
+const normalizePackageItem = (value: unknown, mode: LanguageMode): Record<string, JsonValue> => {
+  const source = isObject(value) ? value : {};
+  return {
+    packageName: localizedForMode(source.packageName, mode),
+    price: typeof source.price === 'number' && Number.isFinite(source.price) ? source.price : 0,
+    features: Array.isArray(source.features) ? source.features.map((entry) => localizedForMode(entry, mode)) : [],
+    image: typeof source.image === 'string' ? source.image : '',
+  };
+};
+
+const normalizeMenuItem = (value: unknown, mode: LanguageMode): Record<string, JsonValue> => {
+  const source = isObject(value) ? value : {};
+  return {
+    title: localizedForMode(source.title, mode),
+    description: localizedForMode(source.description, mode),
+    image: typeof source.image === 'string' ? source.image : '',
+  };
+};
+
 const normalizeClientItem = (value: unknown, mode: LanguageMode): Record<string, JsonValue> => {
   const source = isObject(value) ? value : {};
   return {
@@ -346,6 +379,8 @@ const normalizeRestrictedArrayByKey = (key: string, value: unknown, mode: Langua
   if (key === 'testimonials') return Array.isArray(value) ? value.map((entry) => normalizeTestimonialItem(entry, mode)) : [];
   if (key === 'gallery') return Array.isArray(value) ? value.map((entry) => normalizeGalleryItem(entry, mode)) : [];
   if (key === 'branches') return Array.isArray(value) ? value.map((entry) => normalizeBranchItem(entry, mode)) : [];
+  if (key === 'packages') return Array.isArray(value) ? value.map((entry) => normalizePackageItem(entry, mode)) : [];
+  if (key === 'menus') return Array.isArray(value) ? value.map((entry) => normalizeMenuItem(entry, mode)) : [];
   return null;
 };
 
@@ -364,6 +399,8 @@ const defaultArrayItemForField = (fieldKey: string, mode: LanguageMode): JsonVal
   if (/(^|\.|\[)testimonials(\]|$)/i.test(fieldKey)) return normalizeTestimonialItem({}, mode);
   if (/(^|\.|\[)gallery(\]|$)/i.test(fieldKey)) return normalizeGalleryItem({}, mode);
   if (/(^|\.|\[)branches(\]|$)/i.test(fieldKey)) return normalizeBranchItem({}, mode);
+  if (/(^|\.|\[)packages(\]|$)/i.test(fieldKey)) return normalizePackageItem({}, mode);
+  if (/(^|\.|\[)menus(\]|$)/i.test(fieldKey)) return normalizeMenuItem({}, mode);
   return null;
 };
 
@@ -413,7 +450,9 @@ const getInputPlaceholder = (fieldKey: string, label: string, uiLang: UiLang, in
   }
   if (key.includes('email')) return uiLang === 'ar' ? 'ادخل البريد الإلكتروني' : 'Enter email address';
   if (key.startsWith('phone')) return uiLang === 'ar' ? 'ادخل رقم الهاتف' : 'Enter phone number';
-  if (key.includes('addressurl') || key === 'link' || key.includes('link')) return uiLang === 'ar' ? 'الصق الرابط الكامل' : 'Paste full URL';
+  if (key.includes('addressurl') || key === 'link' || key.includes('link') || key === 'menulink') {
+    return uiLang === 'ar' ? 'الصق الرابط الكامل' : 'Paste full URL';
+  }
   if (key.includes('address')) return uiLang === 'ar' ? 'اكتب العنوان' : 'Write address';
   if (key.includes('desc') || key.includes('description') || key.includes('answer')) {
     return uiLang === 'ar' ? 'اكتب وصفا واضحا ومختصرا' : 'Write a clear and concise description';
@@ -882,7 +921,7 @@ const DynamicField = ({
 const SectionEditor = () => {
   const { sectionName = '' } = useParams();
   const { isAuthenticated } = useAuth();
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const isAr = lang === 'ar';
   const { data: myPortfolio } = useMyPortfolio();
 
@@ -907,7 +946,24 @@ const SectionEditor = () => {
   const [editingItemId, setEditingItemId] = useState('');
   const [editingItemForm, setEditingItemForm] = useState<Record<string, JsonValue>>({});
   const [uploadedPaths, setUploadedPaths] = useState<string[]>([]);
+  const [pendingImageUploads, setPendingImageUploads] = useState(0);
   const sectionSlug = sectionName.toLowerCase();
+
+  const beginImageUpload = useCallback(() => {
+    setPendingImageUploads((count) => count + 1);
+  }, []);
+
+  const endImageUpload = useCallback(() => {
+    setPendingImageUploads((count) => Math.max(0, count - 1));
+  }, []);
+
+  const isImageUploading =
+    pendingImageUploads > 0 || uploadSingleMutation.isPending || uploadMultipleMutation.isPending;
+  const sectionDisplayLang = useMemo(
+    () => resolvePortfolioDisplayLang(myPortfolio, lang),
+    [myPortfolio, lang],
+  );
+  const sectionTitle = sectionLabel(sectionName, sectionDisplayLang);
   const restrictedSectionConfig = useMemo(
     () => RESTRICTED_SECTION_CONFIGS[sectionSlug] ?? null,
     [sectionSlug],
@@ -990,6 +1046,10 @@ const SectionEditor = () => {
   };
 
   const onSaveSection = async () => {
+    if (isImageUploading) {
+      toast.message(t('sectionEditor.waitingImageUpload'));
+      return;
+    }
     const basePayload = restrictedSectionConfig
       ? normalizeRestrictedSectionForm(
         sectionForm,
@@ -1004,6 +1064,10 @@ const SectionEditor = () => {
   };
 
   const onCreateItem = async () => {
+    if (isImageUploading) {
+      toast.message(t('sectionEditor.waitingImageUpload'));
+      return;
+    }
     await createItemMutation.mutateAsync({ sectionName, payload: newItemForm });
   };
 
@@ -1018,6 +1082,10 @@ const SectionEditor = () => {
 
   const onUpdateItem = async () => {
     if (!editingItemId) return toast.error(isAr ? 'اختر عنصرا أولا.' : 'Choose an item first.');
+    if (isImageUploading) {
+      toast.message(t('sectionEditor.waitingImageUpload'));
+      return;
+    }
     await updateItemMutation.mutateAsync({
       sectionName,
       itemId: editingItemId,
@@ -1038,25 +1106,43 @@ const SectionEditor = () => {
   const onUploadSingle = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    const result = await uploadSingleMutation.mutateAsync(file);
-    const path = result.filePath || result.url || '';
-    appendUniquePath(path ? [path] : []);
-    event.currentTarget.value = '';
+    beginImageUpload();
+    try {
+      const result = await uploadSingleMutation.mutateAsync(file);
+      const path = result.filePath || result.url || '';
+      appendUniquePath(path ? [path] : []);
+    } finally {
+      endImageUpload();
+      event.currentTarget.value = '';
+    }
   };
 
-  const uploadImageAndGetPath = async (file: File) => {
-    const result = await uploadSingleMutation.mutateAsync(file);
-    const path = result.filePath || result.url || '';
-    return path || null;
-  };
+  const uploadImageAndGetPath = useCallback(
+    async (file: File) => {
+      beginImageUpload();
+      try {
+        const result = await uploadSingleMutation.mutateAsync(file);
+        const path = result.filePath || result.url || '';
+        return path || null;
+      } finally {
+        endImageUpload();
+      }
+    },
+    [beginImageUpload, endImageUpload, uploadSingleMutation],
+  );
 
   const onUploadMultiple = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []);
     if (files.length === 0) return;
-    const result = await uploadMultipleMutation.mutateAsync(files);
-    const paths = result.filePaths?.length ? result.filePaths : (result.urls ?? []);
-    appendUniquePath(paths);
-    event.currentTarget.value = '';
+    beginImageUpload();
+    try {
+      const result = await uploadMultipleMutation.mutateAsync(files);
+      const paths = result.filePaths?.length ? result.filePaths : (result.urls ?? []);
+      appendUniquePath(paths);
+    } finally {
+      endImageUpload();
+      event.currentTarget.value = '';
+    }
   };
 
   const addImageToSection = (path: string) => {
@@ -1106,8 +1192,8 @@ const SectionEditor = () => {
               <span className="inline-flex rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
                 {isAr ? 'محرر المحتوى' : 'Content editor'}
               </span>
-              <h1 className="mt-4 font-heading text-3xl font-bold capitalize text-foreground md:text-4xl">
-                {isAr ? `تعديل قسم ${titleCase(sectionName, lang)}` : `Edit ${sectionName} section`}
+              <h1 className="mt-4 font-heading text-3xl font-bold text-foreground md:text-4xl">
+                {isAr ? `تعديل قسم ${sectionTitle}` : `Edit ${sectionTitle} section`}
               </h1>
               <p className="mt-3 text-sm leading-7 text-muted-foreground md:text-base">
                 {isAr
@@ -1141,13 +1227,22 @@ const SectionEditor = () => {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
+            {isImageUploading && (
+              <p className="w-full text-xs font-medium text-amber-700 dark:text-amber-400">
+                {t('sectionEditor.waitingImageUpload')}
+              </p>
+            )}
             <button
               onClick={onSaveSection}
-              disabled={upsertSectionMutation.isPending || isEditingLocked}
+              disabled={upsertSectionMutation.isPending || isEditingLocked || isImageUploading}
               className={primaryButtonClass}
             >
               <Save className="h-4 w-4" />
-              {upsertSectionMutation.isPending ? (isAr ? 'جار الحفظ...' : 'Saving...') : isAr ? 'حفظ القسم' : 'Save section'}
+              {upsertSectionMutation.isPending
+                ? t('sectionEditor.savingSection')
+                : isImageUploading
+                  ? t('sectionEditor.waitingImageUpload')
+                  : t('sectionEditor.saveSection')}
             </button>
             <div className="flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2">
               <span className="text-xs font-medium text-muted-foreground">
@@ -1261,15 +1356,15 @@ const SectionEditor = () => {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <label className={`${ghostButtonClass} ${isEditingLocked ? 'pointer-events-none opacity-50' : ''}`}>
+            <label className={`${ghostButtonClass} ${isEditingLocked || isImageUploading ? 'pointer-events-none opacity-50' : ''}`}>
               <UploadCloud className="h-4 w-4" />
-              {isAr ? 'رفع صورة واحدة' : 'Upload one image'}
-              <input type="file" accept="image/*" onChange={onUploadSingle} className="hidden" disabled={isEditingLocked} />
+              {isImageUploading ? t('sectionEditor.uploadingImage') : isAr ? 'رفع صورة واحدة' : 'Upload one image'}
+              <input type="file" accept="image/*" onChange={onUploadSingle} className="hidden" disabled={isEditingLocked || isImageUploading} />
             </label>
-            <label className={`${ghostButtonClass} ${isEditingLocked ? 'pointer-events-none opacity-50' : ''}`}>
+            <label className={`${ghostButtonClass} ${isEditingLocked || isImageUploading ? 'pointer-events-none opacity-50' : ''}`}>
               <ImagePlus className="h-4 w-4" />
-              {isAr ? 'رفع عدة صور' : 'Upload many images'}
-              <input type="file" accept="image/*" multiple onChange={onUploadMultiple} className="hidden" disabled={isEditingLocked} />
+              {isImageUploading ? t('sectionEditor.uploadingImage') : isAr ? 'رفع عدة صور' : 'Upload many images'}
+              <input type="file" accept="image/*" multiple onChange={onUploadMultiple} className="hidden" disabled={isEditingLocked || isImageUploading} />
             </label>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
@@ -1365,11 +1460,15 @@ const SectionEditor = () => {
               </div>
               <button
                 onClick={onCreateItem}
-                disabled={createItemMutation.isPending || isEditingLocked}
+                disabled={createItemMutation.isPending || isEditingLocked || isImageUploading}
                 className={`${primaryButtonClass} mt-4`}
               >
                 <Plus className="h-4 w-4" />
-                {createItemMutation.isPending ? (isAr ? 'جار الإنشاء...' : 'Creating...') : isAr ? 'إضافة عنصر' : 'Add item'}
+                {createItemMutation.isPending
+                  ? t('sectionEditor.creatingItem')
+                  : isImageUploading
+                    ? t('sectionEditor.waitingImageUpload')
+                    : t('sectionEditor.addItem')}
               </button>
             </div>
 
@@ -1402,11 +1501,15 @@ const SectionEditor = () => {
               </div>
               <button
                 onClick={onUpdateItem}
-                disabled={updateItemMutation.isPending || !editingItemId || isEditingLocked}
+                disabled={updateItemMutation.isPending || !editingItemId || isEditingLocked || isImageUploading}
                 className={`${primaryButtonClass} mt-4`}
               >
                 <Save className="h-4 w-4" />
-                {updateItemMutation.isPending ? (isAr ? 'جار التحديث...' : 'Updating...') : isAr ? 'تحديث العنصر' : 'Update item'}
+                {updateItemMutation.isPending
+                  ? t('sectionEditor.updatingItem')
+                  : isImageUploading
+                    ? t('sectionEditor.waitingImageUpload')
+                    : t('sectionEditor.updateItem')}
               </button>
             </div>
           </div>

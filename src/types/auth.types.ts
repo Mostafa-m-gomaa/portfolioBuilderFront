@@ -16,6 +16,7 @@ export type AuthUser = {
   role?: string | null;
   authProvider?: string | null;
   subscriptionStatus?: string | null;
+  country?: string | null;
 };
 
 export type AuthSuccess = {
@@ -28,6 +29,7 @@ export type RegisterPayload = {
   name: string;
   email: string;
   password: string;
+  country: string;
   type?: "freelancer" | "agency" | string;
   subdomain?: string;
 };
@@ -40,6 +42,7 @@ export type LoginPayload = {
 export type GoogleAuthPayload = {
   idToken: string;
   type?: "freelancer" | "agency" | string;
+  country?: string;
   subdomain?: string;
 };
 
@@ -81,8 +84,9 @@ export type UpdateTemplateNamePayload = {
 };
 
 export type UpdateProfilePayload = {
-  currency: string;
-  allowWhatsapp: boolean;
+  country?: string;
+  currency?: string;
+  allowWhatsapp?: boolean;
   whatsapp?: string;
 };
 

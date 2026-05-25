@@ -1,4 +1,5 @@
 import { apiClient } from "@/api/axios";
+import { normalizeSubscriptionSummary } from "@/lib/normalizeSubscriptionSummary";
 import type {
   SubscriptionMeSummaryResponse,
   SubscriptionRecord,
@@ -9,7 +10,7 @@ export const subscriptionsService = {
     const response = await apiClient.get<SubscriptionMeSummaryResponse>(
       "/subscriptions/me/summary",
     );
-    return response.data;
+    return normalizeSubscriptionSummary(response.data);
   },
 
   async startFreeTrial(): Promise<SubscriptionRecord> {

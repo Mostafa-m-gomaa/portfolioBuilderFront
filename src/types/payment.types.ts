@@ -1,7 +1,10 @@
+export type PaymentCheckoutCurrency = "EGP" | "USD";
+
 /** Request body for POST /payments/checkout */
 export type PaymentCheckoutRequest = {
   packageId: string;
-  /** When set, server validates coupon and charges `finalPrice` from apply logic */
+  price: number;
+  currency: PaymentCheckoutCurrency;
   couponName?: string;
 };
 

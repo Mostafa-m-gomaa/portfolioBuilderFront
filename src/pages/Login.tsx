@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { isEmailNotVerifiedLoginError } from '@/lib/authErrors';
 import { getPostAuthEntryPath, isConfiguredSubdomain, needsSubscriptionOnboarding } from '@/lib/authRouting';
 import { startPackageCheckout } from '@/lib/startPackageCheckout';
+import { getStoredDisplayCurrency } from '@/lib/pricingDisplayCurrencyStorage';
 import { portfolioService } from '@/services/portfolio.service';
 import { useAuthStore } from '@/store/auth.store';
 import type { AuthUser } from '@/types/auth.types';
@@ -86,6 +87,7 @@ const Login = () => {
     const navigated = await startPackageCheckout(
       pendingPkg,
       t('payment.checkoutError'),
+      { checkoutCurrency: getStoredDisplayCurrency() },
     );
     if (navigated) sessionStorage.removeItem('pending_checkout_package_id');
     return navigated;

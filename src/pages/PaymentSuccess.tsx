@@ -6,7 +6,10 @@ import { CheckCircle2, LayoutDashboard, UserCog } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { applySubscriptionSummaryToAuth } from '@/lib/syncSubscriptionAuth';
+import { subscriptionsService } from '@/services/subscriptions.service';
 import { useAuthStore } from '@/store/auth.store';
+
 const PaymentSuccess = () => {
   const { t } = useLanguage();
   const queryClient = useQueryClient();
@@ -14,8 +17,19 @@ const PaymentSuccess = () => {
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    void queryClient.invalidateQueries({ queryKey: ['subscription-summary'] });
-    void queryClient.invalidateQueries({ queryKey: ['portfolio', 'me'] });
+    void (async () => {
+      await queryClient.resetQueries({ queryKey: ['subscription-summary'] });
+      try {
+        const summary = await queryClient.fetchQuery({
+          queryKey: ['subscription-summary'],
+          queryFn: () => subscriptionsService.getMeSummary(),
+        });
+        applySubscriptionSummaryToAuth(summary);
+      } catch {
+        /* Dashboard will refetch; avoid blocking success UI */
+      }
+      void queryClient.invalidateQueries({ queryKey: ['portfolio', 'me'] });
+    })();
   }, [isAuthenticated, queryClient]);
 
   return (

@@ -1,8 +1,8 @@
-import type { Package } from "@/types/package.types";
-import { convertPackagePriceToDisplayCurrency } from "@/lib/pricingDisplayCurrencies";
+import type { Lang } from "@/contexts/LanguageContext";
+import type { LocalizedString, Package } from "@/types/package.types";
+import type { PaymentCheckoutCurrency } from "@/types/payment.types";
+import { displayLocalized } from "@/lib/displayLocalized";
 import { toLatinDigits } from "@/lib/latinDigits";
-
-type Lang = "ar" | "en";
 
 /** Western digits (0–9) regardless of UI language */
 const formatLatinNumber = (value: number, options?: Intl.NumberFormatOptions) =>
@@ -10,14 +10,43 @@ const formatLatinNumber = (value: number, options?: Intl.NumberFormatOptions) =>
     value.toLocaleString("en-US", { numberingSystem: "latn", ...options }),
   );
 
+/** Always returns a string safe to render in React (never `{ ar, en }`). */
+export const toDisplayText = (value: unknown, lang: Lang): string =>
+  displayLocalized(value, lang);
+
+export const pickLocalized = (
+  value: LocalizedString | string | unknown,
+  lang: Lang,
+): string => displayLocalized(value, lang);
+
+export const packageName = (pkg: Pick<Package, "name">, lang: Lang) =>
+  pickLocalized(pkg.name, lang);
+
+export const packageDescription = (pkg: Pick<Package, "description">, lang: Lang) =>
+  pickLocalized(pkg.description, lang);
+
+export const packageFeatureText = (feature: LocalizedString, lang: Lang) =>
+  pickLocalized(feature, lang);
+
+/** Price and currency from API fields (no conversion). */
+export const getPackagePrice = (
+  pkg: Pick<Package, "priceEgp" | "priceUsd">,
+  displayCurrency: string,
+): { price: number; currency: PaymentCheckoutCurrency } => {
+  const code = displayCurrency.trim().toUpperCase();
+  if (code === "USD") {
+    return { price: pkg.priceUsd, currency: "USD" };
+  }
+  return { price: pkg.priceEgp, currency: "EGP" };
+};
+
 export const formatPackagePrice = (
   price: number,
   currency: string,
   _lang: Lang,
 ) => {
-  const code = (currency || "SAR").toUpperCase();
+  const code = (currency || "EGP").toUpperCase();
   try {
-    // Always use a Latin locale so digits stay 0–9 (ar-SA can still render Eastern numerals in some engines).
     return toLatinDigits(
       new Intl.NumberFormat("en-US", {
         style: "currency",
@@ -32,20 +61,38 @@ export const formatPackagePrice = (
   }
 };
 
-/** Formats API price converted into the visitor’s chosen display currency when supported. */
-export const formatConvertedPackagePrice = (
-  price: number,
-  packageCurrency: string,
+/** Formats package price for the visitor’s chosen display currency. */
+export const formatPackageDisplayPrice = (
+  pkg: Pick<Package, "priceEgp" | "priceUsd">,
   displayCurrencyCode: string,
   lang: Lang,
 ) => {
-  const from = (packageCurrency || "SAR").toUpperCase();
-  const to = displayCurrencyCode.toUpperCase();
-  const converted = convertPackagePriceToDisplayCurrency(price, from, to);
-  if (converted == null) {
-    return formatPackagePrice(price, packageCurrency, lang);
+  const { price, currency } = getPackagePrice(pkg, displayCurrencyCode);
+  return formatPackagePrice(price, currency, lang);
+};
+
+const coerceCurrencyCode = (value: unknown): string | null => {
+  if (typeof value === "string" && value.trim()) {
+    return value.trim().toUpperCase();
   }
-  return formatPackagePrice(converted, to, lang);
+  return null;
+};
+
+/** Subscription summary: charged amount if API sends it, else priceEgp / priceUsd. */
+export const formatSubscriptionPackagePrice = (
+  pkg: Pick<Package, "priceEgp" | "priceUsd"> & {
+    price?: number;
+    currency?: unknown;
+  },
+  lang: Lang,
+  displayCurrency = "EGP",
+) => {
+  const chargedCurrency = coerceCurrencyCode(pkg.currency);
+  if (typeof pkg.price === "number" && chargedCurrency) {
+    return formatPackagePrice(pkg.price, chargedCurrency, lang);
+  }
+  const { price, currency } = getPackagePrice(pkg, displayCurrency);
+  return formatPackagePrice(price, currency, lang);
 };
 
 export const formatDurationMonths = (months: number, lang: Lang) => {

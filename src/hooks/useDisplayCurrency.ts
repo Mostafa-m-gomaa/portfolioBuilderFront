@@ -1,36 +1,30 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import {
-  DISPLAY_CURRENCY_OPTIONS,
-  isSupportedDisplayCurrency,
-} from "@/lib/pricingDisplayCurrencies";
+  getStoredDisplayCurrency,
+  persistDisplayCurrency,
+  subscribeDisplayCurrency,
+} from "@/lib/pricingDisplayCurrencyStorage";
+import { isSupportedDisplayCurrency } from "@/lib/pricingDisplayCurrencies";
 
-const STORAGE_KEY = "portfolio_pricing_display_currency";
+export { getStoredDisplayCurrency } from "@/lib/pricingDisplayCurrencyStorage";
 
-const defaultCode = DISPLAY_CURRENCY_OPTIONS[0]?.code ?? "EGP";
-
-const readStored = (): string => {
-  if (typeof window === "undefined") return defaultCode;
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw && isSupportedDisplayCurrency(raw)) return raw.toUpperCase();
-  } catch {
-    /* ignore */
-  }
-  return defaultCode;
-};
-
-/** Shared display currency for package list + detail (persisted). */
 export const useDisplayCurrency = () => {
-  const [displayCurrency, setDisplayCurrencyState] = useState(() => readStored());
+  const storedCurrency = useSyncExternalStore(
+    subscribeDisplayCurrency,
+    getStoredDisplayCurrency,
+    () => "EGP",
+  );
+  const [displayCurrency, setDisplayCurrencyState] = useState(storedCurrency);
+
+  useEffect(() => {
+    setDisplayCurrencyState(storedCurrency);
+  }, [storedCurrency]);
 
   const setDisplayCurrency = useCallback((code: string) => {
-    const next = code.toUpperCase();
+    const next = code.trim().toUpperCase();
     if (!isSupportedDisplayCurrency(next)) return;
-    setDisplayCurrencyState(next);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, next);
-    } catch {
-      /* ignore */
+    if (persistDisplayCurrency(next)) {
+      setDisplayCurrencyState(next);
     }
   }, []);
 

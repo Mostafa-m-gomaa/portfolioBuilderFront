@@ -5,7 +5,15 @@ import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { fetchPackageById } from "@/api/packages";
 import { parseApiError } from "@/api/axios";
-import { formatDurationMonths, formatConvertedPackagePrice, isTwelveMonthPopularPlan } from "@/lib/packageDisplay";
+import {
+  formatDurationMonths,
+  formatPackageDisplayPrice,
+  getPackagePrice,
+  isTwelveMonthPopularPlan,
+  packageDescription,
+  packageFeatureText,
+  packageName,
+} from "@/lib/packageDisplay";
 import SubscribePackageCta from "@/components/pricing/SubscribePackageCta";
 import DisplayCurrencySelect from "@/components/pricing/DisplayCurrencySelect";
 import { useDisplayCurrency } from "@/hooks/useDisplayCurrency";
@@ -29,6 +37,7 @@ const PackageDetail = () => {
   });
 
   const errMsg = isError ? parseApiError(error, t("pricing.loadError")) : "";
+  const listPrice = pkg ? getPackagePrice(pkg, displayCurrency) : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -59,13 +68,12 @@ const PackageDetail = () => {
               {t("pricing.retry")}
             </button>
           </div>
-        ) : pkg ? (
+        ) : pkg && listPrice ? (
           <article
-            className={`relative mt-10 rounded-2xl border p-6 md:p-8 ${
-              isTwelveMonthPopularPlan(pkg)
+            className={`relative mt-10 rounded-2xl border p-6 md:p-8 ${isTwelveMonthPopularPlan(pkg)
                 ? "border-primary bg-primary/5 shadow-lg shadow-primary/20"
                 : "border-border bg-card shadow-sm"
-            }`}
+              }`}
           >
             {isTwelveMonthPopularPlan(pkg) ? (
               <span className="absolute -top-3 start-6 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow-sm md:start-8">
@@ -74,7 +82,7 @@ const PackageDetail = () => {
             ) : null}
             <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
               <h1 className="font-heading text-3xl font-bold text-foreground md:text-4xl">
-                {pkg.name}
+                {packageName(pkg, lang)}
               </h1>
               <DisplayCurrencySelect
                 value={displayCurrency}
@@ -84,18 +92,18 @@ const PackageDetail = () => {
             </div>
             <p className="mt-2 text-muted-foreground">
               {formatDurationMonths(pkg.durationMonths, lang)} ·{" "}
-              {formatConvertedPackagePrice(pkg.price, pkg.currency, displayCurrency, lang)}
+              {formatPackageDisplayPrice(pkg, displayCurrency, lang)}
             </p>
-            {pkg.description ? (
+            {packageDescription(pkg, lang) ? (
               <p className="mt-6 text-lg leading-relaxed text-foreground/90">
-                {pkg.description}
+                {packageDescription(pkg, lang)}
               </p>
             ) : null}
             <ul className="mt-8 space-y-3">
               {pkg.features.map((f, i) => (
                 <li key={i} className="flex items-start gap-3 text-foreground">
                   <Check className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                  <span>{f}</span>
+                  <span>{packageFeatureText(f, lang)}</span>
                 </li>
               ))}
             </ul>
@@ -103,8 +111,9 @@ const PackageDetail = () => {
               <SubscribePackageCta
                 packageId={pkg._id}
                 couponEnabled
-                packagePrice={pkg.price}
-                packageCurrency={pkg.currency}
+                packagePrice={listPrice.price}
+                packageCurrency={listPrice.currency}
+                selectedDisplayCurrency={displayCurrency}
                 className="inline-flex rounded-xl bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
               >
                 {t("pricing.cta")}

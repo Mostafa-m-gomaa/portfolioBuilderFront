@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Globe2, BadgeCheck, UserRound } from 'lucide-react';
+import { Mail, Globe2, BadgeCheck, UserRound, MapPin } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { useAuthStore } from '@/store/auth.store';
 import SubdomainManagerCard from '@/components/auth/SubdomainManagerCard';
@@ -10,10 +10,11 @@ import LogoManagerCard from '@/components/auth/LogoManagerCard';
 import ProfilePreferencesCard from '@/components/auth/ProfilePreferencesCard';
 import { useMyPortfolio } from '@/hooks/usePortfolio';
 import { resolveApiAssetUrl } from '@/api/axios';
-import SubscriptionSummaryPanel from '@/components/subscription/SubscriptionSummaryPanel';
+import SubscriptionSummaryPanelSafe from '@/components/subscription/SubscriptionSummaryPanelSafe';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getAccountTypeLabel } from '@/constants/accountTypes';
 import { prettyTemplateName } from '@/lib/templateCatalogView';
+import { countryLabel } from '@/constants/countries';
 
 const Profile = () => {
   const { lang, t } = useLanguage();
@@ -90,10 +91,16 @@ const Profile = () => {
                 {templateName ? prettyTemplateName(templateName, lang) : '-'}
               </p>
             </div>
+            <div className="glass rounded-2xl p-4">
+              <p className="text-xs text-muted-foreground mb-2 flex items-center gap-2">
+                <MapPin className="w-4 h-4" /> {t('profile.country')}
+              </p>
+              <p className="font-medium">{user?.country ? countryLabel(user.country, lang) : '-'}</p>
+            </div>
           </div>
         </motion.div>
 
-        <SubscriptionSummaryPanel />
+        <SubscriptionSummaryPanelSafe />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           <div className="space-y-4">
@@ -112,6 +119,7 @@ const Profile = () => {
               currentDefaultLanguage={portfolio?.defaultLanguage || null}
             />
             <ProfilePreferencesCard
+              currentCountry={user?.country || null}
               currentCurrency={user?.currency || null}
               currentAllowWhatsapp={user?.allowWhatsapp}
               currentWhatsApp={user?.WhatsApp || null}

@@ -1,14 +1,22 @@
 import { Link } from "react-router-dom";
 import { Loader2, CreditCard, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useDisplayCurrency } from "@/hooks/useDisplayCurrency";
 import { useSubscriptionSummary } from "@/hooks/useSubscriptionSummary";
+import { displayLocalized } from "@/lib/displayLocalized";
 import {
   formatDurationMonths,
-  formatPackagePrice,
+  formatSubscriptionPackagePrice,
 } from "@/lib/packageDisplay";
 import { toLatinDigits } from "@/lib/latinDigits";
+import { cn } from "@/lib/utils";
 
 type Lang = "ar" | "en";
+
+type SubscriptionSummaryPanelProps = {
+  className?: string;
+  compact?: boolean;
+};
 
 const formatSummaryDate = (iso: string, _lang: Lang) => {
   const d = new Date(iso);
@@ -24,22 +32,60 @@ const formatSummaryDate = (iso: string, _lang: Lang) => {
 
 const formatDays = (n: number) => toLatinDigits(String(n));
 
-const subscriptionStatusLabel = (status: string, t: (key: string) => string) => {
-  const key = `subscription.status.${status}`;
+const subscriptionStatusLabel = (
+  status: unknown,
+  lang: Lang,
+  t: (key: string) => string,
+) => {
+  const code =
+    typeof status === "string"
+      ? status
+      : displayLocalized(status, lang).toUpperCase();
+  if (!code) return "";
+  const key = `subscription.status.${code}`;
   const label = t(key);
-  return label === key ? status : label;
+  return label === key ? code : label;
 };
 
 /**
  * Dashboard / profile: current plan, trial, or inactive state from GET /subscriptions/me/summary.
  */
-const SubscriptionSummaryPanel = () => {
+const SubscriptionSummaryPanel = ({
+  className,
+  compact = false,
+}: SubscriptionSummaryPanelProps) => {
   const { t, lang } = useLanguage();
+  const { displayCurrency } = useDisplayCurrency();
   const { data, isLoading, isError } = useSubscriptionSummary();
+
+  const rootClass = (extra: string) =>
+    cn(
+      compact ? "glass-strong rounded-3xl p-4 h-full" : "mb-8 rounded-2xl p-5",
+      extra,
+      className,
+    );
+
+  const iconClass = compact ? "h-5 w-5" : "h-6 w-6";
+  const titleClass = compact
+    ? "font-heading text-base font-semibold"
+    : "font-heading text-lg font-semibold";
+  const packageTitleClass = compact
+    ? "mt-0.5 font-heading text-lg font-bold"
+    : "mt-1 font-heading text-xl font-bold";
+  const detailClass = compact
+    ? "mt-1 text-xs text-muted-foreground"
+    : "mt-2 text-sm text-muted-foreground";
+  const detailClassTight = compact
+    ? "mt-0.5 text-xs text-muted-foreground"
+    : "mt-1 text-sm text-muted-foreground";
 
   if (isLoading) {
     return (
-      <div className="mb-8 flex items-center gap-2 rounded-2xl border border-border bg-card/50 px-4 py-3 text-sm text-muted-foreground">
+      <div
+        className={rootClass(
+          "flex items-center gap-2 border border-border bg-card/50 text-sm text-muted-foreground",
+        )}
+      >
         <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
         {t("subscription.summary.loading")}
       </div>
@@ -53,20 +99,26 @@ const SubscriptionSummaryPanel = () => {
   if (data.subscriptionStatus === "FREE_TRIAL" && data.subscription) {
     const sub = data.subscription;
     return (
-      <div className="mb-8 rounded-2xl border border-sky-500/40 bg-sky-500/10 p-5 dark:bg-sky-950/20">
-        <div className="flex items-start gap-3">
-          <Sparkles className="mt-0.5 h-6 w-6 shrink-0 text-sky-600 dark:text-sky-400" />
-          <div>
-            <p className="font-heading text-lg font-semibold text-foreground">
+      <div
+        className={rootClass(
+          "border border-sky-500/40 bg-sky-500/10 dark:bg-sky-950/20",
+        )}
+      >
+        <div className="flex h-full items-start gap-3">
+          <Sparkles
+            className={cn("mt-0.5 shrink-0 text-sky-600 dark:text-sky-400", iconClass)}
+          />
+          <div className="min-w-0">
+            <p className={cn(titleClass, "text-foreground")}>
               {t("subscription.summary.trialTitle")}
             </p>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className={detailClass}>
               {t("subscription.summary.trialEnds")}{" "}
               <span className="font-medium text-foreground">
                 {formatSummaryDate(sub.endDate, lang)}
               </span>
             </p>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className={detailClassTight}>
               {t("subscription.summary.daysLeft")}{" "}
               <span className="font-medium text-foreground">
                 {formatDays(sub.remainingDays)}
@@ -78,38 +130,55 @@ const SubscriptionSummaryPanel = () => {
     );
   }
 
-  if (data.hasActiveSubscription && data.subscription) {
+  if (data.hasActiveSubscription && data.subscription?.package) {
     const sub = data.subscription;
     const pkg = sub.package;
+    const planTitle = displayLocalized(pkg.name, lang);
+    const planDescription = displayLocalized(pkg.description, lang);
+
     return (
-      <div className="mb-8 rounded-2xl border border-primary/35 bg-primary/5 p-5 shadow-sm dark:bg-primary/10">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="flex items-start gap-3">
-            <CreditCard className="mt-0.5 h-6 w-6 shrink-0 text-primary" aria-hidden />
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+      <div
+        className={rootClass(
+          "border border-primary/35 bg-primary/5 shadow-sm dark:bg-primary/10",
+        )}
+      >
+        <div className="flex h-full flex-col justify-between gap-3 sm:flex-row sm:items-start">
+          <div className="flex min-w-0 items-start gap-3">
+            <CreditCard
+              className={cn("mt-0.5 shrink-0 text-primary", iconClass)}
+              aria-hidden
+            />
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-primary sm:text-xs">
                 {t("subscription.summary.activeBadge")}
               </p>
-              <h2 className="mt-1 font-heading text-xl font-bold text-foreground">
-                {pkg.name}
+              <h2 className={cn(packageTitleClass, "text-foreground")}>
+                {planTitle}
               </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
+              {planDescription ? (
+                <p className={detailClassTight}>{planDescription}</p>
+              ) : null}
+              <p className={detailClassTight}>
                 {t("subscription.summary.status")}:{" "}
                 <span className="font-medium text-foreground">
-                  {subscriptionStatusLabel(data.subscriptionStatus, t)}
+                  {subscriptionStatusLabel(data.subscriptionStatus, lang, t)}
                 </span>
               </p>
-              <p className="mt-2 text-sm text-foreground">
-                {formatPackagePrice(pkg.price, pkg.currency, lang)} ·{" "}
+              <p
+                className={
+                  compact ? "mt-1 text-xs text-foreground" : "mt-2 text-sm text-foreground"
+                }
+              >
+                {formatSubscriptionPackagePrice(pkg, lang, displayCurrency)} ·{" "}
                 {formatDurationMonths(pkg.durationMonths, lang)}
               </p>
-              <p className="mt-2 text-sm text-muted-foreground">
+              <p className={detailClass}>
                 {t("subscription.summary.endsAt")}{" "}
                 <span className="font-medium text-foreground">
                   {formatSummaryDate(sub.endDate, lang)}
                 </span>
               </p>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className={detailClassTight}>
                 {t("subscription.summary.daysLeft")}{" "}
                 <span className="font-medium text-foreground">
                   {formatDays(sub.remainingDays)}
@@ -119,7 +188,7 @@ const SubscriptionSummaryPanel = () => {
           </div>
           <Link
             to="/pricing"
-            className="shrink-0 rounded-xl border border-border bg-background px-3 py-2 text-xs font-medium text-foreground hover:bg-muted/60"
+            className="shrink-0 self-start rounded-xl border border-border bg-background px-3 py-2 text-xs font-medium text-foreground hover:bg-muted/60"
           >
             {t("subscription.summary.viewPlans")}
           </Link>
@@ -138,11 +207,15 @@ const SubscriptionSummaryPanel = () => {
         ? "subscription.summary.inactive.CANCELLED"
         : "subscription.summary.inactive.EXPIRED";
     return (
-      <div className="mb-8 rounded-2xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
-        <p>{t(msgKey)}</p>
+      <div
+        className={rootClass(
+          "border border-border bg-muted/30 text-sm text-muted-foreground",
+        )}
+      >
+        <p className={compact ? "text-xs" : undefined}>{t(msgKey)}</p>
         <Link
           to="/pricing"
-          className="mt-2 inline-block text-sm font-medium text-primary hover:underline"
+          className="mt-2 inline-block text-xs font-medium text-primary hover:underline sm:text-sm"
         >
           {t("subscription.summary.viewPlans")}
         </Link>

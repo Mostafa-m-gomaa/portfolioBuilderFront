@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
 import { getPostAuthEntryPath, needsSubscriptionOnboarding } from '@/lib/authRouting';
 import { startPackageCheckout } from '@/lib/startPackageCheckout';
+import { getStoredDisplayCurrency } from '@/lib/pricingDisplayCurrencyStorage';
 import { useAuthStore } from '@/store/auth.store';
 import { EmailInput, type EmailInputHandle } from '@/components/auth/EmailInput';
 import { getEmailValidationError, normalizeEmail } from '@/lib/emailValidation';
@@ -40,6 +41,7 @@ const VerifyEmail = () => {
         const navigated = await startPackageCheckout(
           pendingPkg,
           t('payment.checkoutError'),
+          { checkoutCurrency: getStoredDisplayCurrency() },
         );
         if (navigated) {
           sessionStorage.removeItem('pending_checkout_package_id');

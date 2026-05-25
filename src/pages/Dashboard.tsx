@@ -1,30 +1,54 @@
-import { Link, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import { AlertTriangle, Loader2 } from 'lucide-react';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
+import { useEffect, useMemo } from 'react';
+import { AlertTriangle, ExternalLink, Globe, Image, LayoutGrid, LayoutTemplate, Loader2, Settings2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { needsSubscriptionOnboarding } from '@/lib/authRouting';
 import { useSubscriptionSummary } from '@/hooks/useSubscriptionSummary';
-import SubscriptionSummaryPanel from '@/components/subscription/SubscriptionSummaryPanel';
+import SubscriptionSummaryPanelSafe from '@/components/subscription/SubscriptionSummaryPanelSafe';
 import { useAllSections, useMyPortfolio, usePortfolioActions, usePortfolioBootstrap } from '@/hooks/usePortfolio';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SubdomainManagerCard from '@/components/auth/SubdomainManagerCard';
 import LanguageModeCard from '@/components/auth/LanguageModeCard';
 import TemplateManagerCard from '@/components/auth/TemplateManagerCard';
 import LogoManagerCard from '@/components/auth/LogoManagerCard';
 import ProfilePreferencesCard from '@/components/auth/ProfilePreferencesCard';
+import { resolvePortfolioDisplayLang } from '@/lib/portfolioDisplayLang';
 import { prettyTemplateName, sectionLabel } from '@/lib/templateCatalogView';
+
+const DASHBOARD_TABS = ['sections', 'domain', 'logo', 'template', 'settings'] as const;
+type DashboardTab = (typeof DASHBOARD_TABS)[number];
+
+const isDashboardTab = (value: string | null): value is DashboardTab =>
+  value !== null && (DASHBOARD_TABS as readonly string[]).includes(value);
+
+const normalizeDashboardTab = (value: string | null): string | null =>
+  value === 'site' ? 'domain' : value;
 
 const Dashboard = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const { lang, t } = useLanguage();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = normalizeDashboardTab(searchParams.get('tab'));
+  const activeTab: DashboardTab = isDashboardTab(tabParam) ? tabParam : 'sections';
   const bootstrapMutation = usePortfolioBootstrap();
   const { data: portfolio, isLoading: portfolioLoading } = useMyPortfolio();
   const { data: sections, isLoading: sectionsLoading } = useAllSections();
   const { publishMutation, unpublishMutation, setSectionActiveMutation } = usePortfolioActions();
-  const { data: subSummary, isFetched: subSumFetched } = useSubscriptionSummary();
+  const {
+    data: subSummary,
+    isFetched: subSumFetched,
+    isLoading: subSummaryLoading,
+    isError: subSummaryError,
+  } = useSubscriptionSummary();
+
+  const sectionDisplayLang = useMemo(
+    () => resolvePortfolioDisplayLang(portfolio, lang),
+    [portfolio, lang],
+  );
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -50,7 +74,10 @@ const Dashboard = () => {
         </div>
       );
     }
-    if (!subSummary || subSummary.subscriptionStatus === 'NOT_DETECTED') {
+    if (
+      !subSummary?.hasActiveSubscription &&
+      subSummary?.subscriptionStatus === 'NOT_DETECTED'
+    ) {
       return <Navigate to="/select-subscription" replace />;
     }
   }
@@ -71,6 +98,16 @@ const Dashboard = () => {
   const freeTrialExpired = subSumFetched && subSummary
     ? subSummary.subscriptionStatus === 'FREE_TRIAL_EXPIRED'
     : user?.subscriptionStatus === 'FREE_TRIAL_EXPIRED';
+
+  const showSubscriptionAside =
+    subSummaryLoading ||
+    (!subSummaryError &&
+      subSummary &&
+      ((subSummary.subscriptionStatus === 'FREE_TRIAL' && subSummary.subscription) ||
+        (subSummary.hasActiveSubscription && subSummary.subscription) ||
+        (!subSummary.hasActiveSubscription &&
+          (subSummary.subscriptionStatus === 'EXPIRED' ||
+            subSummary.subscriptionStatus === 'CANCELLED'))));
 
   return (
     <div className="min-h-screen bg-background">
@@ -103,12 +140,14 @@ const Dashboard = () => {
             </Link>
           </div>
         ) : null}
-        <SubscriptionSummaryPanel />
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="font-heading text-3xl font-bold">{t('dashboard.title')}</h1>
             <p className="text-muted-foreground text-sm">
-              {t('dashboard.welcome')} {user?.name || user?.email || t('dashboard.creatorFallback')}
+              {t('dashboard.welcome')}{' '}
+              {typeof user?.name === 'string'
+                ? user.name
+                : user?.email || t('dashboard.creatorFallback')}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -132,103 +171,185 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="glass-strong rounded-3xl p-6 mb-8">
-          <p className="text-sm text-muted-foreground">{t('dashboard.subdomain')}</p>
-          <p className="text-lg font-semibold">{user?.subdomain || portfolio?.subdomain || t('dashboard.notSet')}</p>
-          <a href={`https://${user?.subdomain || portfolio?.subdomain || ''}.getsirty.com`} target='_blank' rel='noopener noreferrer' className="text-xxs text-primary hover:underline">
-            {t('dashboard.goToSite')}
-          </a>
-          <p className="text-xs text-muted-foreground mt-2">
-            {t('dashboard.template')}{' '}
-            {user?.templateName || portfolio?.templateName
-              ? prettyTemplateName(String(user?.templateName || portfolio?.templateName), lang)
-              : t('templates.choose.notSelected')}
-          </p>
-          <p className="text-xs text-muted-foreground mt-2">
-            {t('dashboard.status')}{' '}
-            {portfolio?.isPublished ? t('dashboard.published') : t('dashboard.draft')}
-          </p>
-        </motion.div>
+        <div
+          className={
+            showSubscriptionAside
+              ? 'mb-6 grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2'
+              : 'mb-6'
+          }
+        >
+          <motion.div
+            initial={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass-strong rounded-3xl p-6 h-full"
+          >
+            <p className="text-sm text-muted-foreground">{t('dashboard.subdomain')}</p>
+            <p className="text-lg font-semibold">{user?.subdomain || portfolio?.subdomain || t('dashboard.notSet')}</p>
+            <a
+              href={`https://${user?.subdomain || portfolio?.subdomain || ''}.getsirty.com`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl gradient-bg px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/20 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto"
+            >
+              {t('dashboard.goToSite')}
+              <ExternalLink
+                className="h-4 w-4 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                aria-hidden
+              />
+            </a>
+            <p className="text-xs text-muted-foreground mt-4">
+              {t('dashboard.template')}{' '}
+              {user?.templateName || portfolio?.templateName
+                ? prettyTemplateName(String(user?.templateName || portfolio?.templateName), lang)
+                : t('templates.choose.notSelected')}
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">
+              {t('dashboard.status')}{' '}
+              {portfolio?.isPublished ? t('dashboard.published') : t('dashboard.draft')}
+            </p>
+          </motion.div>
+          {showSubscriptionAside ? (
+            <SubscriptionSummaryPanelSafe compact className="mb-0" />
+          ) : null}
+        </div>
 
-        <div className="mb-8 grid grid-cols-1 xl:grid-cols-2 gap-4">
-          <div className="space-y-4">
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => setSearchParams({ tab: value }, { replace: true })}
+          className="space-y-6"
+        >
+          <TabsList className="h-auto flex w-full flex-wrap justify-start gap-2 rounded-2xl bg-transparent p-0">
+            <TabsTrigger
+              value="sections"
+              className="inline-flex glass rounded-xl px-4 py-2.5 text-sm gap-2 data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
+            >
+              <LayoutGrid className="h-4 w-4 shrink-0" aria-hidden />
+              {t('dashboard.tab.sections')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="domain"
+              className="inline-flex glass rounded-xl px-4 py-2.5 text-sm gap-2 data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
+            >
+              <Globe className="h-4 w-4 shrink-0" aria-hidden />
+              {t('dashboard.tab.domain')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="logo"
+              className="inline-flex glass rounded-xl px-4 py-2.5 text-sm gap-2 data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
+            >
+              <Image className="h-4 w-4 shrink-0" aria-hidden />
+              {t('dashboard.tab.logo')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="template"
+              className="inline-flex glass rounded-xl px-4 py-2.5 text-sm gap-2 data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
+            >
+              <LayoutTemplate className="h-4 w-4 shrink-0" aria-hidden />
+              {t('dashboard.tab.template')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="settings"
+              className="inline-flex glass rounded-xl px-4 py-2.5 text-sm gap-2 data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
+            >
+              <Settings2 className="h-4 w-4 shrink-0" aria-hidden />
+              {t('dashboard.tab.settings')}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="sections" className="mt-0 focus-visible:outline-none">
+            {(sectionsLoading || portfolioLoading) && (
+              <div className="glass-strong rounded-2xl p-6 text-sm text-muted-foreground">{t('dashboard.loading')}</div>
+            )}
+            {!sectionsLoading && !portfolioLoading && sectionEntries.length === 0 && (
+              <div className="glass-strong rounded-2xl p-6 text-sm text-muted-foreground">{t('dashboard.noSections')}</div>
+            )}
+            {!sectionsLoading && sectionEntries.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {sectionEntries.map(([section, value]) => {
+                  const sectionName = String(section);
+                  const active = Boolean(
+                    value &&
+                      typeof value === 'object' &&
+                      'active' in value &&
+                      typeof (value as { active?: unknown }).active === 'boolean' &&
+                      (value as { active: boolean }).active,
+                  );
+                  const isToggling =
+                    setSectionActiveMutation.isPending &&
+                    setSectionActiveMutation.variables?.sectionName === sectionName;
+
+                  return (
+                    <div key={sectionName} className="glass-strong rounded-2xl p-5 glow-border">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <h3 className="font-heading font-semibold">{sectionLabel(sectionName, sectionDisplayLang)}</h3>
+                          <p className="text-xs text-muted-foreground mt-1">{t('dashboard.editSection')}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-muted-foreground">
+                            {isToggling
+                              ? t('dashboard.sectionUpdating')
+                              : active
+                                ? t('dashboard.sectionOpen')
+                                : t('dashboard.sectionClosed')}
+                          </span>
+                          <Switch
+                            checked={active}
+                            disabled={isToggling}
+                            onCheckedChange={(checked) =>
+                              setSectionActiveMutation.mutate({ sectionName, active: checked })
+                            }
+                            aria-label={t('dashboard.sectionToggleAria').replace(
+                              '{section}',
+                              sectionLabel(sectionName, sectionDisplayLang),
+                            )}
+                          />
+                        </div>
+                      </div>
+                      <Link
+                        to={`/section/${sectionName}/editor`}
+                        className="inline-block mt-4 text-sm text-primary hover:underline"
+                      >
+                        {t('dashboard.openEditor')}
+                      </Link>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="domain" className="mt-0 focus-visible:outline-none">
             <SubdomainManagerCard
               title={t('profile.updateSubdomain.title')}
               description={t('profile.updateSubdomain.description')}
               buttonLabel={t('profile.updateSubdomain.button')}
               currentSubdomain={user?.subdomain || portfolio?.subdomain || ''}
             />
-            <TemplateManagerCard currentTemplateName={user?.templateName || String(portfolio?.templateName ?? '')} />
+          </TabsContent>
+
+          <TabsContent value="logo" className="mt-0 focus-visible:outline-none">
             <LogoManagerCard currentLogo={user?.logo || null} />
-          </div>
-          <div className="space-y-4">
+          </TabsContent>
+
+          <TabsContent value="template" className="mt-0 focus-visible:outline-none">
+            <TemplateManagerCard currentTemplateName={user?.templateName || String(portfolio?.templateName ?? '')} />
+          </TabsContent>
+
+          <TabsContent value="settings" className="mt-0 focus-visible:outline-none space-y-4">
             <LanguageModeCard
               currentLanguageMode={portfolio?.languageMode || null}
               currentDefaultLanguage={portfolio?.defaultLanguage || null}
             />
             <ProfilePreferencesCard
+              currentCountry={user?.country || null}
               currentCurrency={user?.currency || null}
               currentAllowWhatsapp={user?.allowWhatsapp}
               currentWhatsApp={user?.WhatsApp || null}
               currentWhatsapp={user?.whatsapp || null}
             />
-          </div>
-        </div>
-
-        <h2 className="font-heading text-2xl font-semibold mb-4">{t('dashboard.sections')}</h2>
-        {(sectionsLoading || portfolioLoading) && (
-          <div className="glass-strong rounded-2xl p-6 text-sm text-muted-foreground">{t('dashboard.loading')}</div>
-        )}
-        {!sectionsLoading && sectionEntries.length === 0 && (
-          <div className="glass-strong rounded-2xl p-6 text-sm text-muted-foreground">{t('dashboard.noSections')}</div>
-        )}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sectionEntries.map(([section, value]) => {
-            const sectionName = String(section);
-            const active = Boolean(
-              value &&
-              typeof value === 'object' &&
-              'active' in value &&
-              typeof (value as { active?: unknown }).active === 'boolean' &&
-              (value as { active: boolean }).active,
-            );
-            const isToggling =
-              setSectionActiveMutation.isPending &&
-              setSectionActiveMutation.variables?.sectionName === sectionName;
-
-            return (
-              <div key={sectionName} className="glass-strong rounded-2xl p-5 glow-border">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h3 className="font-heading font-semibold">{sectionLabel(sectionName, lang)}</h3>
-                    <p className="text-xs text-muted-foreground mt-1">{t('dashboard.editSection')}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-muted-foreground">
-                      {isToggling
-                        ? t('dashboard.sectionUpdating')
-                        : active
-                          ? t('dashboard.sectionOpen')
-                          : t('dashboard.sectionClosed')}
-                    </span>
-                    <Switch
-                      checked={active}
-                      disabled={isToggling}
-                      onCheckedChange={(checked) => setSectionActiveMutation.mutate({ sectionName, active: checked })}
-                      aria-label={`Toggle ${sectionName} active state`}
-                    />
-                  </div>
-                </div>
-                <Link
-                  to={`/section/${sectionName}/editor`}
-                  className="inline-block mt-4 text-sm text-primary hover:underline"
-                >
-                  {t('dashboard.openEditor')}
-                </Link>
-              </div>
-            )
-          })}
-        </div>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );

@@ -10,8 +10,12 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { fetchPackages } from "@/api/packages";
 import { parseApiError } from "@/api/axios";
 import {
-  formatConvertedPackagePrice,
   formatDurationMonths,
+  formatPackageDisplayPrice,
+  getPackagePrice,
+  packageDescription,
+  packageFeatureText,
+  packageName,
   sortPackagesByOrder,
 } from "@/lib/packageDisplay";
 import { needsSubscriptionOnboarding, getPostAuthEntryPath } from "@/lib/authRouting";
@@ -48,7 +52,7 @@ const SelectSubscription = () => {
     const out: string[] = [];
     for (const p of packages) {
       for (const f of p.features) {
-        const s = f.trim();
+        const s = packageFeatureText(f, lang).trim();
         if (s && !seen.has(s)) {
           seen.add(s);
           out.push(s);
@@ -56,7 +60,7 @@ const SelectSubscription = () => {
       }
     }
     return out.slice(0, 14);
-  }, [packages]);
+  }, [packages, lang]);
 
   const freeTrialMutation = useMutation({
     mutationFn: () => subscriptionsService.startFreeTrial(),
@@ -201,11 +205,11 @@ const SelectSubscription = () => {
                   {(mergedTrialFeatures.length > 0
                     ? mergedTrialFeatures
                     : [
-                        t("subscription.freeTrial.fallback1"),
-                        t("subscription.freeTrial.fallback2"),
-                        t("subscription.freeTrial.fallback3"),
-                        t("subscription.freeTrial.fallback4"),
-                      ]
+                      t("subscription.freeTrial.fallback1"),
+                      t("subscription.freeTrial.fallback2"),
+                      t("subscription.freeTrial.fallback3"),
+                      t("subscription.freeTrial.fallback4"),
+                    ]
                   )
                     .slice(0, 5)
                     .map((line, j) => (
@@ -237,7 +241,9 @@ const SelectSubscription = () => {
                   </Link>
                 </div>
               </motion.div>
-              {packages.map((pkg, i) => (
+              {packages.map((pkg, i) => {
+                const { price, currency } = getPackagePrice(pkg, displayCurrency);
+                return (
                 <motion.div
                   key={pkg._id}
                   initial={{ opacity: 0, y: 16 }}
@@ -246,23 +252,18 @@ const SelectSubscription = () => {
                   className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-sm"
                 >
                   <h3 className="font-heading text-lg font-semibold text-foreground">
-                    {pkg.name}
+                    {packageName(pkg, lang)}
                   </h3>
                   <p className="mt-2 font-heading text-2xl font-bold text-foreground">
-                    {formatConvertedPackagePrice(
-                      pkg.price,
-                      pkg.currency,
-                      displayCurrency,
-                      lang,
-                    )}
+                    {formatPackageDisplayPrice(pkg, displayCurrency, lang)}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {t('pricing.subscriptionDuration')}
                     {formatDurationMonths(pkg.durationMonths, lang)}
                   </p>
-                  {pkg.description ? (
+                  {packageDescription(pkg, lang) ? (
                     <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">
-                      {pkg.description}
+                      {packageDescription(pkg, lang)}
                     </p>
                   ) : null}
                   <ul className="mt-4 flex-1 space-y-2">
@@ -272,7 +273,7 @@ const SelectSubscription = () => {
                         className="flex items-center gap-2 text-xs text-foreground"
                       >
                         <Check className="h-3.5 w-3.5 shrink-0 text-primary" />
-                        {f}
+                        {packageFeatureText(f, lang)}
                       </li>
                     ))}
                   </ul>
@@ -280,8 +281,9 @@ const SelectSubscription = () => {
                     <SubscribePackageCta
                       packageId={pkg._id}
                       couponEnabled
-                      packagePrice={pkg.price}
-                      packageCurrency={pkg.currency}
+                      packagePrice={price}
+                      packageCurrency={currency}
+                      selectedDisplayCurrency={displayCurrency}
                       className="block w-full rounded-xl bg-primary py-2.5 text-center text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
                     >
                       {t("pricing.cta")}
@@ -294,7 +296,8 @@ const SelectSubscription = () => {
                     </Link>
                   </div>
                 </motion.div>
-              ))}
+              );
+              })}
             </div>
           </div>
         )}

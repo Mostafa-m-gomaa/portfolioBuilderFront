@@ -1,16 +1,38 @@
 import { apiClient } from "@/api/axios";
 import type {
+  PaymentCheckoutCurrency,
   PaymentCheckoutRequest,
   PaymentCheckoutResponse,
 } from "@/types/payment.types";
+
+/** Always EGP or USD (3-letter ISO) for express-validator on the API. */
+export const toPaymentCheckoutCurrency = (
+  code: unknown,
+): PaymentCheckoutCurrency => {
+  const normalized = String(code ?? "").trim().toUpperCase();
+  return normalized === "USD" ? "USD" : "EGP";
+};
 
 export const paymentsService = {
   async createCheckout(
     payload: PaymentCheckoutRequest,
   ): Promise<PaymentCheckoutResponse> {
+    const price = Math.round(Number(payload.price) * 100) / 100;
+    if (!Number.isFinite(price) || price <= 0) {
+      throw new Error("Invalid checkout price");
+    }
+
+    const body: PaymentCheckoutRequest = {
+      packageId: String(payload.packageId ?? "").trim(),
+      price,
+      currency: toPaymentCheckoutCurrency(payload.currency),
+    };
+    const coupon = payload.couponName?.trim();
+    if (coupon) body.couponName = coupon;
+
     const response = await apiClient.post<PaymentCheckoutResponse>(
       "/payments/checkout",
-      payload,
+      body,
     );
     return response.data;
   },
