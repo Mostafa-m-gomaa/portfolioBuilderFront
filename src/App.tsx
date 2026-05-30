@@ -34,6 +34,7 @@ import PublicTemplates from "./pages/PublicTemplates";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure";
 import PaymentStatusRedirect from "./components/payment/PaymentStatusRedirect";
+import WhatsAppFloatingButton from "./components/WhatsAppFloatingButton";
 
 const queryClient = new QueryClient();
 
@@ -46,34 +47,37 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <PaymentStatusRedirect />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/pricing" element={<Pricing />} />
-              <Route path="/pricing/:packageId" element={<PackageDetail />} />
-              <Route path="/payment/success" element={<PaymentSuccess />} />
-              <Route path="/payment/failure" element={<PaymentFailure />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/login" element={<GuestOnly><Login /></GuestOnly>} />
-              <Route path="/signup" element={<GuestOnly><SignUp /></GuestOnly>} />
-              <Route path="/verify-email" element={<VerifyEmail />} />
-              <Route path="/forgot-password" element={<GuestOnly><ForgotPassword /></GuestOnly>} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/choose-subdomain" element={<ChooseSubdomain />} />
-              <Route path="/select-subscription" element={<RequireAuth><SelectSubscription /></RequireAuth>} />
-              <Route path="/select-language-mode" element={<RequireAuth><SelectLanguageMode /></RequireAuth>} />
-              <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-              <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
-              <Route path="/templates" element={<PublicTemplates />} />
-              <Route path="/template-selector" element={<RequireAuth><TemplateSelector /></RequireAuth>} />
-              <Route path="/section/:sectionName/editor" element={<RequireAuth><SectionEditor /></RequireAuth>} />
-              <Route path="/get-started" element={<GetStarted />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/refund-policy" element={<RefundPolicy />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <WhatsAppFloatingButton />
+            <div className="min-h-screen overflow-x-clip">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/pricing/:packageId" element={<PackageDetail />} />
+                <Route path="/payment/success" element={<PaymentSuccess />} />
+                <Route path="/payment/failure" element={<PaymentFailure />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/login" element={<GuestOnly><Login /></GuestOnly>} />
+                <Route path="/signup" element={<GuestOnly><SignUp /></GuestOnly>} />
+                <Route path="/verify-email" element={<VerifyEmail />} />
+                <Route path="/forgot-password" element={<GuestOnly><ForgotPassword /></GuestOnly>} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/choose-subdomain" element={<ChooseSubdomain />} />
+                <Route path="/select-subscription" element={<RequireAuth><SelectSubscription /></RequireAuth>} />
+                <Route path="/select-language-mode" element={<RequireAuth><SelectLanguageMode /></RequireAuth>} />
+                <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+                <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+                <Route path="/templates" element={<PublicTemplates />} />
+                <Route path="/template-selector" element={<RequireAuth><TemplateSelector /></RequireAuth>} />
+                <Route path="/section/:sectionName/editor" element={<RequireAuth><SectionEditor /></RequireAuth>} />
+                <Route path="/get-started" element={<GetStarted />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/refund-policy" element={<RefundPolicy />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
           </BrowserRouter>
         </TooltipProvider>
       </LanguageProvider>

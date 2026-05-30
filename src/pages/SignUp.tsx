@@ -112,11 +112,16 @@ const SignUp = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-clip bg-background">
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen px-6 pt-24">
-        <div className="floating-orb w-72 h-72 bg-secondary/20 -top-10 end-10" />
-        <div className="floating-orb w-56 h-56 bg-accent/15 bottom-10 start-10" style={{ animation: 'float-delayed 10s ease-in-out infinite' }} />
+      <div className="relative flex min-h-screen w-full max-w-full items-center justify-center overflow-x-clip px-6 pt-24">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <div className="floating-orb end-0 top-0 h-48 w-48 bg-secondary/20 sm:h-72 sm:w-72" />
+          <div
+            className="floating-orb start-0 bottom-0 h-40 w-40 bg-accent/15 sm:h-56 sm:w-56"
+            style={{ animation: 'float-delayed 10s ease-in-out infinite' }}
+          />
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

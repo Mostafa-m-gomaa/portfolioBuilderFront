@@ -21,8 +21,8 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.16),transparent_34%),linear-gradient(180deg,hsl(var(--background))_0%,hsl(var(--muted)/0.35)_100%)]" />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <div className="grid items-center gap-14 lg:grid-cols-[0.92fr_1.08fr]">
+      <div className="relative z-10 mx-auto max-w-7xl min-w-0 px-6">
+        <div className="grid min-w-0 items-center gap-14 lg:grid-cols-[0.92fr_1.08fr]">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -34,12 +34,12 @@ const HeroSection = () => {
               {t('hero.badge')}
             </div>
 
-            <h1 className="mt-7 max-w-3xl font-heading text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl xl:text-7xl">
+            <h1 className="mt-7 max-w-3xl font-heading text-4xl font-bold leading-[1.4] tracking-tight text-foreground sm:text-5xl sm:leading-[1.35] lg:text-6xl lg:leading-[1.4] xl:text-7xl xl:leading-[1.4]">
               {t('hero.title')}{' '}
               <span className="text-primary">{t('hero.titleHighlight')}</span>
             </h1>
 
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground md:text-xl">
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl md:leading-8 lg:leading-9">
               {t('hero.subtitle')}
             </p>
 
@@ -83,9 +83,9 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: 'easeOut', delay: 0.16 }}
-            className="relative"
+            className="relative min-w-0"
           >
-            <div className="absolute -inset-6 rounded-[2.25rem] bg-primary/10 blur-3xl" aria-hidden="true" />
+            <div className="absolute inset-0 rounded-[2.25rem] bg-primary/10 blur-3xl sm:-inset-4" aria-hidden="true" />
             <div className="relative rounded-[2rem] border border-border bg-card p-3 shadow-2xl shadow-foreground/10">
               <div className="rounded-[1.5rem] border border-border bg-background overflow-hidden">
                 <div className="flex items-center justify-between border-b border-border bg-muted/40 px-4 py-3">

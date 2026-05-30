@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import SocialLinks from '@/components/SocialLinks';
+import { MOSTAFA_BUILDS_FACEBOOK_URL } from '@/constants/socialLinks';
 import logo from '@/assets/logo.png';
 
 const Footer = () => {
@@ -14,7 +16,8 @@ const Footer = () => {
               <img src={logo} alt={t('brand.logoAlt')} className="w-12 h-12 rounded-xl object-contain" />
               <span className="font-heading font-bold text-lg text-foreground">{t('brand.name')}</span>
             </div>
-            <p className="text-muted-foreground text-sm">{t('footer.description')}</p>
+            <p className="text-muted-foreground text-sm mb-5">{t('footer.description')}</p>
+            <SocialLinks />
           </div>
           <div>
             <h4 className="font-heading font-semibold text-foreground mb-4">{t('footer.links')}</h4>
@@ -64,8 +67,19 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        <div className="mt-8 pt-8 border-t border-border text-center">
+        <div className="mt-8 pt-8 border-t border-border text-center space-y-2">
           <p className="text-sm text-muted-foreground">{t('footer.copyright')}</p>
+          <p className="text-sm text-muted-foreground">
+            {t('footer.developedBy')}{' '}
+            <a
+              href={MOSTAFA_BUILDS_FACEBOOK_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-foreground hover:text-primary transition-colors"
+            >
+              {t('footer.developerName')}
+            </a>
+          </p>
         </div>
       </div>
     </footer>

@@ -35,17 +35,17 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-50">
-      <div className="mx-4 mt-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between rounded-2xl border border-border bg-background/90 px-6 py-3 shadow-sm backdrop-blur-xl">
+    <nav className="fixed inset-x-0 top-0 z-50 overflow-x-clip">
+      <div className="mx-4 mt-4 max-w-[calc(100%-2rem)]">
+        <div className="mx-auto flex max-w-7xl min-w-0 items-center justify-between gap-2 rounded-2xl border border-border bg-background/90 px-4 py-3 shadow-sm backdrop-blur-xl sm:px-6">
           {/* Logo */}
-          <Link to="/" className="group flex items-center gap-3">
+          <Link to="/" className="group flex min-w-0 shrink items-center gap-2 sm:gap-3">
             <img src={logo} alt={t('brand.logoAlt')} className="w-12 h-12 rounded-xl object-contain" />
             <span
-              className={`bg-gradient-to-br from-foreground via-primary to-foreground bg-clip-text font-heading font-black leading-none text-transparent transition group-hover:from-primary group-hover:via-primary group-hover:to-secondary ${
+              className={`truncate bg-gradient-to-br from-foreground via-primary to-foreground bg-clip-text font-heading font-black leading-none text-transparent transition group-hover:from-primary group-hover:via-primary group-hover:to-secondary ${
                 lang === 'ar'
-                  ? 'text-[1.35rem] tracking-[-0.045em]'
-                  : 'text-[1.45rem] tracking-[-0.055em]'
+                  ? 'text-xl tracking-[-0.045em] sm:text-[1.35rem]'
+                  : 'text-xl tracking-[-0.055em] sm:text-[1.45rem]'
               }`}
             >
               {t('brand.name')}

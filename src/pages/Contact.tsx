@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SocialLinks from '@/components/SocialLinks';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone } from 'lucide-react';
@@ -40,6 +41,9 @@ const Contact = () => {
                   <span className="text-foreground text-sm">{item.text}</span>
                 </div>
               ))}
+              <div className="glass-strong rounded-2xl p-4">
+                <SocialLinks showLabel />
+              </div>
             </motion.div>
             <motion.form initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="glass-strong rounded-2xl p-6 glow-border space-y-4" onSubmit={handleSubmit} noValidate>
               <input

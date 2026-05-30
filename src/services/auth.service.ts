@@ -12,7 +12,6 @@ import type {
   UpdateProfilePayload,
   UpdateSubdomainPayload,
   UpdateTemplateNamePayload,
-  VerifyResetPasswordCodePayload,
   VerifyEmailPayload,
 } from "@/types/auth.types";
 
@@ -39,7 +38,8 @@ const normalizeUser = (raw: unknown): AuthUser | undefined => {
     emailVerified: Boolean(r.emailVerified ?? r.isVerified),
     role: (r.role as string | null | undefined) ?? null,
     authProvider: (r.authProvider as string | null | undefined) ?? null,
-    subscriptionStatus: (r.subscriptionStatus as string | null | undefined) ?? null,
+    subscriptionStatus:
+      (r.subscriptionStatus as string | null | undefined) ?? null,
     country: (r.country as string | null | undefined) ?? null,
   };
 };
@@ -121,16 +121,15 @@ export const authService = {
   async resetPassword(
     payload: ResetPasswordPayload,
   ): Promise<{ message?: string }> {
-    const response = await apiClient.post("/auth/reset-password", payload);
-    return response.data;
-  },
-
-  async verifyResetPasswordCode(
-    payload: VerifyResetPasswordCodePayload,
-  ): Promise<{ message?: string }> {
+    const { token, newPassword, newPasswordConfirmation } = payload;
     const response = await apiClient.post(
-      "/auth/verify-reset-password-code",
-      payload,
+      "/auth/reset-password",
+      { newPassword, newPasswordConfirmation },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
     );
     return response.data;
   },

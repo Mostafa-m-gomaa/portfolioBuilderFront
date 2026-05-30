@@ -85,7 +85,7 @@ const finalizeUploadToast = (config: any, isSuccess: boolean) => {
 
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_STORAGE_KEY);
-  if (token) {
+  if (token && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 

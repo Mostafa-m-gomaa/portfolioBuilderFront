@@ -1,115 +1,118 @@
-import { useMemo, useRef, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useMemo, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PasswordInput } from '@/components/auth/PasswordInput';
-import { EmailInput, type EmailInputHandle } from '@/components/auth/EmailInput';
-import { normalizeEmail } from '@/lib/emailValidation';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
-  const emailFromQuery = useMemo(() => searchParams.get('email') ?? '', [searchParams]);
-  const { verifyResetPasswordCodeMutation, resetPasswordMutation } = useAuth();
+  const navigate = useNavigate();
+  const token = useMemo(() => searchParams.get('token')?.trim() ?? '', [searchParams]);
+  const { resetPasswordMutation } = useAuth();
   const { lang } = useLanguage();
-  const [email, setEmail] = useState(emailFromQuery);
-  const [code, setCode] = useState('');
-  const [step, setStep] = useState<'verify' | 'reset'>('verify');
   const [newPassword, setNewPassword] = useState('');
-  const emailRef = useRef<EmailInputHandle>(null);
+  const [newPasswordConfirmation, setNewPasswordConfirmation] = useState('');
   const isAr = lang === 'ar';
-
-  const onVerifyCode = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!emailRef.current?.validate()) return;
-    const normalizedEmail = normalizeEmail(email);
-    try {
-      await verifyResetPasswordCodeMutation.mutateAsync({ email: normalizedEmail, code });
-      setStep('reset');
-    } catch {
-      // Error toast handled in mutation hook.
-    }
-  };
 
   const onResetPassword = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (step !== 'reset') return;
+    if (!token) return;
+
+    if (newPassword !== newPasswordConfirmation) {
+      toast.error(
+        isAr ? 'كلمتا المرور غير متطابقتين.' : 'Passwords do not match.',
+      );
+      return;
+    }
+
     try {
-      await resetPasswordMutation.mutateAsync({ email: normalizeEmail(email), newPassword });
+      await resetPasswordMutation.mutateAsync({
+        token,
+        newPassword,
+        newPasswordConfirmation,
+      });
       setNewPassword('');
+      setNewPasswordConfirmation('');
+      navigate('/login', { replace: true });
     } catch {
       // Error toast handled in mutation hook.
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-clip bg-background">
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen px-6 pt-24">
+      <div className="flex min-h-screen items-center justify-center px-6 pt-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-strong rounded-3xl p-8 w-full max-w-md glow-border"
+          className="glass-strong glow-border w-full max-w-md rounded-3xl p-8"
         >
-          <h1 className="font-heading text-2xl font-bold text-foreground mb-2">
+          <h1 className="mb-2 font-heading text-2xl font-bold text-foreground">
             {isAr ? 'إعادة تعيين كلمة المرور' : 'Reset password'}
           </h1>
-          {step === 'verify' ? (
+
+          {!token ? (
             <>
-              <p className="text-sm text-muted-foreground mb-6">
+              <p className="mb-6 text-sm text-muted-foreground">
                 {isAr
-                  ? 'الخطوة 1 من 2: أدخل البريد الإلكتروني ورمز الاستعادة.'
-                  : 'Step 1 of 2: Enter your email and reset code.'}
+                  ? 'رابط إعادة التعيين غير صالح أو منتهي. اطلب رابطاً جديداً من صفحة استعادة كلمة المرور.'
+                  : 'This reset link is invalid or expired. Request a new link from the forgot password page.'}
               </p>
-              <form onSubmit={onVerifyCode} className="space-y-4" noValidate>
-                <EmailInput
-                  ref={emailRef}
-                  value={email}
-                  onChange={setEmail}
-                  placeholder={isAr ? 'البريد الإلكتروني' : 'Email'}
-                  required
-                />
-                <input
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  placeholder={isAr ? 'رمز إعادة التعيين' : 'Reset code'}
-                  required
-                  className="w-full glass rounded-xl px-4 py-3 text-sm bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-                <button
-                  type="submit"
-                  disabled={verifyResetPasswordCodeMutation.isPending || !email || !code}
-                  className="w-full glass py-3 rounded-xl text-foreground font-semibold text-sm disabled:opacity-70"
-                >
-                  {verifyResetPasswordCodeMutation.isPending
-                    ? isAr
-                      ? 'جار التحقق...'
-                      : 'Verifying...'
-                    : isAr
-                      ? 'متابعة'
-                      : 'Continue'}
-                </button>
-              </form>
+              <Link
+                to="/forgot-password"
+                className="inline-block text-sm font-medium text-primary hover:underline"
+              >
+                {isAr ? 'طلب رابط جديد' : 'Request a new link'}
+              </Link>
             </>
           ) : (
             <>
-              <p className="text-sm text-muted-foreground mb-6">
+              <p className="mb-6 text-sm text-muted-foreground">
                 {isAr
-                  ? 'الخطوة 2 من 2: أدخل كلمة المرور الجديدة.'
-                  : 'Step 2 of 2: Enter your new password.'}
+                  ? 'أدخل كلمة المرور الجديدة وتأكيدها.'
+                  : 'Enter and confirm your new password.'}
               </p>
               <form onSubmit={onResetPassword} className="space-y-4" noValidate>
-                <PasswordInput
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder={isAr ? 'كلمة المرور الجديدة' : 'New password'}
-                  required
-                  minLength={8}
-                />
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-foreground">
+                    {isAr ? 'كلمة المرور الجديدة' : 'New password'}
+                  </label>
+                  <PasswordInput
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder={isAr ? 'كلمة المرور الجديدة' : 'New password'}
+                    required
+                    minLength={8}
+                    autoComplete="new-password"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-foreground">
+                    {isAr ? 'تأكيد كلمة المرور الجديدة' : 'Confirm new password'}
+                  </label>
+                  <PasswordInput
+                    value={newPasswordConfirmation}
+                    onChange={(e) => setNewPasswordConfirmation(e.target.value)}
+                    placeholder={
+                      isAr ? 'تأكيد كلمة المرور الجديدة' : 'Confirm new password'
+                    }
+                    required
+                    minLength={8}
+                    autoComplete="new-password"
+                  />
+                </div>
                 <button
-                  disabled={resetPasswordMutation.isPending}
-                  className="w-full gradient-bg py-3 rounded-xl text-primary-foreground font-semibold text-sm disabled:opacity-70"
+                  type="submit"
+                  disabled={
+                    resetPasswordMutation.isPending ||
+                    !newPassword ||
+                    !newPasswordConfirmation
+                  }
+                  className="gradient-bg w-full rounded-xl py-3 text-sm font-semibold text-primary-foreground disabled:opacity-70"
                 >
                   {resetPasswordMutation.isPending
                     ? isAr
@@ -119,12 +122,11 @@ const ResetPassword = () => {
                       ? 'تحديث كلمة المرور'
                       : 'Update password'}
                 </button>
-
               </form>
             </>
           )}
 
-          <Link to="/login" className="inline-block mt-4 text-sm text-primary hover:underline">
+          <Link to="/login" className="mt-4 inline-block text-sm text-primary hover:underline">
             {isAr ? 'العودة إلى تسجيل الدخول' : 'Back to login'}
           </Link>
         </motion.div>
@@ -134,4 +136,3 @@ const ResetPassword = () => {
 };
 
 export default ResetPassword;
-

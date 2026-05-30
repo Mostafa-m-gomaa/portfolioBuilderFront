@@ -1227,47 +1227,47 @@ const SectionEditor = () => {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-            {isImageUploading && (
-              <p className="w-full text-xs font-medium text-amber-700 dark:text-amber-400">
-                {t('sectionEditor.waitingImageUpload')}
-              </p>
-            )}
-            <button
-              onClick={onSaveSection}
-              disabled={upsertSectionMutation.isPending || isEditingLocked || isImageUploading}
-              className={primaryButtonClass}
-            >
-              <Save className="h-4 w-4" />
-              {upsertSectionMutation.isPending
-                ? t('sectionEditor.savingSection')
-                : isImageUploading
-                  ? t('sectionEditor.waitingImageUpload')
-                  : t('sectionEditor.saveSection')}
-            </button>
-            <div className="flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2">
-              <span className="text-xs font-medium text-muted-foreground">
-                {setSectionActiveMutation.isPending
-                  ? isAr
-                    ? 'جار التحديث...'
-                    : 'Updating...'
-                  : isAr
-                    ? `ظهور القسم: ${isSectionActive ? 'مفتوح' : 'مغلق'}`
-                    : `Visibility: ${isSectionActive ? 'Visible' : 'Hidden'}`}
-              </span>
-              <Switch
-                checked={isSectionActive}
-                disabled={setSectionActiveMutation.isPending}
-                onCheckedChange={(checked) => setSectionActiveMutation.mutate({ sectionName, active: checked })}
-              />
-            </div>
-            <button
-              onClick={() => clearSectionMutation.mutate(sectionName)}
-              disabled={clearSectionMutation.isPending || isEditingLocked}
-              className={ghostButtonClass}
-            >
-              <RotateCcw className="h-4 w-4" />
-              {clearSectionMutation.isPending ? (isAr ? 'جار المسح...' : 'Clearing...') : isAr ? 'مسح القسم' : 'Clear section'}
-            </button>
+              {isImageUploading && (
+                <p className="w-full text-xs font-medium text-amber-700 dark:text-amber-400">
+                  {t('sectionEditor.waitingImageUpload')}
+                </p>
+              )}
+              <button
+                onClick={onSaveSection}
+                disabled={upsertSectionMutation.isPending || isEditingLocked || isImageUploading}
+                className={primaryButtonClass}
+              >
+                <Save className="h-4 w-4" />
+                {upsertSectionMutation.isPending
+                  ? t('sectionEditor.savingSection')
+                  : isImageUploading
+                    ? t('sectionEditor.waitingImageUpload')
+                    : t('sectionEditor.saveSection')}
+              </button>
+              <div className="flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2">
+                <span className="text-xs font-medium text-muted-foreground">
+                  {setSectionActiveMutation.isPending
+                    ? isAr
+                      ? 'جار التحديث...'
+                      : 'Updating...'
+                    : isAr
+                      ? `ظهور القسم: ${isSectionActive ? 'مفتوح' : 'مغلق'}`
+                      : `Visibility: ${isSectionActive ? 'Visible' : 'Hidden'}`}
+                </span>
+                <Switch
+                  checked={isSectionActive}
+                  disabled={setSectionActiveMutation.isPending}
+                  onCheckedChange={(checked) => setSectionActiveMutation.mutate({ sectionName, active: checked })}
+                />
+              </div>
+              <button
+                onClick={() => clearSectionMutation.mutate(sectionName)}
+                disabled={clearSectionMutation.isPending || isEditingLocked}
+                className={ghostButtonClass}
+              >
+                <RotateCcw className="h-4 w-4" />
+                {clearSectionMutation.isPending ? (isAr ? 'جار المسح...' : 'Clearing...') : isAr ? 'مسح القسم' : 'Clear section'}
+              </button>
             </div>
           </div>
 

@@ -1,7 +1,7 @@
 export type Lang = "ar" | "en";
 
 export const translations: Record<Lang, Record<string, string>> = {
-  "ar": {
+  ar: {
     "nav.home": "الرئيسية",
     "nav.about": "من نحن",
     "nav.services": "خدماتنا",
@@ -14,7 +14,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "hero.badge": "موقع شخصي جاهز للنشر بدون تعقيد",
     "hero.title": "ابني موقعك الشخصي",
     "hero.titleHighlight": "بشكل احترافي",
-    "hero.subtitle": "سيرتي يساعدك تعرض خبرتك، أعمالك، وطرق التواصل معك في موقع سريع ومنظم، مناسب للمستقلين والمهنيين وأصحاب الخدمات.",
+    "hero.subtitle":
+      "سيرتي يساعدك تعرض خبرتك، أعمالك، وطرق التواصل معك في موقع سريع ومنظم، مناسب للمستقلين والمهنيين وأصحاب الخدمات.",
     "hero.cta1": "ابدأ إنشاء موقعك",
     "hero.cta2": "تصفح القوالب",
     "hero.bullet1": "قوالب مرتبة حسب المجال",
@@ -32,15 +33,18 @@ export const translations: Record<Lang, Record<string, string>> = {
     "hero.mockCaption": "معاينة واقعية قبل النشر",
     "features.kicker": "المميزات",
     "features.title": "كل ما تحتاجه لعرض شغلك بوضوح",
-    "features.subtitle": "واجهة بسيطة، قوالب عملية، وإعدادات كافية لتطلع بموقع شكله مهني من غير وقت طويل.",
+    "features.subtitle":
+      "واجهة بسيطة، قوالب عملية، وإعدادات كافية لتطلع بموقع شكله مهني من غير وقت طويل.",
     "features.1.title": "قوالب لمجالات مختلفة",
     "features.1.desc": "ابدأ من تصميم مناسب لمجالك بدل بناء كل شيء من الصفر.",
     "features.2.title": "تحكم في المحتوى",
-    "features.2.desc": "أضف نبذة، خدمات، مشاريع، صور، وروابط تواصل بطريقة منظمة.",
+    "features.2.desc":
+      "أضف نبذة، خدمات، مشاريع، صور، وروابط تواصل بطريقة منظمة.",
     "features.3.title": "نشر فوري",
     "features.3.desc": "جهّز موقعك وشاركه بسرعة مع العملاء أو جهات التوظيف.",
     "features.4.title": "تجربة مستقرة",
-    "features.4.desc": "تصميم متجاوب وصفحات خفيفة تساعد الزائر يوصل للمعلومة بسرعة.",
+    "features.4.desc":
+      "تصميم متجاوب وصفحات خفيفة تساعد الزائر يوصل للمعلومة بسرعة.",
     "how.kicker": "طريقة العمل",
     "how.title": "من أول قالب لحد النشر في خطوات واضحة",
     "how.subtitle": "ابدأ بالاختيار، عدّل بياناتك، وانشر رابطك لما يكون جاهز.",
@@ -69,13 +73,15 @@ export const translations: Record<Lang, Record<string, string>> = {
     "package.missingId": "معرّف الباقة غير صالح.",
     "subscription.kicker": "الاشتراك",
     "subscription.title": "اختر خطتك أو ابدأ بتجربة مجانية",
-    "subscription.subtitle": "لتفعيل حسابك وإكمال إعداد الموقع، اختر باقة مدفوعة أو جرّب كل الميزات لمدة 4 أيام بدون تكلفة.",
+    "subscription.subtitle":
+      "لتفعيل حسابك وإكمال إعداد الموقع، اختر باقة مدفوعة أو جرّب كل الميزات لمدة 4 أيام بدون تكلفة.",
     "subscription.freeTrial.heading": "تجربة مجانية",
     "subscription.freeTrial.badge": "4 أيام",
     "subscription.freeTrial.cardPrice": "مجاني",
     "subscription.freeTrial.title": "تجربة مجانية",
     "subscription.freeTrial.duration": "مدة التجربة: 4 أيام",
-    "subscription.freeTrial.description": "احصل على نفس مميزات الباقات المتاحة لفترة محدودة، ثم أكمل باختيار الدومين وإعداد موقعك.",
+    "subscription.freeTrial.description":
+      "احصل على نفس مميزات الباقات المتاحة لفترة محدودة، ثم أكمل باختيار الدومين وإعداد موقعك.",
     "subscription.freeTrial.fallback1": "كل ميزات الباقات المتاحة على المنصة",
     "subscription.freeTrial.fallback2": "تعديل المحتوى والقالب أثناء التجربة",
     "subscription.freeTrial.fallback3": "نشر تجريبي وفق سياسة المنصة",
@@ -86,7 +92,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "subscription.paidPlans.heading": "الباقات المدفوعة",
     "subscription.paidPlans.viewDetails": "عرض التفاصيل",
     "subscription.error.generic": "تعذر تفعيل التجربة. حاول مرة أخرى.",
-    "subscription.error.freeTrialAlreadyUsed": "تم استخدام التجربة المجانية مسبقاً لهذا الحساب.",
+    "subscription.error.freeTrialAlreadyUsed":
+      "تم استخدام التجربة المجانية مسبقاً لهذا الحساب.",
     "payment.subscribe": "اشترك الآن",
     "payment.redirecting": "جاري التوجيه للدفع…",
     "payment.checkoutError": "تعذر بدء عملية الدفع. حاول مرة أخرى.",
@@ -101,19 +108,22 @@ export const translations: Record<Lang, Record<string, string>> = {
     "payment.coupon.remove": "إزالة الكوبون",
     "payment.coupon.applyError": "تعذر تطبيق الكوبون.",
     "payment.success.title": "تم الدفع بنجاح",
-    "payment.success.subtitle": "شكراً لك. تم تفعيل اشتراكك ويمكنك متابعة إعداد موقعك الآن.",
+    "payment.success.subtitle":
+      "شكراً لك. تم تفعيل اشتراكك ويمكنك متابعة إعداد موقعك الآن.",
     "payment.success.reference": "رقم العملية:",
     "payment.success.ctaDashboard": "الذهاب للوحة التحكم",
     "payment.success.ctaProfile": "عرض الاشتراك",
     "payment.success.ctaPricing": "عرض الباقات",
     "payment.failure.title": "لم تكتمل عملية الدفع",
-    "payment.failure.subtitle": "لم يتم خصم المبلغ. يمكنك المحاولة مرة أخرى أو التواصل معنا إذا استمرت المشكلة.",
+    "payment.failure.subtitle":
+      "لم يتم خصم المبلغ. يمكنك المحاولة مرة أخرى أو التواصل معنا إذا استمرت المشكلة.",
     "payment.failure.reference": "رقم العملية:",
     "payment.failure.ctaRetry": "إعادة المحاولة",
     "payment.failure.ctaContact": "تواصل معنا",
     "payment.failure.ctaHome": "العودة للرئيسية",
     "subscription.banner.freeTrialExpired.title": "انتهت التجربة المجانية",
-    "subscription.banner.freeTrialExpired.description": "بياناتك محفوظة، لكن البورتفوليو متوقف لحد ما تشترك في خطة مناسبة.",
+    "subscription.banner.freeTrialExpired.description":
+      "بياناتك محفوظة، لكن البورتفوليو متوقف لحد ما تشترك في خطة مناسبة.",
     "subscription.banner.freeTrialExpired.cta": "عرض الباقات والاشتراك",
     "subscription.summary.loading": "جاري تحميل حالة الاشتراك…",
     "subscription.summary.activeBadge": "اشتراك نشط",
@@ -123,14 +133,18 @@ export const translations: Record<Lang, Record<string, string>> = {
     "subscription.summary.viewPlans": "عرض الباقات",
     "subscription.summary.trialTitle": "أنت في التجربة المجانية",
     "subscription.summary.trialEnds": "تنتهي التجربة في",
-    "subscription.summary.inactive.EXPIRED": "انتهى اشتراكك السابق. يمكنك اختيار باقة جديدة للمتابعة.",
-    "subscription.summary.inactive.CANCELLED": "تم إلغاء اشتراكك. يمكنك الاشتراك مرة أخرى من صفحة الأسعار.",
+    "subscription.summary.inactive.EXPIRED":
+      "انتهى اشتراكك السابق. يمكنك اختيار باقة جديدة للمتابعة.",
+    "subscription.summary.inactive.CANCELLED":
+      "تم إلغاء اشتراكك. يمكنك الاشتراك مرة أخرى من صفحة الأسعار.",
     "subscription.summary.syncing": "جاري مزامنة حالة الاشتراك…",
     "testimonials.kicker": "آراء العملاء",
     "testimonials.title": "مستخدمون بنوا حضورهم بشكل أسرع",
-    "testimonials.subtitle": "نماذج من أصحاب أعمال ومهنيين احتاجوا موقع مرتب وسهل التحديث.",
+    "testimonials.subtitle":
+      "نماذج من أصحاب أعمال ومهنيين احتاجوا موقع مرتب وسهل التحديث.",
     "cta.title": "ابدأ بموقع يعرض شغلك بوضوح",
-    "cta.subtitle": "جهّز صفحتك، أضف أعمالك، وشارك الرابط مع العملاء في وقت قصير.",
+    "cta.subtitle":
+      "جهّز صفحتك، أضف أعمالك، وشارك الرابط مع العملاء في وقت قصير.",
     "cta.button": "ابدأ الآن",
     "footer.description": "منصة متقدمة لبناء مواقع البورتفوليو الاحترافية",
     "footer.links": "روابط سريعة",
@@ -158,6 +172,12 @@ export const translations: Record<Lang, Record<string, string>> = {
     "services.title": "خدماتنا",
     "services.subtitle": "نقدم مجموعة شاملة من الأدوات والخدمات",
     "contact.title": "تواصل معنا",
+    "whatsappFloat.message": "تواصل معنا",
+    "whatsappFloat.ariaLabel": "تواصل معنا عبر واتساب",
+    "social.followUs": "تابعنا",
+    "social.facebookAria": "تابعنا على فيسبوك",
+    "social.linkedinAria": "تابعنا على لينكدإن",
+    "social.whatsappAria": "تواصل معنا عبر واتساب",
     "contact.subtitle": "نسعد بالإجابة على استفساراتك",
     "contact.send": "إرسال الرسالة",
     "contact.message": "رسالتك",
@@ -178,7 +198,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "auth.creatingAccount": "جاري إنشاء الحساب…",
     "auth.placeholderEmail": "name@example.com",
     "auth.emailRequired": "يرجى إدخال البريد الإلكتروني.",
-    "auth.emailInvalid": "يرجى إدخال بريد إلكتروني صحيح (مثال: name@example.com).",
+    "auth.emailInvalid":
+      "يرجى إدخال بريد إلكتروني صحيح (مثال: name@example.com).",
     "auth.placeholderPassword": "••••••••",
     "auth.showPassword": "إظهار كلمة المرور",
     "auth.hidePassword": "إخفاء كلمة المرور",
@@ -193,7 +214,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "errors.notFound.title": "الصفحة غير موجودة",
     "errors.notFound.backHome": "العودة للرئيسية",
     "onboarding.languageMode.title": "اختر وضع لغة البورتفوليو",
-    "onboarding.languageMode.subtitle": "حدد كيف يُعرض محتوى موقعك. يمكنك تغيير ذلك لاحقاً.",
+    "onboarding.languageMode.subtitle":
+      "حدد كيف يُعرض محتوى موقعك. يمكنك تغيير ذلك لاحقاً.",
     "onboarding.languageMode.enTitle": "الإنجليزية",
     "onboarding.languageMode.enDesc": "عرض المحتوى بالإنجليزية فقط.",
     "onboarding.languageMode.arTitle": "العربية",
@@ -202,7 +224,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "onboarding.languageMode.bothDesc": "عرض المحتوى بالعربية والإنجليزية.",
     "onboarding.languageMode.saving": "جاري حفظ وضع اللغة…",
     "onboarding.subdomain.title": "اختر الدومين الفرعي",
-    "onboarding.subdomain.description": "يتم التحقق من التوفر أثناء الكتابة. لا يُحجز الاسم إلا عند الحفظ.",
+    "onboarding.subdomain.description":
+      "يتم التحقق من التوفر أثناء الكتابة. لا يُحجز الاسم إلا عند الحفظ.",
     "onboarding.subdomain.submit": "متابعة",
     "profile.fallbackName": "مستخدم المنصة",
     "profile.verifiedAccount": "حساب موثّق",
@@ -215,12 +238,14 @@ export const translations: Record<Lang, Record<string, string>> = {
     "profile.publicUrl": "الرابط العام",
     "profile.template": "القالب",
     "profile.updateSubdomain.title": "تحديث الدومين الفرعي",
-    "profile.updateSubdomain.description": "يُتحقق من التوفر أثناء الكتابة. يُحفظ الاسم فقط عند التوفر والضغط على تحديث.",
+    "profile.updateSubdomain.description":
+      "يُتحقق من التوفر أثناء الكتابة. يُحفظ الاسم فقط عند التوفر والضغط على تحديث.",
     "profile.updateSubdomain.button": "تحديث الدومين",
     "profile.logo.alt": "شعار المستخدم",
     "templates.library.badge": "مكتبة القوالب",
     "templates.library.title": "تصفح القوالب قبل إنشاء حسابك",
-    "templates.library.subtitle": "شاهد كل القوالب المتاحة حسب المجال، وافتح أي قالب في صفحة مستقلة لمعاينته. التفعيل متاح فقط بعد تسجيل الدخول.",
+    "templates.library.subtitle":
+      "شاهد كل القوالب المتاحة حسب المجال، وافتح أي قالب في صفحة مستقلة لمعاينته. التفعيل متاح فقط بعد تسجيل الدخول.",
     "templates.library.startSite": "ابدأ بموقعك",
     "templates.library.askTemplate": "اسألنا عن قالب مناسب",
     "templates.library.visit": "زيارة القالب",
@@ -232,7 +257,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "templates.choose.view": "عرض القالب",
     "templates.choose.active": "القالب مفعّل",
     "templates.choose.activate": "تفعيل هذا القالب",
-    "templates.cardDesc.public": "قالب مناسب لقسم {category}، يمكنك معاينته قبل اختيار الخطة المناسبة.",
+    "templates.cardDesc.public":
+      "قالب مناسب لقسم {category}، يمكنك معاينته قبل اختيار الخطة المناسبة.",
     "dashboard.title": "لوحة التحكم",
     "dashboard.welcome": "مرحباً",
     "dashboard.creatorFallback": "منشئ المحتوى",
@@ -285,7 +311,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     "section.team": "الفريق",
     "section.pricing": "الأسعار",
     "section.packages": "الباقات",
-    "section.menus": "القائمة",
+    "section.menus": "قائمة الآسعار",
     "section.fallback": "قسم {name}",
     "sectionEditor.waitingImageUpload": "في انتظار رفع الصورة…",
     "sectionEditor.uploadingImage": "جار رفع الصورة…",
@@ -306,7 +332,10 @@ export const translations: Record<Lang, Record<string, string>> = {
     "footer.privacyDesc": "كيف نتعامل مع بياناتك الشخصية",
     "footer.refundDesc": "سياسة الاسترداد والاشتراكات عبر Paddle",
     "footer.copyright": "© 2024 سيرتي. جميع الحقوق محفوظة.",
-    "toast.auth.registerSuccess": "تم التسجيل بنجاح. يرجى تأكيد بريدك الإلكتروني.",
+    "footer.developedBy": "تم التطوير بواسطة",
+    "footer.developerName": "Mostafa Builds",
+    "toast.auth.registerSuccess":
+      "تم التسجيل بنجاح. يرجى تأكيد بريدك الإلكتروني.",
     "toast.auth.registerError": "تعذر إتمام التسجيل.",
     "toast.auth.welcomeBack": "مرحباً بعودتك.",
     "toast.auth.loginError": "تعذر تسجيل الدخول.",
@@ -359,9 +388,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     "toast.portfolio.imagesUploaded": "تم رفع الصور.",
     "toast.portfolio.imagesUploadError": "تعذر رفع الصور.",
     "toast.portfolio.imageDeleted": "تم حذف الصورة.",
-    "toast.portfolio.imageDeleteError": "تعذر حذف الصورة."
+    "toast.portfolio.imageDeleteError": "تعذر حذف الصورة.",
   },
-  "en": {
+  en: {
     "nav.home": "Home",
     "nav.about": "About",
     "nav.services": "Services",
@@ -374,7 +403,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "hero.badge": "A personal site ready to publish without complexity",
     "hero.title": "Build your personal website",
     "hero.titleHighlight": "professionally",
-    "hero.subtitle": "Sirty helps you present your experience, work, and contact details in a fast, organized website for freelancers, professionals, and service providers.",
+    "hero.subtitle":
+      "Sirty helps you present your experience, work, and contact details in a fast, organized website for freelancers, professionals, and service providers.",
     "hero.cta1": "Start building",
     "hero.cta2": "Browse templates",
     "hero.bullet1": "Templates by profession",
@@ -388,31 +418,42 @@ export const translations: Record<Lang, Record<string, string>> = {
     "hero.stat3.label": "Site availability",
     "hero.previewTitle": "Your site dashboard",
     "hero.previewSubtitle": "Manage content and design",
-    "hero.trust": "Clean design, good loading speed, and a visitor-friendly experience.",
+    "hero.trust":
+      "Clean design, good loading speed, and a visitor-friendly experience.",
     "hero.mockCaption": "A realistic preview before publishing",
     "features.kicker": "Features",
     "features.title": "Everything you need to present your work clearly",
-    "features.subtitle": "A simple interface, practical templates, and enough control to launch a professional-looking site quickly.",
+    "features.subtitle":
+      "A simple interface, practical templates, and enough control to launch a professional-looking site quickly.",
     "features.1.title": "Templates for different fields",
-    "features.1.desc": "Start from a layout that fits your profession instead of building from scratch.",
+    "features.1.desc":
+      "Start from a layout that fits your profession instead of building from scratch.",
     "features.2.title": "Control your content",
-    "features.2.desc": "Add your bio, services, projects, images, and contact links in an organized way.",
+    "features.2.desc":
+      "Add your bio, services, projects, images, and contact links in an organized way.",
     "features.3.title": "Instant Publishing",
-    "features.3.desc": "Prepare your site and share it quickly with clients or employers.",
+    "features.3.desc":
+      "Prepare your site and share it quickly with clients or employers.",
     "features.4.title": "Stable Experience",
-    "features.4.desc": "Responsive layouts and lightweight pages help visitors find what they need quickly.",
+    "features.4.desc":
+      "Responsive layouts and lightweight pages help visitors find what they need quickly.",
     "how.kicker": "How it works",
     "how.title": "How It Works",
-    "how.subtitle": "Pick a template, add your details, and publish your link when it is ready.",
+    "how.subtitle":
+      "Pick a template, add your details, and publish your link when it is ready.",
     "how.1.title": "Choose a Template",
-    "how.1.desc": "Choose a layout that matches your field and preferred presentation style.",
+    "how.1.desc":
+      "Choose a layout that matches your field and preferred presentation style.",
     "how.2.title": "Add Your Details",
-    "how.2.desc": "Write a short bio, add your work, and define the best ways to contact you.",
+    "how.2.desc":
+      "Write a short bio, add your work, and define the best ways to contact you.",
     "how.3.title": "Publish & Share",
-    "how.3.desc": "Review the final result, then share your link with clients or your audience.",
+    "how.3.desc":
+      "Review the final result, then share your link with clients or your audience.",
     "pricing.kicker": "Pricing",
     "pricing.title": "Clear plans without complexity",
-    "pricing.subtitle": "Choose the duration that fits you and start with a site ready to use.",
+    "pricing.subtitle":
+      "Choose the duration that fits you and start with a site ready to use.",
     "pricing.free": "Free",
     "pricing.pro": "Pro",
     "pricing.business": "Business",
@@ -421,7 +462,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "pricing.popular": "Most Popular",
     "pricing.loading": "Loading plans…",
     "pricing.retry": "Try again",
-    "pricing.loadError": "Could not load plans. Check your connection and try again.",
+    "pricing.loadError":
+      "Could not load plans. Check your connection and try again.",
     "pricing.empty": "No packages available at the moment.",
     "pricing.chooseCurrency": "Choose currency",
     "package.details": "Details",
@@ -429,15 +471,19 @@ export const translations: Record<Lang, Record<string, string>> = {
     "package.missingId": "Invalid package link.",
     "subscription.kicker": "Subscription",
     "subscription.title": "Choose a plan or start with a free trial",
-    "subscription.subtitle": "To activate your account and continue setup, pick a paid plan or try all features free for 4 days.",
+    "subscription.subtitle":
+      "To activate your account and continue setup, pick a paid plan or try all features free for 4 days.",
     "subscription.freeTrial.heading": "Free trial",
     "subscription.freeTrial.badge": "4 days",
     "subscription.freeTrial.cardPrice": "Free",
     "subscription.freeTrial.title": "Free trial",
     "subscription.freeTrial.duration": "Trial length: 4 days",
-    "subscription.freeTrial.description": "Use the same capabilities as our paid plans for a limited time, then continue with your domain and site setup.",
-    "subscription.freeTrial.fallback1": "Full access to current platform features during the trial",
-    "subscription.freeTrial.fallback2": "Edit your content and template while trialing",
+    "subscription.freeTrial.description":
+      "Use the same capabilities as our paid plans for a limited time, then continue with your domain and site setup.",
+    "subscription.freeTrial.fallback1":
+      "Full access to current platform features during the trial",
+    "subscription.freeTrial.fallback2":
+      "Edit your content and template while trialing",
     "subscription.freeTrial.fallback3": "Publishing subject to platform policy",
     "subscription.freeTrial.fallback4": "No card required to start",
     "subscription.freeTrial.cta": "Start free trial",
@@ -445,8 +491,10 @@ export const translations: Record<Lang, Record<string, string>> = {
     "subscription.freeTrial.success": "Your free trial is active.",
     "subscription.paidPlans.heading": "Paid plans",
     "subscription.paidPlans.viewDetails": "View details",
-    "subscription.error.generic": "Could not start the trial. Please try again.",
-    "subscription.error.freeTrialAlreadyUsed": "Free trial has already been used for this account.",
+    "subscription.error.generic":
+      "Could not start the trial. Please try again.",
+    "subscription.error.freeTrialAlreadyUsed":
+      "Free trial has already been used for this account.",
     "payment.subscribe": "Subscribe now",
     "payment.redirecting": "Redirecting to payment…",
     "payment.checkoutError": "Could not start payment. Please try again.",
@@ -461,19 +509,22 @@ export const translations: Record<Lang, Record<string, string>> = {
     "payment.coupon.remove": "Remove promo code",
     "payment.coupon.applyError": "Could not apply this code.",
     "payment.success.title": "Payment successful",
-    "payment.success.subtitle": "Thank you. Your subscription is active and you can continue setting up your site.",
+    "payment.success.subtitle":
+      "Thank you. Your subscription is active and you can continue setting up your site.",
     "payment.success.reference": "Transaction reference:",
     "payment.success.ctaDashboard": "Go to dashboard",
     "payment.success.ctaProfile": "View subscription",
     "payment.success.ctaPricing": "View plans",
     "payment.failure.title": "Payment was not completed",
-    "payment.failure.subtitle": "You were not charged. Try again or contact us if the issue continues.",
+    "payment.failure.subtitle":
+      "You were not charged. Try again or contact us if the issue continues.",
     "payment.failure.reference": "Transaction reference:",
     "payment.failure.ctaRetry": "Try again",
     "payment.failure.ctaContact": "Contact us",
     "payment.failure.ctaHome": "Back to home",
     "subscription.banner.freeTrialExpired.title": "Your free trial has ended",
-    "subscription.banner.freeTrialExpired.description": "Your data is safe, but your portfolio stays paused until you subscribe to a plan.",
+    "subscription.banner.freeTrialExpired.description":
+      "Your data is safe, but your portfolio stays paused until you subscribe to a plan.",
     "subscription.banner.freeTrialExpired.cta": "View plans & subscribe",
     "subscription.summary.loading": "Loading subscription status…",
     "subscription.summary.activeBadge": "Active subscription",
@@ -483,16 +534,21 @@ export const translations: Record<Lang, Record<string, string>> = {
     "subscription.summary.viewPlans": "View plans",
     "subscription.summary.trialTitle": "You are on the free trial",
     "subscription.summary.trialEnds": "Trial ends on",
-    "subscription.summary.inactive.EXPIRED": "Your previous subscription has ended. Pick a new plan to continue.",
-    "subscription.summary.inactive.CANCELLED": "Your subscription was cancelled. You can subscribe again from pricing.",
+    "subscription.summary.inactive.EXPIRED":
+      "Your previous subscription has ended. Pick a new plan to continue.",
+    "subscription.summary.inactive.CANCELLED":
+      "Your subscription was cancelled. You can subscribe again from pricing.",
     "subscription.summary.syncing": "Syncing subscription status…",
     "testimonials.kicker": "Testimonials",
     "testimonials.title": "Users who built their presence faster",
-    "testimonials.subtitle": "Examples from professionals who needed a clean site they can update easily.",
+    "testimonials.subtitle":
+      "Examples from professionals who needed a clean site they can update easily.",
     "cta.title": "Start with a site that presents your work clearly",
-    "cta.subtitle": "Set up your page, add your work, and share the link with clients in less time.",
+    "cta.subtitle":
+      "Set up your page, add your work, and share the link with clients in less time.",
     "cta.button": "Get Started",
-    "footer.description": "An advanced platform for building professional portfolio websites",
+    "footer.description":
+      "An advanced platform for building professional portfolio websites",
     "footer.links": "Quick Links",
     "footer.legal": "Legal",
     "footer.terms": "Terms of Use",
@@ -514,15 +570,23 @@ export const translations: Record<Lang, Record<string, string>> = {
     "auth.forgotPassword": "Forgot password?",
     "auth.accountType": "Account type / profession",
     "about.title": "About Us",
-    "about.subtitle": "We're a passionate team empowering creatives to showcase their work beautifully",
+    "about.subtitle":
+      "We're a passionate team empowering creatives to showcase their work beautifully",
     "services.title": "Our Services",
     "services.subtitle": "A comprehensive set of tools and services",
     "contact.title": "Contact Us",
+    "whatsappFloat.message": "Contact us",
+    "whatsappFloat.ariaLabel": "Contact us on WhatsApp",
+    "social.followUs": "Follow us",
+    "social.facebookAria": "Follow us on Facebook",
+    "social.linkedinAria": "Follow us on LinkedIn",
+    "social.whatsappAria": "Contact us on WhatsApp",
     "contact.subtitle": "We'd love to hear from you",
     "contact.send": "Send Message",
     "contact.message": "Your Message",
     "getStarted.title": "Get Started",
-    "getStarted.subtitle": "Your comprehensive guide to building a professional portfolio",
+    "getStarted.subtitle":
+      "Your comprehensive guide to building a professional portfolio",
     "terms.title": "Terms of Use",
     "privacy.title": "Privacy Policy",
     "brand.name": "Sirty",
@@ -538,12 +602,14 @@ export const translations: Record<Lang, Record<string, string>> = {
     "auth.creatingAccount": "Creating account…",
     "auth.placeholderEmail": "name@example.com",
     "auth.emailRequired": "Please enter your email address.",
-    "auth.emailInvalid": "Please enter a valid email address (e.g. name@example.com).",
+    "auth.emailInvalid":
+      "Please enter a valid email address (e.g. name@example.com).",
     "auth.placeholderPassword": "••••••••",
     "auth.showPassword": "Show password",
     "auth.hidePassword": "Hide password",
     "auth.verify.title": "Verify your email",
-    "auth.verify.subtitle": "Enter the verification code we sent to your email.",
+    "auth.verify.subtitle":
+      "Enter the verification code we sent to your email.",
     "auth.verify.codePlaceholder": "Verification code",
     "auth.verify.submit": "Verify email",
     "auth.verify.submitting": "Verifying…",
@@ -553,7 +619,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "errors.notFound.title": "Page not found",
     "errors.notFound.backHome": "Return to home",
     "onboarding.languageMode.title": "Choose portfolio language mode",
-    "onboarding.languageMode.subtitle": "Pick how your portfolio content is displayed. You can change this later.",
+    "onboarding.languageMode.subtitle":
+      "Pick how your portfolio content is displayed. You can change this later.",
     "onboarding.languageMode.enTitle": "English",
     "onboarding.languageMode.enDesc": "Show content in English only.",
     "onboarding.languageMode.arTitle": "Arabic",
@@ -562,7 +629,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "onboarding.languageMode.bothDesc": "Show content in Arabic and English.",
     "onboarding.languageMode.saving": "Saving language mode…",
     "onboarding.subdomain.title": "Choose your subdomain",
-    "onboarding.subdomain.description": "Availability is checked as you type. The name is only saved when you submit.",
+    "onboarding.subdomain.description":
+      "Availability is checked as you type. The name is only saved when you submit.",
     "onboarding.subdomain.submit": "Continue",
     "profile.fallbackName": "Portfolio user",
     "profile.verifiedAccount": "Verified account",
@@ -575,12 +643,14 @@ export const translations: Record<Lang, Record<string, string>> = {
     "profile.publicUrl": "Public URL",
     "profile.template": "Template",
     "profile.updateSubdomain.title": "Update your subdomain",
-    "profile.updateSubdomain.description": "Availability is checked as you type. The name is saved only when available and you click update.",
+    "profile.updateSubdomain.description":
+      "Availability is checked as you type. The name is saved only when available and you click update.",
     "profile.updateSubdomain.button": "Update subdomain",
     "profile.logo.alt": "User logo",
     "templates.library.badge": "Template library",
     "templates.library.title": "Browse templates before creating an account",
-    "templates.library.subtitle": "Explore all available templates by category and open any template in a separate preview. Activation is only available after signing in.",
+    "templates.library.subtitle":
+      "Explore all available templates by category and open any template in a separate preview. Activation is only available after signing in.",
     "templates.library.startSite": "Start your site",
     "templates.library.askTemplate": "Ask about a suitable template",
     "templates.library.visit": "Visit template",
@@ -592,7 +662,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "templates.choose.view": "View template",
     "templates.choose.active": "Active template",
     "templates.choose.activate": "Activate this template",
-    "templates.cardDesc.public": "A template for {category}. Preview it before choosing a plan.",
+    "templates.cardDesc.public":
+      "A template for {category}. Preview it before choosing a plan.",
     "dashboard.title": "Dashboard",
     "dashboard.welcome": "Welcome",
     "dashboard.creatorFallback": "creator",
@@ -666,7 +737,10 @@ export const translations: Record<Lang, Record<string, string>> = {
     "footer.privacyDesc": "How we collect and process data",
     "footer.refundDesc": "Refunds and subscription billing via Paddle",
     "footer.copyright": "© 2024 Sirty. All rights reserved.",
-    "toast.auth.registerSuccess": "Registered successfully. Please verify your email.",
+    "footer.developedBy": "Developed by",
+    "footer.developerName": "Mostafa Builds",
+    "toast.auth.registerSuccess":
+      "Registered successfully. Please verify your email.",
     "toast.auth.registerError": "Failed to register.",
     "toast.auth.welcomeBack": "Welcome back.",
     "toast.auth.loginError": "Failed to log in.",
@@ -709,7 +783,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "toast.portfolio.languageModeUpdated": "Language mode updated.",
     "toast.portfolio.languageModeError": "Failed to update language mode.",
     "toast.portfolio.defaultLanguageUpdated": "Default language updated.",
-    "toast.portfolio.defaultLanguageError": "Failed to update default language.",
+    "toast.portfolio.defaultLanguageError":
+      "Failed to update default language.",
     "toast.portfolio.published": "Portfolio published.",
     "toast.portfolio.publishError": "Failed to publish portfolio.",
     "toast.portfolio.unpublished": "Portfolio unpublished.",
@@ -719,6 +794,6 @@ export const translations: Record<Lang, Record<string, string>> = {
     "toast.portfolio.imagesUploaded": "Images uploaded.",
     "toast.portfolio.imagesUploadError": "Failed to upload images.",
     "toast.portfolio.imageDeleted": "Image deleted.",
-    "toast.portfolio.imageDeleteError": "Failed to delete image."
-  }
+    "toast.portfolio.imageDeleteError": "Failed to delete image.",
+  },
 };

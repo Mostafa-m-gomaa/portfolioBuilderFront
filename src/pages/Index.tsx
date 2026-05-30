@@ -9,9 +9,9 @@ import CTASection from '@/components/landing/CTASection';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-clip bg-background">
       <Navbar />
-      <main>
+      <main className="overflow-x-clip">
         <HeroSection />
         <FeaturesSection />
         <HowItWorksSection />

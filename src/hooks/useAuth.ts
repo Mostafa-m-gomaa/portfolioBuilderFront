@@ -14,7 +14,6 @@ import type {
   ResendVerificationPayload,
   ResetPasswordPayload,
   UpdateProfilePayload,
-  VerifyResetPasswordCodePayload,
   VerifyEmailPayload,
 } from "@/types/auth.types";
 
@@ -120,14 +119,6 @@ export const useAuth = () => {
       toast.error(parseApiError(error, tToast("toast.auth.passwordResetError"))),
   });
 
-  const verifyResetPasswordCodeMutation = useMutation({
-    mutationFn: (payload: VerifyResetPasswordCodePayload) =>
-      authService.verifyResetPasswordCode(payload),
-    onSuccess: () => toast.success(tToast("toast.auth.resetCodeVerified")),
-    onError: (error) =>
-      toast.error(parseApiError(error, tToast("toast.auth.resetCodeError"))),
-  });
-
   const updateSubdomainMutation = useMutation({
     mutationFn: (subdomain: string) =>
       authService.updateSubdomain({ subdomain }),
@@ -228,7 +219,6 @@ export const useAuth = () => {
     verifyEmailMutation,
     resendVerificationMutation,
     forgotPasswordMutation,
-    verifyResetPasswordCodeMutation,
     resetPasswordMutation,
     updateSubdomainMutation,
     updateTemplateNameMutation,

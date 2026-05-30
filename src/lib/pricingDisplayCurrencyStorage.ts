@@ -16,7 +16,9 @@ const defaultCode = DISPLAY_CURRENCY_OPTIONS[0]?.code ?? "EGP";
 export const getStoredDisplayCurrency = (): string => {
   if (typeof window === "undefined") return defaultCode;
   try {
-    const raw = window.localStorage.getItem(PRICING_DISPLAY_CURRENCY_STORAGE_KEY);
+    const raw = window.localStorage.getItem(
+      PRICING_DISPLAY_CURRENCY_STORAGE_KEY,
+    );
     if (raw && isSupportedDisplayCurrency(raw)) return raw.toUpperCase();
   } catch {
     /* ignore */
@@ -24,7 +26,9 @@ export const getStoredDisplayCurrency = (): string => {
   return defaultCode;
 };
 
-export const subscribeDisplayCurrency = (onChange: () => void): (() => void) => {
+export const subscribeDisplayCurrency = (
+  onChange: () => void,
+): (() => void) => {
   if (typeof window === "undefined") return () => {};
 
   const onStorage = (e: StorageEvent) => {

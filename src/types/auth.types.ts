@@ -59,14 +59,10 @@ export type ForgotPasswordPayload = {
   email: string;
 };
 
-export type VerifyResetPasswordCodePayload = {
-  email: string;
-  code: string;
-};
-
 export type ResetPasswordPayload = {
-  email: string;
+  token: string;
   newPassword: string;
+  newPasswordConfirmation: string;
 };
 
 export type SubdomainAvailabilityResponse = {
