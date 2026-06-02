@@ -963,7 +963,7 @@ const SectionEditor = () => {
     () => resolvePortfolioDisplayLang(myPortfolio, lang),
     [myPortfolio, lang],
   );
-  const sectionTitle = sectionLabel(sectionName, sectionDisplayLang);
+  const sectionTitle = sectionLabel(sectionName, lang);
   const restrictedSectionConfig = useMemo(
     () => RESTRICTED_SECTION_CONFIGS[sectionSlug] ?? null,
     [sectionSlug],

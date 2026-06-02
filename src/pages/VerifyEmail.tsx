@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import Navbar from '@/components/Navbar';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -10,10 +11,12 @@ import { getStoredDisplayCurrency } from '@/lib/pricingDisplayCurrencyStorage';
 import { useAuthStore } from '@/store/auth.store';
 import { EmailInput, type EmailInputHandle } from '@/components/auth/EmailInput';
 import { getEmailValidationError, normalizeEmail } from '@/lib/emailValidation';
+import { subscriptionsService } from '@/services/subscriptions.service';
 
 const VerifyEmail = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { t } = useLanguage();
   const { pendingEmail, verifyEmailMutation, resendVerificationMutation, isAuthenticated, user } = useAuth();
   const [emailInput, setEmailInput] = useState('');
@@ -33,11 +36,28 @@ const VerifyEmail = () => {
     try {
       await verifyEmailMutation.mutateAsync({ email: targetEmail, code });
       const u = useAuthStore.getState().user;
+      let resolvedSubscriptionStatus: string | null | undefined = u?.subscriptionStatus;
+      try {
+        const summary = await queryClient.fetchQuery({
+          queryKey: ['subscription-summary'],
+          queryFn: () => subscriptionsService.getMeSummary(),
+          staleTime: 30_000,
+        });
+        resolvedSubscriptionStatus = summary.subscriptionStatus;
+      } catch {
+        // If the summary is unavailable, fall back to the auth snapshot.
+      }
+      const resolvedUser = u
+        ? {
+            ...u,
+            subscriptionStatus: resolvedSubscriptionStatus ?? u.subscriptionStatus ?? null,
+          }
+        : u;
       const pendingPkg =
         typeof sessionStorage !== 'undefined'
           ? sessionStorage.getItem('pending_checkout_package_id')
           : null;
-      if (pendingPkg && u && !needsSubscriptionOnboarding(u)) {
+      if (pendingPkg && resolvedUser && !needsSubscriptionOnboarding(resolvedUser)) {
         const navigated = await startPackageCheckout(
           pendingPkg,
           t('payment.checkoutError'),
@@ -48,7 +68,7 @@ const VerifyEmail = () => {
           return;
         }
       }
-      navigate(getPostAuthEntryPath(u));
+      navigate(getPostAuthEntryPath(resolvedUser));
     } catch {
       // Error toast handled in hook.
     }

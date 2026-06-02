@@ -5,7 +5,7 @@ export const isConfiguredSubdomain = (subdomain?: string | null) =>
 
 /** User must pick a plan or start free trial before the rest of onboarding. */
 export const needsSubscriptionOnboarding = (user?: AuthUser | null) =>
-  user?.subscriptionStatus === "NOT_DETECTED";
+  user?.subscriptionStatus == null || user?.subscriptionStatus === "NOT_DETECTED";
 
 /**
  * Default authenticated landing path (does not check portfolio / language — those pages redirect further).

@@ -39,7 +39,7 @@ const HeroSection = () => {
               <span className="text-primary">{t('hero.titleHighlight')}</span>
             </h1>
 
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl md:leading-8 lg:leading-9">
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground md:text-xl">
               {t('hero.subtitle')}
             </p>
 

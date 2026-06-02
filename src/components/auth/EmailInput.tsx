@@ -56,7 +56,7 @@ export const EmailInput = forwardRef<EmailInputHandle, EmailInputProps>(function
           }
         }}
         className={cn(
-          'w-full glass rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 bg-transparent',
+          'w-full glass rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 bg-transparent shadow-sm dark:shadow-none dark:bg-transparent bg-card/50',
           error && 'ring-2 ring-destructive/50 focus:ring-destructive/50',
           inputClassName,
         )}

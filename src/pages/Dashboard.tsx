@@ -3,6 +3,7 @@ import { useEffect, useMemo } from 'react';
 import { AlertTriangle, ExternalLink, Globe, Image, LayoutGrid, LayoutTemplate, Loader2, Settings2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
+import { useAuthStore } from '@/store/auth.store';
 import { needsSubscriptionOnboarding } from '@/lib/authRouting';
 import { useSubscriptionSummary } from '@/hooks/useSubscriptionSummary';
 import SubscriptionSummaryPanelSafe from '@/components/subscription/SubscriptionSummaryPanelSafe';
@@ -18,6 +19,7 @@ import LogoManagerCard from '@/components/auth/LogoManagerCard';
 import ProfilePreferencesCard from '@/components/auth/ProfilePreferencesCard';
 import { resolvePortfolioDisplayLang } from '@/lib/portfolioDisplayLang';
 import { prettyTemplateName, sectionLabel } from '@/lib/templateCatalogView';
+import { portfolioSiteBaseUrl, portfolioSiteEditorUrl } from '@/lib/portfolioSiteUrl';
 
 const DASHBOARD_TABS = ['sections', 'domain', 'logo', 'template', 'settings'] as const;
 type DashboardTab = (typeof DASHBOARD_TABS)[number];
@@ -30,6 +32,7 @@ const normalizeDashboardTab = (value: string | null): string | null =>
 
 const Dashboard = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const token = useAuthStore((state) => state.token);
   const { lang, t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = normalizeDashboardTab(searchParams.get('tab'));
@@ -86,6 +89,11 @@ const Dashboard = () => {
   if (!effectiveSubdomain || effectiveSubdomain.startsWith('temp-')) {
     return <Navigate to="/choose-subdomain" replace />;
   }
+
+  const siteSubdomain = String(user?.subdomain || portfolio?.subdomain || '');
+  const siteUrl = portfolioSiteBaseUrl(siteSubdomain);
+  const siteEditorUrl =
+    token && siteSubdomain ? portfolioSiteEditorUrl(siteSubdomain, token) : null;
 
   if (!portfolioLoading && !portfolio?.languageMode) {
     return <Navigate to="/select-language-mode" replace />;
@@ -185,8 +193,9 @@ const Dashboard = () => {
           >
             <p className="text-sm text-muted-foreground">{t('dashboard.subdomain')}</p>
             <p className="text-lg font-semibold">{user?.subdomain || portfolio?.subdomain || t('dashboard.notSet')}</p>
+            <div className='flex flex-col gap-2'>
             <a
-              href={`https://${user?.subdomain || portfolio?.subdomain || ''}.getsirty.com`}
+              href={siteUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="group mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl gradient-bg px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/20 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto"
@@ -197,6 +206,31 @@ const Dashboard = () => {
                 aria-hidden
               />
             </a>
+            {siteEditorUrl ? (
+              <a
+                href={siteEditorUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/10 px-5 py-3 text-sm font-semibold text-primary transition-all hover:scale-[1.02] hover:bg-primary/15 active:scale-[0.98] sm:w-auto"
+              >
+                {t('dashboard.goToEditor')}
+                <ExternalLink
+                  className="h-4 w-4 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  aria-hidden
+                />
+              </a>
+            ) : null}
+            {siteEditorUrl ? (
+              <div className="mt-3 rounded-lg border border-border bg-background p-3 text-sm">
+                <p className="font-semibold text-foreground">{lang === 'ar' ? 'ملاحظة:' : 'Note:'}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {lang === 'ar'
+                    ? 'قد لا يعرض المحرر القالب الذي اخترته أثناء التحرير، لكن التعديلات ستُطبق على القالب النشط لديك.'
+                    : 'The editor may not display your selected template, but any changes will still be applied to your active template.'}
+                </p>
+              </div>
+            ) : null}
+            </div>
             <p className="text-xs text-muted-foreground mt-4">
               {t('dashboard.template')}{' '}
               {user?.templateName || portfolio?.templateName
@@ -281,8 +315,8 @@ const Dashboard = () => {
                   return (
                     <div key={sectionName} className="glass-strong rounded-2xl p-5 glow-border">
                       <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <h3 className="font-heading font-semibold">{sectionLabel(sectionName, sectionDisplayLang)}</h3>
+                        <div >
+                              <h3 className="font-heading font-semibold">{sectionLabel(sectionName, lang)}</h3>
                           <p className="text-xs text-muted-foreground mt-1">{t('dashboard.editSection')}</p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -301,7 +335,7 @@ const Dashboard = () => {
                             }
                             aria-label={t('dashboard.sectionToggleAria').replace(
                               '{section}',
-                              sectionLabel(sectionName, sectionDisplayLang),
+                              sectionLabel(sectionName, lang),
                             )}
                           />
                         </div>

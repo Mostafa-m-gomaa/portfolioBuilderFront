@@ -1,7 +1,9 @@
+import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Globe2, BadgeCheck, UserRound, MapPin } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import { useAuth } from '@/hooks/useAuth';
 import { useAuthStore } from '@/store/auth.store';
 import SubdomainManagerCard from '@/components/auth/SubdomainManagerCard';
 import LanguageModeCard from '@/components/auth/LanguageModeCard';
@@ -18,9 +20,27 @@ import { countryLabel } from '@/constants/countries';
 
 const Profile = () => {
   const { lang, t } = useLanguage();
+  const { updateProfileMutation } = useAuth();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const { data: portfolio } = useMyPortfolio();
+  const [accountName, setAccountName] = useState(user?.name || '');
+
+  useEffect(() => {
+    setAccountName(user?.name || '');
+  }, [user?.name]);
+
+  const handleAccountNameSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const nextName = accountName.trim();
+    if (!nextName || nextName === (user?.name || '').trim()) return;
+    try {
+      await updateProfileMutation.mutateAsync({ name: nextName });
+      setAccountName(nextName);
+    } catch {
+      // Error toast handled by the mutation.
+    }
+  };
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -98,6 +118,31 @@ const Profile = () => {
               <p className="font-medium">{user?.country ? countryLabel(user.country, lang) : '-'}</p>
             </div>
           </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="glass-strong rounded-3xl p-6 glow-border">
+          <h2 className="font-heading text-xl font-semibold text-foreground">{lang === 'ar' ? 'اسم الحساب' : 'Account name'}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {lang === 'ar' ? 'يمكنك تعديل الاسم الظاهر في البروفايل وداخل الحساب.' : 'Update the name shown across your profile and dashboard.'}
+          </p>
+          <form onSubmit={handleAccountNameSubmit} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div className="flex-1">
+              <label className="mb-2 block text-sm text-muted-foreground">{t('auth.name')}</label>
+              <input
+                value={accountName}
+                onChange={(e) => setAccountName(e.target.value)}
+                placeholder={t('auth.name')}
+                className="w-full glass rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 bg-transparent"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={updateProfileMutation.isPending}
+              className="rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-70 sm:min-w-32"
+            >
+              {updateProfileMutation.isPending ? (lang === 'ar' ? 'جار الحفظ...' : 'Saving...') : (lang === 'ar' ? 'حفظ الاسم' : 'Save name')}
+            </button>
+          </form>
         </motion.div>
 
         <SubscriptionSummaryPanelSafe />

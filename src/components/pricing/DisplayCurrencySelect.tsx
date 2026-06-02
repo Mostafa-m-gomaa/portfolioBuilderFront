@@ -14,24 +14,35 @@ const DisplayCurrencySelect = ({ value, onChange, className }: Props) => {
 
   return (
     <div className={className}>
-      <label
-        htmlFor={PRICING_CURRENCY_SELECT_ID}
-        className="mb-2 block text-start text-sm text-muted-foreground md:text-center"
-      >
-        {t("pricing.chooseCurrency")}
-      </label>
-      <select
-        id={PRICING_CURRENCY_SELECT_ID}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="min-w-[240px] rounded-xl border border-border bg-card px-4 py-2 text-foreground shadow-sm"
-      >
-        {DISPLAY_CURRENCY_OPTIONS.map((item) => (
-          <option key={item.code} value={item.code}>
-            {isAr ? item.labelAr : item.labelEn} ({item.code})
-          </option>
-        ))}
-      </select>
+      <div className="mb-2 block text-start text-sm text-muted-foreground md:text-center">{t("pricing.chooseCurrency")}</div>
+      <div className="flex flex-wrap items-center gap-2">
+        {DISPLAY_CURRENCY_OPTIONS.map((item) => {
+          const selected = String(value).toUpperCase() === item.code.toUpperCase();
+          return (
+            <label
+              key={item.code}
+              className={`inline-flex items-center gap-3 rounded-xl border px-3 py-2 text-sm cursor-pointer transition-shadow ${
+                selected
+                  ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                  : 'bg-background text-foreground border-border hover:shadow-sm'
+              }`}
+            >
+              <input
+                type="radio"
+                name={PRICING_CURRENCY_SELECT_ID}
+                value={item.code}
+                checked={selected}
+                onChange={() => onChange(item.code)}
+                className="sr-only"
+              />
+              <div className="flex items-baseline gap-2">
+                <span className="font-medium">{isAr ? item.labelAr : item.labelEn}</span>
+                <span className="text-xs text-muted-foreground">({item.code})</span>
+              </div>
+            </label>
+          );
+        })}
+      </div>
     </div>
   );
 };

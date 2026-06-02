@@ -26,6 +26,7 @@ const Navbar = () => {
   const logout = useAuthStore((state) => state.logout);
   const navLinks = [
     { to: '/', label: t('nav.home') },
+    { to: '/quickstart', label: lang === 'ar' ? 'خطوات انشاء ويبسايت في دقايق' : 'Website in Minutes' },
     { to: '/about', label: t('nav.about') },
     { to: '/services', label: t('nav.services') },
     { to: '/templates', label: t('nav.templates') },

@@ -191,6 +191,7 @@ export const useAuth = () => {
         setAuth({
           user: {
             ...user,
+            ...(payload.name !== undefined ? { name: payload.name } : {}),
             ...(payload.country !== undefined ? { country: payload.country } : {}),
             ...(payload.currency !== undefined ? { currency: payload.currency } : {}),
             ...(payload.allowWhatsapp !== undefined ? { allowWhatsapp: payload.allowWhatsapp } : {}),

@@ -158,8 +158,10 @@ const Login = () => {
           className="glass-strong rounded-3xl p-8 w-full max-w-md relative z-10 glow-border"
         >
           <div className="text-center mb-8">
-            <div className=" mx-auto mb-4 flex items-center justify-center">
-              <img src={anotherLogo} alt={t('brand.logoAlt')} className="w-16 h-16 object-contain" />
+            <div className="mx-auto mb-4 flex items-center justify-center">
+              <div className="rounded-full p-2 shadow-md dark:shadow-none dark:bg-transparent bg-gradient-to-br from-slate-800/80 to-slate-600/60">
+                <img src={anotherLogo} alt={t('brand.logoAlt')} className="w-16 h-16 object-contain" />
+              </div>
             </div>
             <h1 className="font-heading text-2xl font-bold text-foreground">{t('auth.login')}</h1>
           </div>

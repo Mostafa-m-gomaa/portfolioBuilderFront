@@ -11,10 +11,10 @@ const ToastViewport = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Viewport>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport>
 >(({ className, ...props }, ref) => (
-  <ToastPrimitives.Viewport
+    <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
+      "fixed top-16 z-[100] left-1/2 -translate-x-1/2 flex max-h-screen w-full max-w-3xl items-center justify-center p-4 sm:top-16 sm:left-1/2 sm:-translate-x-1/2 sm:flex-col md:max-w-[720px]",
       className,
     )}
     {...props}

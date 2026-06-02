@@ -21,6 +21,7 @@ import NotFound from "./pages/NotFound";
 import VerifyEmail from "./pages/VerifyEmail";
 import ChooseSubdomain from "./pages/ChooseSubdomain";
 import Dashboard from "./pages/Dashboard";
+import QuickStart from "./pages/QuickStart";
 import SectionEditor from "./pages/SectionEditor";
 import RequireAuth from "./components/RequireAuth";
 import ResetPassword from "./pages/ResetPassword";
@@ -61,6 +62,7 @@ const App = () => (
                 <Route path="/login" element={<GuestOnly><Login /></GuestOnly>} />
                 <Route path="/signup" element={<GuestOnly><SignUp /></GuestOnly>} />
                 <Route path="/verify-email" element={<VerifyEmail />} />
+                <Route path="/quickstart" element={<QuickStart />} />
                 <Route path="/forgot-password" element={<GuestOnly><ForgotPassword /></GuestOnly>} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/choose-subdomain" element={<ChooseSubdomain />} />

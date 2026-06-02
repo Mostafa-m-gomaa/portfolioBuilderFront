@@ -20,7 +20,7 @@ export function PasswordInput({ className, ...props }: PasswordInputProps) {
         {...props}
         type={visible ? 'text' : 'password'}
         className={cn(
-          'w-full glass rounded-xl py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 bg-transparent pe-11 ps-4',
+          'w-full glass rounded-xl py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 bg-transparent pe-11 ps-4 shadow-sm dark:shadow-none dark:bg-transparent bg-card/50',
           className,
         )}
       />

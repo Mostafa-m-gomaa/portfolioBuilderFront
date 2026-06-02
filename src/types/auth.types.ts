@@ -80,6 +80,7 @@ export type UpdateTemplateNamePayload = {
 };
 
 export type UpdateProfilePayload = {
+  name?: string;
   country?: string;
   currency?: string;
   allowWhatsapp?: boolean;

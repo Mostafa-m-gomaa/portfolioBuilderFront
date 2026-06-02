@@ -27,21 +27,28 @@ export async function startPackageCheckout(
   options?: StartPackageCheckoutOptions,
 ): Promise<boolean> {
   try {
+    // Display currency (what the user sees) — preserved from options or local storage.
     const explicit = options?.checkoutCurrency?.trim();
-    const checkoutCurrency: PaymentCheckoutCurrency =
+    const displayCurrency: PaymentCheckoutCurrency =
       explicit && isSupportedDisplayCurrency(explicit)
         ? normalizeCheckoutCurrency(explicit)
         : normalizeCheckoutCurrency(getStoredDisplayCurrency());
 
+    // Gateway must always receive EGP according to requirement.
+    const gatewayCurrency: PaymentCheckoutCurrency = 'EGP';
+
+    // Determine amount to charge in EGP. If caller provided a price we assume
+    // it's already in appropriate API/base currency (typically EGP); otherwise
+    // fetch package and use its EGP price.
     let price = options?.price;
     if (typeof price !== "number" || !Number.isFinite(price)) {
       const pkg = await fetchPackageById(packageId);
-      price = getPackagePrice(pkg, checkoutCurrency).price;
+      price = getPackagePrice(pkg, gatewayCurrency).price;
     }
 
     const { price: chargePrice, currency } = buildCheckoutCharge(
       price,
-      checkoutCurrency,
+      gatewayCurrency,
     );
 
     const data = await paymentsService.createCheckout({
