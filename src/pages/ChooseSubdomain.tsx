@@ -3,14 +3,12 @@ import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { needsSubscriptionOnboarding } from '@/lib/authRouting';
 import SubdomainManagerCard from '@/components/auth/SubdomainManagerCard';
-import { useMyPortfolio } from '@/hooks/usePortfolio';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const ChooseSubdomain = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { isAuthenticated, user } = useAuth();
-  const { data: portfolio, isLoading: portfolioLoading } = useMyPortfolio();
   const hasTemporarySubdomain = Boolean(user?.subdomain?.startsWith('temp-'));
 
   if (!isAuthenticated) {
@@ -22,8 +20,7 @@ const ChooseSubdomain = () => {
   }
 
   if (user?.subdomain && !hasTemporarySubdomain) {
-    if (portfolioLoading) return null;
-    return <Navigate to={portfolio?.languageMode ? '/dashboard' : '/select-language-mode'} replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (
@@ -35,7 +32,7 @@ const ChooseSubdomain = () => {
             title={t('onboarding.subdomain.title')}
             description={t('onboarding.subdomain.description')}
             buttonLabel={t('onboarding.subdomain.submit')}
-            onSuccess={() => navigate('/select-language-mode')}
+            onSuccess={() => navigate('/dashboard')}
           />
         </div>
       </div>

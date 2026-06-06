@@ -1,6 +1,7 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
+import PlatformVideoSection from '@/components/shared/PlatformVideoSection';
 
 const HowItWorksSection = () => {
   const { t } = useLanguage();
@@ -48,6 +49,8 @@ const HowItWorksSection = () => {
             </motion.div>
           ))}
         </div>
+
+        <PlatformVideoSection className="mt-20" />
       </div>
     </section>
   );

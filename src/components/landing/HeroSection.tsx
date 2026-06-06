@@ -43,7 +43,7 @@ const HeroSection = () => {
               {t('hero.subtitle')}
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link
                 to="/signup"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-4 text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 transition hover:-translate-y-0.5 hover:bg-primary/90"
@@ -55,9 +55,15 @@ const HeroSection = () => {
                 to="/templates"
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-7 py-4 text-base font-bold text-foreground transition hover:-translate-y-0.5 hover:border-primary/30 hover:text-primary"
               >
-                <PlayCircle className="h-5 w-5" />
                 {t('hero.cta2')}
               </Link>
+              <a
+                href="#platform-video"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-7 py-4 text-base font-bold text-primary transition hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/10"
+              >
+                <PlayCircle className="h-5 w-5" />
+                {t('hero.ctaVideo')}
+              </a>
             </div>
 
             <div className="mt-7 grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">

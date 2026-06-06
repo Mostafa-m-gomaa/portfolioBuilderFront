@@ -47,20 +47,14 @@ const SignUp = () => {
       return;
     }
     try {
-      let portfolio;
       try {
-        portfolio = await portfolioService.getMyPortfolio();
+        await portfolioService.getMyPortfolio();
       } catch {
         await portfolioService.createPortfolio();
-        portfolio = await portfolioService.getMyPortfolio();
       }
-      if (!portfolio?.languageMode) {
-        navigate('/select-language-mode');
-      } else {
-        navigate('/dashboard');
-      }
+      navigate('/dashboard');
     } catch {
-      navigate('/select-language-mode');
+      navigate('/dashboard');
     }
   };
 

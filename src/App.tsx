@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index";
@@ -28,7 +28,6 @@ import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import GuestOnly from "./components/GuestOnly";
 import Profile from "./pages/Profile";
-import SelectLanguageMode from "./pages/SelectLanguageMode";
 import SelectSubscription from "./pages/SelectSubscription";
 import TemplateSelector from "./pages/TemplateSelector";
 import PublicTemplates from "./pages/PublicTemplates";
@@ -67,7 +66,7 @@ const App = () => (
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/choose-subdomain" element={<ChooseSubdomain />} />
                 <Route path="/select-subscription" element={<RequireAuth><SelectSubscription /></RequireAuth>} />
-                <Route path="/select-language-mode" element={<RequireAuth><SelectLanguageMode /></RequireAuth>} />
+                <Route path="/select-language-mode" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
                 <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
                 <Route path="/templates" element={<PublicTemplates />} />

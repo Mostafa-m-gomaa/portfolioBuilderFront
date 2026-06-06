@@ -1,6 +1,6 @@
-import { Fragment } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import PlatformVideoSection from '@/components/shared/PlatformVideoSection';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const QuickStart = () => {
@@ -58,7 +58,9 @@ const QuickStart = () => {
       <Navbar />
       <main className="pt-28 pb-16 px-6 max-w-4xl mx-auto">
         <h1 className="font-heading text-3xl font-bold mb-3">{copy.title}</h1>
-        <p className="text-muted-foreground mb-6">{copy.intro}</p>
+        <p className="text-muted-foreground mb-10">{copy.intro}</p>
+
+        <PlatformVideoSection id="video" showQuickStartLink={false} className="mb-12" />
 
         <div className="space-y-4">
           {copy.steps.map((s, i) => (

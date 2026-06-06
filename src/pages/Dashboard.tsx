@@ -95,10 +95,6 @@ const Dashboard = () => {
   const siteEditorUrl =
     token && siteSubdomain ? portfolioSiteEditorUrl(siteSubdomain, token) : null;
 
-  if (!portfolioLoading && !portfolio?.languageMode) {
-    return <Navigate to="/select-language-mode" replace />;
-  }
-
   const sectionEntries = Array.isArray(sections)
     ? sections.map((section) => [String(section), { active: false }] as const)
     : Object.entries((sections ?? {}) as Record<string, unknown>).map(([key, value]) => [key, value] as const);
