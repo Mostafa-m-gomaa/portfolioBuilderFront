@@ -6,8 +6,8 @@ import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { isEmailNotVerifiedLoginError } from '@/lib/authErrors';
 import { getPostAuthEntryPath, isConfiguredSubdomain, needsSubscriptionOnboarding } from '@/lib/authRouting';
+import { isUserEmailVerified, prepareEmailVerificationFlow } from '@/lib/authVerification';
 import { startPackageCheckout } from '@/lib/startPackageCheckout';
-import { getStoredDisplayCurrency } from '@/lib/pricingDisplayCurrencyStorage';
 import { portfolioService } from '@/services/portfolio.service';
 import { useAuthStore } from '@/store/auth.store';
 import type { AuthUser } from '@/types/auth.types';
@@ -58,14 +58,15 @@ const Login = () => {
   };
 
   const goToVerifyWithResend = async (targetEmail: string) => {
-    const normalized = targetEmail.trim().toLowerCase();
-    setPendingEmail(normalized);
-    try {
-      await resendVerificationMutation.mutateAsync({ email: normalized });
-    } catch {
-      // Resend errors are toasted by the mutation; still send user to verify page.
-    }
+    const normalized = await prepareEmailVerificationFlow(targetEmail, {
+      setPendingEmail,
+      resendVerification: (email) => resendVerificationMutation.mutateAsync({ email }),
+    });
     navigate('/verify-email', { state: { email: normalized } });
+  };
+
+  const handleUnverifiedLogin = async (targetEmail: string) => {
+    await goToVerifyWithResend(targetEmail);
   };
 
   const tryRedirectToPendingCheckout = async (
@@ -80,7 +81,6 @@ const Login = () => {
     const navigated = await startPackageCheckout(
       pendingPkg,
       t('payment.checkoutError'),
-      { checkoutCurrency: getStoredDisplayCurrency() },
     );
     if (navigated) sessionStorage.removeItem('pending_checkout_package_id');
     return navigated;
@@ -92,8 +92,12 @@ const Login = () => {
     const normalizedEmail = normalizeEmail(email);
     try {
       const result = await loginMutation.mutateAsync({ email: normalizedEmail, password });
+      const authUser = result.user ?? useAuthStore.getState().user;
+      if (result.token && authUser && !isUserEmailVerified(authUser)) {
+        await handleUnverifiedLogin(normalizedEmail);
+        return;
+      }
       if (result.token) {
-        const authUser = result.user ?? useAuthStore.getState().user;
         if (await tryRedirectToPendingCheckout(authUser)) return;
         await continueAfterAuth(authUser);
       } else {
@@ -101,7 +105,7 @@ const Login = () => {
       }
     } catch (err) {
       if (isEmailNotVerifiedLoginError(err)) {
-        await goToVerifyWithResend(normalizedEmail);
+        await handleUnverifiedLogin(normalizedEmail);
         return;
       }
       // Other errors: toast handled in loginMutation onError.

@@ -1,5 +1,8 @@
 export type Lang = "ar" | "en";
 
+/** Embeds Latin/technical terms safely inside Arabic RTL strings. */
+const L = (text: string) => `\u2066${text}\u2069`;
+
 export const translations: Record<Lang, Record<string, string>> = {
   ar: {
     "nav.home": "الرئيسية",
@@ -12,7 +15,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     "nav.signup": "إنشاء حساب",
     "nav.getStarted": "ابدأ الآن",
     "hero.badge": "موقع شخصي جاهز للنشر بدون تعقيد",
-    "hero.title": "ابني موقعك الشخصي",
+    "hero.title": "ابني موقعك في دقايق",
     "hero.titleHighlight": "بشكل احترافي",
     "hero.subtitle":
       "سيرتي يساعدك تعرض خبرتك، أعمالك، وطرق التواصل معك في موقع سريع ومنظم، مناسب للمستقلين والمهنيين وأصحاب الخدمات.",
@@ -46,6 +49,10 @@ export const translations: Record<Lang, Record<string, string>> = {
     "features.4.title": "تجربة مستقرة",
     "features.4.desc":
       "تصميم متجاوب وصفحات خفيفة تساعد الزائر يوصل للمعلومة بسرعة.",
+    "templateShowcase.kicker": "نماذج جاهزة",
+    "templateShowcase.title": "نماذج لمواقعنا",
+    "templateShowcase.subtitle":
+      "مجموعة من القوالب الجاهزة لمجالات مختلفة — اختر ما يناسبك وابدأ فوراً.",
     "how.kicker": "طريقة العمل",
     "how.title": "من أول قالب لحد النشر في خطوات واضحة",
     "how.subtitle": "ابدأ بالاختيار، عدّل بياناتك، وانشر رابطك لما يكون جاهز.",
@@ -215,6 +222,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "auth.verify.submitting": "جاري التحقق…",
     "auth.verify.resend": "إعادة إرسال الرمز",
     "auth.verify.resending": "جاري الإرسال…",
+    "auth.verify.resendIn": "يمكنك إعادة الإرسال بعد {seconds} ثانية",
+    "auth.verify.redirecting": "جاري إرسال رمز التحقق…",
     "auth.verify.backLogin": "العودة لتسجيل الدخول",
     "errors.notFound.title": "الصفحة غير موجودة",
     "errors.notFound.backHome": "العودة للرئيسية",
@@ -246,6 +255,78 @@ export const translations: Record<Lang, Record<string, string>> = {
     "profile.updateSubdomain.description":
       "يُتحقق من التوفر أثناء الكتابة. يُحفظ الاسم فقط عند التوفر والضغط على تحديث.",
     "profile.updateSubdomain.button": "تحديث الدومين",
+    "domainManager.title": "ربط دومين خاص",
+    "domainManager.description":
+      "فعّل الدومين الخاص بك لعرض موقعك على عنوان مثل ahmed.com بدلاً من الدومين الفرعي.",
+    "domainManager.toggle.on": "تفعيل الدومين",
+    "domainManager.toggle.off": "إيقاف تفعيل الدومين",
+    "domainManager.toggle.reverting": "إيقاف تفعيل الدومين",
+    "domainManager.toggle.revertingHint":
+      "اختر الدومين الفرعي الجديد ثم احفظ لإكمال الإيقاف",
+    "domainManager.toggle.hint":
+      "عند الإيقاف، ارجع للدومين الفرعي على getsirty.com",
+    "domainManager.toggle.aria": "تفعيل أو إيقاف الدومين الخاص",
+    "domainManager.domain.label": "الدومين الخاص",
+    "domainManager.domain.empty": "اكتب الدومين للتحقق من التوفر.",
+    "domainManager.domain.noWww":
+      "لا تستخدم www. — أدخل الدومين مباشرة مثل ahmed.com",
+    "domainManager.domain.invalid":
+      "صيغة غير صالحة. استخدم دوميناً ينتهي بـ .com أو .net أو ما شابه.",
+    "domainManager.domain.current": "هذا هو الدومين الحالي.",
+    "domainManager.domain.available": "متاح. يمكنك استخدام هذا الدومين.",
+    "domainManager.domain.unavailable": "غير متاح. جرّب دوميناً آخر.",
+    "domainManager.domain.formatHint":
+      "مثال: ahmed.com أو ahmed.net — بدون www.",
+    "domainManager.domain.currentValue": "الحالي",
+    "domainManager.subdomain.label": "الدومين الفرعي",
+    "domainManager.subdomain.empty": "اكتب الدومين الفرعي للتحقق من التوفر.",
+    "domainManager.subdomain.minLength": "الحد الأدنى 3 أحرف.",
+    "domainManager.subdomain.current": "هذا هو الدومين الفرعي الحالي.",
+    "domainManager.subdomain.available":
+      "متاح. يمكنك استخدام هذا الدومين الفرعي.",
+    "domainManager.subdomain.unavailable": "غير متاح. جرّب اسماً آخر.",
+    "domainManager.subdomain.currentValue": "الحالي",
+    "domainManager.revert.description":
+      "اختر الدومين الفرعي الذي تريد العودة إليه على getsirty.com",
+    "domainManager.revert.save": "حفظ والعودة للدومين الفرعي",
+    "domainManager.checking": "جار التحقق من التوفر...",
+    "domainManager.save": "حفظ الدومين",
+    "domainManager.saving": "جار الحفظ...",
+    "domainManager.inactiveHint":
+      "موقعك يعمل حالياً على الدومين الفرعي. فعّل المفتاح أعلاه لربط دومين خاص بك.",
+    "domainManager.guide.title": "كيف تربط الدومين الخاص بك؟",
+    "domainManager.guide.intro": `بعد تفعيل الدومين وحفظه هنا، اتبع الخطوات التالية في إعدادات ${L("DNS")} لدى مزود النطاق.`,
+    "domainManager.guide.step1": `سجّل الدخول إلى موقع مزود النطاق الخاص بك (مثل ${L("GoDaddy")} أو ${L("Namecheap")}).`,
+    "domainManager.guide.step2": `انتقل إلى إعدادات ${L("DNS")} أو قسم إدارة ${L("DNS")}.`,
+    "domainManager.guide.step3": `احذف جميع السجلات الموجودة من نوع ${L("CNAME")}.`,
+    "domainManager.guide.step4": `أضف سجل ${L("CNAME")} جديداً بالبيانات الموضحة أدناه.`,
+    "domainManager.guide.step5": `احفظ التغييرات وانتظر نشر إعدادات ${L("DNS")} (عادةً من بضع ساعات إلى 48 ساعة).`,
+    "domainManager.guide.step6":
+      `بعد حفظ إعدادات ${L("DNS")}، اضغط على زر «تحقق من ربط الدومين» لتفعيل شهادة ${L("SSL")}.`,
+    "domainManager.guide.step7.prefix": "إذا واجهت أي مشكلة، تواصل معنا عبر ",
+    "domainManager.guide.step7.link": "واتساب",
+    "domainManager.guide.step7.suffix": ".",
+    "domainManager.guide.cname.title": `سجل ${L("CNAME")}`,
+    "domainManager.guide.cname.name": "الاسم / المضيف",
+    "domainManager.guide.cname.nameValue": `${L("www")} أو النطاق الفرعي الذي تريد توجيهه`,
+    "domainManager.guide.cname.type": "النوع",
+    "domainManager.guide.cname.typeValue": "CNAME",
+    "domainManager.guide.cname.pointsTo": "القيمة / يشير إلى",
+    "domainManager.guide.cname.ttl": L("TTL"),
+    "domainManager.guide.cname.ttlValue": "القيمة الافتراضية أو 3600 ثانية",
+    "domainManager.guide.note":
+      `ملاحظة: بعد الإعداد، يجب أن يبقى على نطاقك سجل ${L("CNAME")} واحد فقط كما هو موضح أدناه.`,
+    "domainManager.verify.button": "تحقق من ربط الدومين",
+    "domainManager.verify.verifying": "جار التحقق...",
+    "domainManager.verify.success":
+      "تم التحقق من الدومين وإنشاء شهادة SSL بنجاح.",
+    "domainManager.verify.noDomain":
+      "لم يتم العثور على دومين خاص. فعّل الدومين واحفظه أولاً.",
+    "domainManager.verify.dnsMismatch":
+      "سجلات DNS غير مُعدّة بشكل صحيح. راجع الجدول أعلاه وحاول مرة أخرى.",
+    "domainManager.verify.sslFailed":
+      "فشل إنشاء شهادة SSL. حاول مرة أخرى بعد قليل.",
+    "domainManager.verify.error": "تعذر التحقق من الدومين.",
     "profile.logo.alt": "شعار المستخدم",
     "templates.library.badge": "مكتبة القوالب",
     "templates.library.title": "تصفح القوالب قبل إنشاء حسابك",
@@ -283,7 +364,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "dashboard.updateSubdomain": "تحديث الدومين الفرعي",
     "dashboard.sections": "الأقسام",
     "dashboard.tab.sections": "الأقسام",
-    "dashboard.tab.domain": "الدومين",
+    "dashboard.tab.domain": "الدومين الفرعي",
+    "dashboard.tab.addDomain": "إضافة دومين",
     "dashboard.tab.logo": "الشعار",
     "dashboard.tab.template": "القالب",
     "dashboard.tab.settings": "اللغة والإعدادات",
@@ -358,6 +440,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "toast.auth.resetCodeVerified": "تم التحقق من الرمز بنجاح.",
     "toast.auth.resetCodeError": "تعذر التحقق من الرمز.",
     "toast.auth.subdomainUpdated": "تم تحديث الدومين الفرعي بنجاح.",
+    "toast.auth.customDomainUpdated": "تم تفعيل الدومين الخاص بنجاح.",
+    "toast.auth.customDomainDisabled": "تم العودة للدومين الفرعي بنجاح.",
     "toast.auth.subdomainError": "تعذر تحديث الدومين الفرعي.",
     "toast.auth.templateUpdated": "تم تحديث القالب بنجاح.",
     "toast.auth.templateError": "تعذر تحديث القالب.",
@@ -407,8 +491,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "nav.signup": "Sign Up",
     "nav.getStarted": "Get Started",
     "hero.badge": "A personal site ready to publish without complexity",
-    "hero.title": "Build your personal website",
-    "hero.titleHighlight": "professionally",
+    "hero.title": "Build your website",
+    "hero.titleHighlight": "professionally in minutes",
     "hero.subtitle":
       "Sirty helps you present your experience, work, and contact details in a fast, organized website for freelancers, professionals, and service providers.",
     "hero.cta1": "Start building",
@@ -444,6 +528,10 @@ export const translations: Record<Lang, Record<string, string>> = {
     "features.4.title": "Stable Experience",
     "features.4.desc":
       "Responsive layouts and lightweight pages help visitors find what they need quickly.",
+    "templateShowcase.kicker": "Ready-made sites",
+    "templateShowcase.title": "Website templates",
+    "templateShowcase.subtitle":
+      "A collection of ready-made templates for different fields — pick one and start right away.",
     "how.kicker": "How it works",
     "how.title": "How It Works",
     "how.subtitle":
@@ -459,7 +547,8 @@ export const translations: Record<Lang, Record<string, string>> = {
       "Review the final result, then share your link with clients or your audience.",
     "video.kicker": "Video walkthrough",
     "video.title": "Get to know the platform in minutes",
-    "video.subtitle": "A quick guide to creating, editing, and publishing your site.",
+    "video.subtitle":
+      "A quick guide to creating, editing, and publishing your site.",
     "video.quickStartLink": "Read the detailed steps",
     "pricing.kicker": "Pricing",
     "pricing.title": "Clear plans without complexity",
@@ -626,6 +715,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "auth.verify.submitting": "Verifying…",
     "auth.verify.resend": "Resend code",
     "auth.verify.resending": "Sending…",
+    "auth.verify.resendIn": "You can resend in {seconds}s",
+    "auth.verify.redirecting": "Sending verification code…",
     "auth.verify.backLogin": "Back to login",
     "errors.notFound.title": "Page not found",
     "errors.notFound.backHome": "Return to home",
@@ -657,6 +748,84 @@ export const translations: Record<Lang, Record<string, string>> = {
     "profile.updateSubdomain.description":
       "Availability is checked as you type. The name is saved only when available and you click update.",
     "profile.updateSubdomain.button": "Update subdomain",
+    "domainManager.title": "Connect a custom domain",
+    "domainManager.description":
+      "Enable your own domain so visitors reach your site at an address like ahmed.com instead of a getsirty subdomain.",
+    "domainManager.toggle.on": "Enable custom domain",
+    "domainManager.toggle.off": "Disable custom domain",
+    "domainManager.toggle.reverting": "Disable custom domain",
+    "domainManager.toggle.revertingHint":
+      "Choose your new subdomain and save to complete disabling",
+    "domainManager.toggle.hint":
+      "When disabled, return to your getsirty.com subdomain",
+    "domainManager.toggle.aria": "Enable or disable custom domain",
+    "domainManager.domain.label": "Custom domain",
+    "domainManager.domain.empty": "Enter your domain to check availability.",
+    "domainManager.domain.noWww":
+      "Do not use www. — enter the domain directly, e.g. ahmed.com",
+    "domainManager.domain.invalid":
+      "Invalid format. Use a domain ending in .com, .net, or similar.",
+    "domainManager.domain.current": "This is your current domain.",
+    "domainManager.domain.available": "Available. You can use this domain.",
+    "domainManager.domain.unavailable": "Unavailable. Try another domain.",
+    "domainManager.domain.formatHint":
+      "Example: ahmed.com or ahmed.net — without www.",
+    "domainManager.domain.currentValue": "Current",
+    "domainManager.subdomain.label": "Subdomain",
+    "domainManager.subdomain.empty":
+      "Type your subdomain to check availability.",
+    "domainManager.subdomain.minLength": "Minimum 3 characters.",
+    "domainManager.subdomain.current": "This is your current subdomain.",
+    "domainManager.subdomain.available":
+      "Available. You can use this subdomain.",
+    "domainManager.subdomain.unavailable": "Unavailable. Try another one.",
+    "domainManager.subdomain.currentValue": "Current",
+    "domainManager.revert.description":
+      "Choose the getsirty.com subdomain you want to return to",
+    "domainManager.revert.save": "Save and return to subdomain",
+    "domainManager.checking": "Checking availability...",
+    "domainManager.save": "Save domain",
+    "domainManager.saving": "Saving...",
+    "domainManager.inactiveHint":
+      "Your site currently uses a getsirty subdomain. Turn on the switch above to connect your own domain.",
+    "domainManager.guide.title": "How to connect your custom domain",
+    "domainManager.guide.intro":
+      "After enabling and saving your domain here, follow these steps in your domain provider DNS settings.",
+    "domainManager.guide.step1":
+      "Log in to your domain provider website (such as GoDaddy or Namecheap).",
+    "domainManager.guide.step2":
+      "Go to DNS settings or the DNS management section.",
+    "domainManager.guide.step3": "Delete all existing CNAME records on your domain.",
+    "domainManager.guide.step4": "Add a new CNAME record using the details below.",
+    "domainManager.guide.step5":
+      "Save the changes and wait for DNS propagation (usually a few hours up to 48 hours).",
+    "domainManager.guide.step6":
+      'After saving your DNS settings, click "Verify domain connection" to activate your SSL certificate.',
+    "domainManager.guide.step7.prefix": "If you run into any issues, contact us on ",
+    "domainManager.guide.step7.link": "WhatsApp",
+    "domainManager.guide.step7.suffix": ".",
+    "domainManager.guide.cname.title": "CNAME record",
+    "domainManager.guide.cname.name": "Name / Host",
+    "domainManager.guide.cname.nameValue":
+      "www or the subdomain you want to point",
+    "domainManager.guide.cname.type": "Type",
+    "domainManager.guide.cname.typeValue": "CNAME",
+    "domainManager.guide.cname.pointsTo": "Value / Points to",
+    "domainManager.guide.cname.ttl": "TTL",
+    "domainManager.guide.cname.ttlValue": "Default value or 3600 seconds",
+    "domainManager.guide.note":
+      "Note: After setup, your domain should only have the CNAME record shown below.",
+    "domainManager.verify.button": "Verify domain connection",
+    "domainManager.verify.verifying": "Verifying...",
+    "domainManager.verify.success":
+      "Domain verified and SSL generated successfully.",
+    "domainManager.verify.noDomain":
+      "No custom domain found. Enable and save your domain first.",
+    "domainManager.verify.dnsMismatch":
+      "DNS records are not configured correctly. Review the table above and try again.",
+    "domainManager.verify.sslFailed":
+      "SSL generation failed. Please try again later.",
+    "domainManager.verify.error": "Could not verify domain.",
     "profile.logo.alt": "User logo",
     "templates.library.badge": "Template library",
     "templates.library.title": "Browse templates before creating an account",
@@ -694,7 +863,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "dashboard.updateSubdomain": "Update subdomain",
     "dashboard.sections": "Sections",
     "dashboard.tab.sections": "Sections",
-    "dashboard.tab.domain": "Domain",
+    "dashboard.tab.domain": "Subdomain",
+    "dashboard.tab.addDomain": "Add domain",
     "dashboard.tab.logo": "Logo",
     "dashboard.tab.template": "Template",
     "dashboard.tab.settings": "Language & settings",
@@ -769,6 +939,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "toast.auth.resetCodeVerified": "Reset code verified successfully.",
     "toast.auth.resetCodeError": "Failed to verify reset code.",
     "toast.auth.subdomainUpdated": "Subdomain updated successfully.",
+    "toast.auth.customDomainUpdated": "Custom domain enabled successfully.",
+    "toast.auth.customDomainDisabled": "Returned to subdomain successfully.",
     "toast.auth.subdomainError": "Failed to update subdomain.",
     "toast.auth.templateUpdated": "Template updated successfully.",
     "toast.auth.templateError": "Failed to update template.",

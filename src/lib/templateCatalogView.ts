@@ -3,6 +3,7 @@ import { translations, type Lang } from "@/i18n/translations";
 
 export const CATEGORY_ORDER = [
   "general",
+  "education",
   "technology",
   "business",
   "creative",
@@ -14,31 +15,79 @@ export const CATEGORY_ORDER = [
   "travel",
 ] as const;
 
+const NEWEST_TEMPLATE_PRIORITY = [
+  "academy-future",
+  "expo-showcase",
+  "edu-mon",
+  "edu-vivid",
+  "edu-wave",
+  "brand-curve",
+  "avynor-dark",
+  "fund-glow",
+  "estate-luxe",
+  "design-flow",
+] as const;
+
+const templateDisplayPriority = (templateName: string) => {
+  const index = NEWEST_TEMPLATE_PRIORITY.indexOf(
+    templateName as (typeof NEWEST_TEMPLATE_PRIORITY)[number],
+  );
+  return index === -1 ? NEWEST_TEMPLATE_PRIORITY.length : index;
+};
+
+const sortTemplatesNewestFirst = (templates: TemplateCatalogEntry[]) => {
+  const catalogOrder = new Map(
+    templateCatalog.map((template, index) => [template.templateName, index]),
+  );
+
+  return [...templates].sort((a, b) => {
+    const priorityDiff =
+      templateDisplayPriority(a.templateName) -
+      templateDisplayPriority(b.templateName);
+    if (priorityDiff !== 0) return priorityDiff;
+
+    return (
+      (catalogOrder.get(a.templateName) ?? 0) -
+      (catalogOrder.get(b.templateName) ?? 0)
+    );
+  });
+};
+
 const TEMPLATE_NAMES_AR: Record<string, string> = {
-  developer: "مطور",
-  designer: "مصمم",
-  "futuristic-3d": "ثلاثي الأبعاد المستقبلي",
-  "fitness-energy": "طاقة اللياقة",
+  developer: "مطور تقني",
+  designer: "مصمم جرافيك",
+  "futuristic-3d": "تقني متقدم",
+  "fitness-energy": "لياقة نشطة",
   "personal-trainer": "مدرب شخصي",
-  "medical-doctor": "طبيب",
-  "corporate-institution": "مؤسسة شركات",
-  "lawyer-personal": "محامٍ شخصي",
+  "medical-doctor": "طبيب استشاري",
+  "corporate-institution": "شركة مؤسسية",
+  "lawyer-personal": "محامٍ",
   "law-firm": "مكتب محاماة",
-  "restaurant-cafe": "مطعم ومقهى",
-  "photographer-creative": "مصور مبدع",
-  "startup-saas": "شركة SaaS ناشئة",
+  "restaurant-cafe": "مطعم وكافيه",
+  "photographer-creative": "مصور محترف",
+  "startup-saas": "شركة برمجيات",
   "universal-modern": "عصري شامل",
-  "clean-white": "أبيض نظيف",
+  "clean-white": "بسيط وأنيق",
   "freelancer-pro": "مستقل محترف",
-  "construction-modern": "إنشاءات عصري",
-  "ai-growth": "نمو الذكاء الاصطناعي",
-  "travel-modern": "سفر عصري",
-  "medical-care-modern": "رعاية طبية عصرية",
-  "liquid-glass-security": "زجاج سائل وأمن",
-  "depth-motion": "عمق وحركة",
-  "universal-joy": "فرح شامل",
-  "contractor-onepage": "مقاول صفحة واحدة",
-  "bright-modern": "عصري مشرق",
+  "construction-modern": "مقاولات عصرية",
+  "ai-growth": "ذكاء اصطناعي",
+  "travel-modern": "سفر وسياحة",
+  "medical-care-modern": "رعاية صحية",
+  "liquid-glass-security": "أمن رقمي",
+  "depth-motion": "عرض ديناميكي",
+  "universal-joy": "مرن وعصري",
+  "contractor-onepage": "مقاول — صفحة واحدة",
+  "bright-modern": "مشرق وعصري",
+  "academy-future": "أكاديمية عصرية",
+  "expo-showcase": "معارض وفعاليات",
+  "edu-mon": "مركز دراسي",
+  "edu-vivid": "تعليم تفاعلي",
+  "edu-wave": "معهد حديث",
+  "brand-curve": "هوية بصرية",
+  "avynor-dark": "استوديو رقمي",
+  "fund-glow": "استشارات تمويل",
+  "estate-luxe": "عقارات فاخرة",
+  "design-flow": "استوديو تصميم",
 };
 
 const SECTION_ALIASES: Record<string, string> = {
@@ -105,6 +154,7 @@ export const categoryLabel = (category: string, lang: Lang) => {
       (
         {
           general: "General",
+          education: "Education",
           technology: "Technology",
           business: "Business",
           creative: "Creative",
@@ -123,6 +173,7 @@ export const categoryLabel = (category: string, lang: Lang) => {
     (
       {
         general: "عام",
+        education: "تعليم",
         technology: "تقني",
         business: "أعمال",
         creative: "إبداعي",
@@ -137,9 +188,13 @@ export const categoryLabel = (category: string, lang: Lang) => {
   );
 };
 
+export const showcaseTemplates = sortTemplatesNewestFirst(templateCatalog);
+
 export const groupedTemplates = CATEGORY_ORDER.map((category) => ({
   category,
-  templates: templateCatalog.filter(
-    (template) => template.category === category,
+  templates: sortTemplatesNewestFirst(
+    category === "general"
+      ? templateCatalog
+      : templateCatalog.filter((template) => template.category === category),
   ),
 })).filter((group) => group.templates.length > 0);

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import Navbar from '@/components/Navbar';
@@ -6,12 +6,14 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/hooks/useAuth';
 import { getPostAuthEntryPath, needsSubscriptionOnboarding } from '@/lib/authRouting';
+import { isUserEmailVerified } from '@/lib/authVerification';
 import { startPackageCheckout } from '@/lib/startPackageCheckout';
-import { getStoredDisplayCurrency } from '@/lib/pricingDisplayCurrencyStorage';
 import { useAuthStore } from '@/store/auth.store';
 import { EmailInput, type EmailInputHandle } from '@/components/auth/EmailInput';
 import { getEmailValidationError, normalizeEmail } from '@/lib/emailValidation';
 import { subscriptionsService } from '@/services/subscriptions.service';
+
+const RESEND_COOLDOWN_SECONDS = 30;
 
 const VerifyEmail = () => {
   const navigate = useNavigate();
@@ -21,7 +23,18 @@ const VerifyEmail = () => {
   const { pendingEmail, verifyEmailMutation, resendVerificationMutation, isAuthenticated, user } = useAuth();
   const [emailInput, setEmailInput] = useState('');
   const [code, setCode] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(RESEND_COOLDOWN_SECONDS);
   const emailRef = useRef<EmailInputHandle>(null);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+
+    const timer = window.setTimeout(() => {
+      setResendCooldown((current) => Math.max(0, current - 1));
+    }, 1000);
+
+    return () => window.clearTimeout(timer);
+  }, [resendCooldown]);
 
   const email = useMemo(() => {
     const raw =
@@ -61,7 +74,6 @@ const VerifyEmail = () => {
         const navigated = await startPackageCheckout(
           pendingPkg,
           t('payment.checkoutError'),
-          { checkoutCurrency: getStoredDisplayCurrency() },
         );
         if (navigated) {
           sessionStorage.removeItem('pending_checkout_package_id');
@@ -81,9 +93,10 @@ const VerifyEmail = () => {
       return;
     }
     await resendVerificationMutation.mutateAsync({ email: targetEmail });
+    setResendCooldown(RESEND_COOLDOWN_SECONDS);
   };
 
-  if (isAuthenticated) {
+  if (isAuthenticated && isUserEmailVerified(user)) {
     return <Navigate to={getPostAuthEntryPath(user)} replace />;
   }
 
@@ -126,15 +139,22 @@ const VerifyEmail = () => {
             </button>
           </form>
 
-          <div className="mt-4 flex items-center justify-between text-sm">
-            <button
-              onClick={onResend}
-              disabled={resendVerificationMutation.isPending || !email}
-              className="text-primary hover:underline disabled:opacity-50"
-            >
-              {resendVerificationMutation.isPending ? t('auth.verify.resending') : t('auth.verify.resend')}
-            </button>
-            <Link to="/login" className="text-muted-foreground hover:text-foreground">
+          <div className="mt-4 flex items-center justify-between gap-4 text-sm">
+            {resendCooldown > 0 ? (
+              <p className="text-muted-foreground">
+                {t('auth.verify.resendIn').replace('{seconds}', String(resendCooldown))}
+              </p>
+            ) : (
+              <button
+                type="button"
+                onClick={onResend}
+                disabled={resendVerificationMutation.isPending || !email}
+                className="text-primary hover:underline disabled:opacity-50"
+              >
+                {resendVerificationMutation.isPending ? t('auth.verify.resending') : t('auth.verify.resend')}
+              </button>
+            )}
+            <Link to="/login" className="shrink-0 text-muted-foreground hover:text-foreground">
               {t('auth.verify.backLogin')}
             </Link>
           </div>

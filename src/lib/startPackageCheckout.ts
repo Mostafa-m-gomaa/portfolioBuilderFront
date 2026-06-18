@@ -4,22 +4,19 @@ import { parseApiError } from "@/api/axios";
 import { getPackagePrice } from "@/lib/packageDisplay";
 import {
   buildCheckoutCharge,
-  normalizeCheckoutCurrency,
+  PAYMENT_CHECKOUT_CURRENCY,
 } from "@/lib/resolveCheckoutPrice";
-import { isSupportedDisplayCurrency } from "@/lib/pricingDisplayCurrencies";
-import { getStoredDisplayCurrency } from "@/lib/pricingDisplayCurrencyStorage";
+import { storePendingPurchase } from "@/lib/metaPixel";
 import { paymentsService } from "@/services/payments.service";
-import type { PaymentCheckoutCurrency } from "@/types/payment.types";
 
 export type StartPackageCheckoutOptions = {
   couponName?: string;
-  /** Price in the selected checkout currency (from priceEgp / priceUsd or coupon apply). */
+  /** Price in EGP (from priceEgp or coupon apply). */
   price?: number;
-  checkoutCurrency?: PaymentCheckoutCurrency | string;
 };
 
 /**
- * Starts Paymob checkout. Sends `currency` and `price` from API priceEgp / priceUsd.
+ * Starts Paymob checkout. Always sends `currency: EGP` and `price` from priceEgp.
  */
 export async function startPackageCheckout(
   packageId: string,
@@ -27,29 +24,13 @@ export async function startPackageCheckout(
   options?: StartPackageCheckoutOptions,
 ): Promise<boolean> {
   try {
-    // Display currency (what the user sees) — preserved from options or local storage.
-    const explicit = options?.checkoutCurrency?.trim();
-    const displayCurrency: PaymentCheckoutCurrency =
-      explicit && isSupportedDisplayCurrency(explicit)
-        ? normalizeCheckoutCurrency(explicit)
-        : normalizeCheckoutCurrency(getStoredDisplayCurrency());
-
-    // Gateway must always receive EGP according to requirement.
-    const gatewayCurrency: PaymentCheckoutCurrency = 'EGP';
-
-    // Determine amount to charge in EGP. If caller provided a price we assume
-    // it's already in appropriate API/base currency (typically EGP); otherwise
-    // fetch package and use its EGP price.
     let price = options?.price;
     if (typeof price !== "number" || !Number.isFinite(price)) {
       const pkg = await fetchPackageById(packageId);
-      price = getPackagePrice(pkg, gatewayCurrency).price;
+      price = getPackagePrice(pkg, PAYMENT_CHECKOUT_CURRENCY).price;
     }
 
-    const { price: chargePrice, currency } = buildCheckoutCharge(
-      price,
-      gatewayCurrency,
-    );
+    const { price: chargePrice, currency } = buildCheckoutCharge(price);
 
     const data = await paymentsService.createCheckout({
       packageId: String(packageId).trim(),
@@ -61,6 +42,7 @@ export async function startPackageCheckout(
     });
 
     if (data.checkoutUrl) {
+      storePendingPurchase(chargePrice, currency);
       window.location.assign(data.checkoutUrl);
       return true;
     }

@@ -1,6 +1,6 @@
 import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo } from 'react';
-import { AlertTriangle, ExternalLink, Globe, Image, LayoutGrid, LayoutTemplate, Loader2, Settings2 } from 'lucide-react';
+import { AlertTriangle, ExternalLink, Globe, Image, LayoutGrid, LayoutTemplate, Link2, Loader2, Settings2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthStore } from '@/store/auth.store';
@@ -13,6 +13,8 @@ import { motion } from 'framer-motion';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SubdomainManagerCard from '@/components/auth/SubdomainManagerCard';
+import DomainManagerCard from '@/components/auth/DomainManagerCard';
+import CustomDomainDnsGuide from '@/components/auth/CustomDomainDnsGuide';
 import LanguageModeCard from '@/components/auth/LanguageModeCard';
 import TemplateManagerCard from '@/components/auth/TemplateManagerCard';
 import LogoManagerCard from '@/components/auth/LogoManagerCard';
@@ -20,8 +22,9 @@ import ProfilePreferencesCard from '@/components/auth/ProfilePreferencesCard';
 import { resolvePortfolioDisplayLang } from '@/lib/portfolioDisplayLang';
 import { prettyTemplateName, sectionLabel } from '@/lib/templateCatalogView';
 import { portfolioSiteBaseUrl, portfolioSiteEditorUrl } from '@/lib/portfolioSiteUrl';
+import { resolveCustomDomainEnabled } from '@/lib/authMeSync';
 
-const DASHBOARD_TABS = ['sections', 'domain', 'logo', 'template', 'settings'] as const;
+const DASHBOARD_TABS = ['sections', 'domain', 'add-domain', 'logo', 'template', 'settings'] as const;
 type DashboardTab = (typeof DASHBOARD_TABS)[number];
 
 const isDashboardTab = (value: string | null): value is DashboardTab =>
@@ -61,6 +64,17 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
+  const usesCustomDomain = resolveCustomDomainEnabled(user, portfolio);
+
+  useEffect(() => {
+    if (usesCustomDomain && activeTab === 'domain') {
+      setSearchParams({ tab: 'add-domain' }, { replace: true });
+    }
+  }, [usesCustomDomain, activeTab, setSearchParams]);
+
+  const visibleActiveTab: DashboardTab =
+    usesCustomDomain && activeTab === 'domain' ? 'add-domain' : activeTab;
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -91,9 +105,11 @@ const Dashboard = () => {
   }
 
   const siteSubdomain = String(user?.subdomain || portfolio?.subdomain || '');
-  const siteUrl = portfolioSiteBaseUrl(siteSubdomain);
+  const siteUrl = portfolioSiteBaseUrl(siteSubdomain, usesCustomDomain);
   const siteEditorUrl =
-    token && siteSubdomain ? portfolioSiteEditorUrl(siteSubdomain, token) : null;
+    token && siteSubdomain
+      ? portfolioSiteEditorUrl(siteSubdomain, token, usesCustomDomain)
+      : null;
 
   const sectionEntries = Array.isArray(sections)
     ? sections.map((section) => [String(section), { active: false }] as const)
@@ -244,7 +260,7 @@ const Dashboard = () => {
         </div>
 
         <Tabs
-          value={activeTab}
+          value={visibleActiveTab}
           onValueChange={(value) => setSearchParams({ tab: value }, { replace: true })}
           className="space-y-6"
         >
@@ -256,12 +272,21 @@ const Dashboard = () => {
               <LayoutGrid className="h-4 w-4 shrink-0" aria-hidden />
               {t('dashboard.tab.sections')}
             </TabsTrigger>
+            {!usesCustomDomain ? (
+              <TabsTrigger
+                value="domain"
+                className="inline-flex glass rounded-xl px-4 py-2.5 text-sm gap-2 data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
+              >
+                <Globe className="h-4 w-4 shrink-0" aria-hidden />
+                {t('dashboard.tab.domain')}
+              </TabsTrigger>
+            ) : null}
             <TabsTrigger
-              value="domain"
+              value="add-domain"
               className="inline-flex glass rounded-xl px-4 py-2.5 text-sm gap-2 data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
             >
-              <Globe className="h-4 w-4 shrink-0" aria-hidden />
-              {t('dashboard.tab.domain')}
+              <Link2 className="h-4 w-4 shrink-0" aria-hidden />
+              {t('dashboard.tab.addDomain')}
             </TabsTrigger>
             <TabsTrigger
               value="logo"
@@ -349,13 +374,23 @@ const Dashboard = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="domain" className="mt-0 focus-visible:outline-none">
-            <SubdomainManagerCard
-              title={t('profile.updateSubdomain.title')}
-              description={t('profile.updateSubdomain.description')}
-              buttonLabel={t('profile.updateSubdomain.button')}
+          {!usesCustomDomain ? (
+            <TabsContent value="domain" className="mt-0 focus-visible:outline-none">
+              <SubdomainManagerCard
+                title={t('profile.updateSubdomain.title')}
+                description={t('profile.updateSubdomain.description')}
+                buttonLabel={t('profile.updateSubdomain.button')}
+                currentSubdomain={user?.subdomain || portfolio?.subdomain || ''}
+              />
+            </TabsContent>
+          ) : null}
+
+          <TabsContent value="add-domain" className="mt-0 focus-visible:outline-none space-y-6">
+            <DomainManagerCard
               currentSubdomain={user?.subdomain || portfolio?.subdomain || ''}
+              customDomainEnabled={usesCustomDomain}
             />
+            <CustomDomainDnsGuide />
           </TabsContent>
 
           <TabsContent value="logo" className="mt-0 focus-visible:outline-none">

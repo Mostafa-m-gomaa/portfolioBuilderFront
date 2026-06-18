@@ -16,6 +16,7 @@ import anotherLogo from '@/assets/anotherLogo.png';
 import { PasswordInput } from '@/components/auth/PasswordInput';
 import { EmailInput, type EmailInputHandle } from '@/components/auth/EmailInput';
 import { normalizeEmail } from '@/lib/emailValidation';
+import { trackCompleteRegistration } from '@/lib/metaPixel';
 import {
   ACCOUNT_TYPE_OPTIONS,
   type AccountTypeValue,
@@ -79,6 +80,7 @@ const SignUp = () => {
         country,
         type,
       });
+      trackCompleteRegistration();
       navigate('/verify-email', { state: { email: normalizedEmail } });
     } catch {
       // Error toast is handled in the mutation.
@@ -95,6 +97,7 @@ const SignUp = () => {
         ...(country ? { country } : {}),
       });
       const authUser = result.user ?? useAuthStore.getState().user;
+      trackCompleteRegistration();
       await continueAfterAuth(authUser);
     } catch {
       // Error toast handled in mutation hook.

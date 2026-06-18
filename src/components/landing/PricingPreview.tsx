@@ -8,7 +8,6 @@ import { parseApiError } from '@/api/axios';
 import {
   formatDurationMonths,
   formatPackageDisplayPrice,
-  getPackagePrice,
   packageDescription,
   packageFeatureText,
   packageName,
@@ -80,7 +79,6 @@ const PricingPreview = () => {
           >
             {packages.map((pkg, i) => {
               const isPopular = isTwelveMonthPopularPlan(pkg);
-              const { price, currency } = getPackagePrice(pkg, displayCurrency);
               return (
                 <motion.div
                   key={pkg._id}
@@ -124,9 +122,7 @@ const PricingPreview = () => {
                     <SubscribePackageCta
                       packageId={pkg._id}
                       couponEnabled
-                      packagePrice={price}
-                      packageCurrency={currency}
-                      selectedDisplayCurrency={displayCurrency}
+                      packagePrice={pkg.priceEgp}
                       className={`block w-full rounded-xl px-4 py-3 text-center text-sm font-medium transition-opacity hover:opacity-90 ${isPopular ? 'bg-background text-foreground' : 'bg-primary text-primary-foreground'
                         }`}
                     >

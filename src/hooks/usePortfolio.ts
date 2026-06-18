@@ -4,7 +4,22 @@ import { parseApiError } from '@/api/axios';
 import { portfolioService } from '@/services/portfolio.service';
 import { uploadService } from '@/services/upload.service';
 import { usePortfolioStore } from '@/store/portfolio.store';
+import { useAuthStore } from '@/store/auth.store';
+import type { AuthUser } from '@/types/auth.types';
 import { tToast } from '@/lib/i18n';
+
+const syncAuthFromMePatch = (authPatch: Partial<AuthUser> | null) => {
+  if (!authPatch) return;
+  const { user, setAuth } = useAuthStore.getState();
+  if (!user) return;
+  setAuth({ user: { ...user, ...authPatch } });
+};
+
+const loadMyPortfolio = async () => {
+  const { portfolio, authPatch } = await portfolioService.getMyPortfolioWithAuth();
+  syncAuthFromMePatch(authPatch);
+  return portfolio;
+};
 
 const portfolioKeys = {
   me: ['portfolio', 'me'] as const,
@@ -20,10 +35,10 @@ export const usePortfolioBootstrap = () => {
   return useMutation({
     mutationFn: async () => {
       try {
-        return await portfolioService.getMyPortfolio();
+        return await loadMyPortfolio();
       } catch {
         await portfolioService.createPortfolio();
-        return portfolioService.getMyPortfolio();
+        return loadMyPortfolio();
       }
     },
     onSuccess: (portfolio) => {
@@ -39,7 +54,7 @@ export const useMyPortfolio = () => {
   return useQuery({
     queryKey: portfolioKeys.me,
     queryFn: async () => {
-      const data = await portfolioService.getMyPortfolio();
+      const data = await loadMyPortfolio();
       setPortfolio(data);
       return data;
     },

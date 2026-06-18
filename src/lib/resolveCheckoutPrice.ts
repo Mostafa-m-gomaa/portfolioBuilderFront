@@ -1,8 +1,9 @@
-import { isSupportedDisplayCurrency } from "@/lib/pricingDisplayCurrencies";
-import { getStoredDisplayCurrency } from "@/lib/pricingDisplayCurrencyStorage";
 import type { PaymentCheckoutCurrency } from "@/types/payment.types";
 
-/** Coerce any hint to EGP | USD (never empty — required by POST /payments/checkout). */
+/** Checkout is always charged in EGP regardless of display currency. */
+export const PAYMENT_CHECKOUT_CURRENCY: PaymentCheckoutCurrency = "EGP";
+
+/** Coerce any hint to EGP | USD (display / formatting only). */
 export const normalizeCheckoutCurrency = (
   code: string | undefined | null,
 ): PaymentCheckoutCurrency => {
@@ -10,26 +11,13 @@ export const normalizeCheckoutCurrency = (
   return normalized === "USD" ? "USD" : "EGP";
 };
 
-/**
- * Currency for POST /payments/checkout.
- * Uses the page’s selected display currency (same as shown prices), else localStorage.
- */
-export const resolvePaymentCheckoutCurrency = (
-  pageSelection?: string | null,
-): PaymentCheckoutCurrency => {
-  const fromPage = pageSelection?.trim();
-  if (fromPage && isSupportedDisplayCurrency(fromPage)) {
-    return normalizeCheckoutCurrency(fromPage);
-  }
-  return normalizeCheckoutCurrency(getStoredDisplayCurrency());
-};
+/** Currency for POST /payments/checkout — always EGP. */
+export const resolvePaymentCheckoutCurrency = (): PaymentCheckoutCurrency =>
+  PAYMENT_CHECKOUT_CURRENCY;
 
-/** Amount is already in the checkout currency (from priceEgp / priceUsd). */
-export const buildCheckoutCharge = (
-  amount: number,
-  pageSelection?: string | null,
-) => {
-  const currency = resolvePaymentCheckoutCurrency(pageSelection);
+/** Amount must be in EGP (from priceEgp or coupon apply on EGP price). */
+export const buildCheckoutCharge = (amount: number) => {
+  const currency = PAYMENT_CHECKOUT_CURRENCY;
   const price = Number.isFinite(amount) ? Math.round(amount * 100) / 100 : 0;
   return { price, currency };
 };

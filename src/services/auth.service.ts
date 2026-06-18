@@ -1,4 +1,5 @@
 import { apiClient } from "@/api/axios";
+import { isCustomDomainEnabled } from "@/lib/authMeSync";
 import type {
   AuthSuccess,
   AuthUser,
@@ -12,6 +13,7 @@ import type {
   UpdateProfilePayload,
   UpdateSubdomainPayload,
   UpdateTemplateNamePayload,
+  VerifyDomainResponse,
   VerifyEmailPayload,
 } from "@/types/auth.types";
 
@@ -24,7 +26,10 @@ const normalizeUser = (raw: unknown): AuthUser | undefined => {
     email: r.email as string | undefined,
     type: r.type as string | undefined,
     subdomain: (r.subdomain as string | null | undefined) ?? null,
-    domain: (r.domain as string | null | undefined) ?? null,
+    domain:
+      r.domain === false || r.domain === "false"
+        ? false
+        : isCustomDomainEnabled(r.domain),
     templateName: (r.templateName as string | null | undefined) ?? null,
     logo: (r.logo as string | null | undefined) ?? null,
     currency: (r.currency as string | null | undefined) ?? null,
@@ -146,6 +151,11 @@ export const authService = {
   async updateSubdomain(payload: UpdateSubdomainPayload): Promise<AuthSuccess> {
     const response = await apiClient.patch("/auth/subdomain", payload);
     return normalizeAuthResponse(response.data);
+  },
+
+  async verifyDomain(): Promise<VerifyDomainResponse> {
+    const response = await apiClient.post("/auth/verify-domain");
+    return response.data;
   },
 
   async updateTemplateName(

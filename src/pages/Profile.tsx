@@ -16,6 +16,7 @@ import SubscriptionSummaryPanelSafe from '@/components/subscription/Subscription
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getAccountTypeLabel } from '@/constants/accountTypes';
 import { prettyTemplateName } from '@/lib/templateCatalogView';
+import { isCustomDomainEnabled } from '@/lib/authMeSync';
 import { countryLabel } from '@/constants/countries';
 
 const Profile = () => {
@@ -102,7 +103,11 @@ const Profile = () => {
             <div className="glass rounded-2xl p-4">
               <p className="text-xs text-muted-foreground mb-2">{t('profile.publicUrl')}</p>
               <p className="font-medium break-all">
-                {user?.subdomain ? `${user.subdomain}.getsirty.com` : '-'}
+                {user?.subdomain
+                  ? isCustomDomainEnabled(user.domain)
+                    ? user.subdomain
+                    : `${user.subdomain}.getsirty.com`
+                  : '-'}
               </p>
             </div>
             <div className="glass rounded-2xl p-4">

@@ -24,6 +24,7 @@ export type Portfolio = {
   id?: string;
   userId?: string;
   subdomain?: string;
+  domain?: boolean;
   templateName?: string;
   languageMode?: 'ar' | 'en' | 'both' | string;
   defaultLanguage?: 'ar' | 'en' | string;

@@ -14,7 +14,7 @@ export const setUnauthorizedHandler = (handler: (() => void) | null) => {
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000,
+  timeout: 50_000,
   headers: {
     "Content-Type": "application/json",
   },

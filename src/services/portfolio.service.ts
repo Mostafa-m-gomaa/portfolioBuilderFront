@@ -1,4 +1,5 @@
 import { apiClient } from '@/api/axios';
+import { mergePortfolioMeResponse } from '@/lib/authMeSync';
 import type {
   Portfolio,
   SectionItem,
@@ -14,7 +15,12 @@ export const portfolioService = {
 
   async getMyPortfolio(): Promise<Portfolio> {
     const response = await apiClient.get('/portfolio/me');
-    return response.data?.portfolio ?? response.data;
+    return mergePortfolioMeResponse(response.data).portfolio;
+  },
+
+  async getMyPortfolioWithAuth(): Promise<ReturnType<typeof mergePortfolioMeResponse>> {
+    const response = await apiClient.get('/portfolio/me');
+    return mergePortfolioMeResponse(response.data);
   },
 
   async getAllSections(): Promise<Record<string, unknown>> {

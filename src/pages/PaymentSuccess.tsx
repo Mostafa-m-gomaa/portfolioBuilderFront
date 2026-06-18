@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { CheckCircle2, LayoutDashboard, UserCog } from 'lucide-react';
@@ -7,13 +7,47 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { applySubscriptionSummaryToAuth } from '@/lib/syncSubscriptionAuth';
+import {
+  consumePendingPurchase,
+  trackPurchase,
+  waitForMetaPixel,
+} from '@/lib/metaPixel';
 import { subscriptionsService } from '@/services/subscriptions.service';
 import { useAuthStore } from '@/store/auth.store';
 
 const PaymentSuccess = () => {
   const { t } = useLanguage();
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const purchaseTracked = useRef(false);
+
+  useEffect(() => {
+    if (purchaseTracked.current) return;
+
+    void (async () => {
+      const ready = await waitForMetaPixel();
+      if (!ready || purchaseTracked.current) return;
+
+      const amountRaw = searchParams.get('amount');
+      const pending = consumePendingPurchase();
+
+      let value = 0;
+      const currency = "EGP";
+
+      if (amountRaw) {
+        const parsed = Number.parseFloat(amountRaw);
+        if (Number.isFinite(parsed)) {
+          value = parsed;
+        }
+      } else if (pending) {
+        value = pending.value;
+      }
+
+      purchaseTracked.current = true;
+      trackPurchase(value, currency);
+   })();
+  }, [searchParams]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -29,7 +63,7 @@ const PaymentSuccess = () => {
         /* Dashboard will refetch; avoid blocking success UI */
       }
       void queryClient.invalidateQueries({ queryKey: ['portfolio', 'me'] });
-    })();
+   })();
   }, [isAuthenticated, queryClient]);
 
   return (

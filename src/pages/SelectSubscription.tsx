@@ -12,13 +12,13 @@ import { parseApiError } from "@/api/axios";
 import {
   formatDurationMonths,
   formatPackageDisplayPrice,
-  getPackagePrice,
   packageDescription,
   packageFeatureText,
   packageName,
   sortPackagesByOrder,
 } from "@/lib/packageDisplay";
 import { needsSubscriptionOnboarding, getPostAuthEntryPath } from "@/lib/authRouting";
+import { trackStartTrial } from "@/lib/metaPixel";
 import { useAuthStore } from "@/store/auth.store";
 import { subscriptionsService } from "@/services/subscriptions.service";
 import DisplayCurrencySelect from "@/components/pricing/DisplayCurrencySelect";
@@ -73,6 +73,7 @@ const SelectSubscription = () => {
       }
       toast.success(t("subscription.freeTrial.success"));
       void queryClient.invalidateQueries({ queryKey: ["subscription-summary"] });
+      trackStartTrial("EGP");
       navigate("/choose-subdomain");
     },
     onError: (err: unknown) => {
@@ -241,9 +242,7 @@ const SelectSubscription = () => {
                   </Link>
                 </div>
               </motion.div>
-              {packages.map((pkg, i) => {
-                const { price, currency } = getPackagePrice(pkg, displayCurrency);
-                return (
+              {packages.map((pkg, i) => (
                 <motion.div
                   key={pkg._id}
                   initial={{ opacity: 0, y: 16 }}
@@ -281,9 +280,7 @@ const SelectSubscription = () => {
                     <SubscribePackageCta
                       packageId={pkg._id}
                       couponEnabled
-                      packagePrice={price}
-                      packageCurrency={currency}
-                      selectedDisplayCurrency={displayCurrency}
+                      packagePrice={pkg.priceEgp}
                       className="block w-full rounded-xl bg-primary py-2.5 text-center text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
                     >
                       {t("pricing.cta")}
@@ -296,8 +293,7 @@ const SelectSubscription = () => {
                     </Link>
                   </div>
                 </motion.div>
-              );
-              })}
+              ))}
             </div>
           </div>
         )}

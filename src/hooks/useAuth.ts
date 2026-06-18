@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { parseApiError, setUnauthorizedHandler } from "@/api/axios";
 import { isEmailNotVerifiedLoginError } from "@/lib/authErrors";
+import { isUserEmailVerified } from "@/lib/authVerification";
 import { authService } from "@/services/auth.service";
+import { isValidCustomDomain } from "@/lib/customDomain";
 import { useAuthStore } from "@/store/auth.store";
+import { usePortfolioStore } from "@/store/portfolio.store";
 import { tToast } from "@/lib/i18n";
+import type { Portfolio } from "@/types/portfolio.types";
 import type {
   ForgotPasswordPayload,
   GoogleAuthPayload,
@@ -14,6 +18,7 @@ import type {
   ResendVerificationPayload,
   ResetPasswordPayload,
   UpdateProfilePayload,
+  UpdateSubdomainPayload,
   VerifyEmailPayload,
 } from "@/types/auth.types";
 
@@ -27,6 +32,7 @@ const useDebouncedValue = (value: string, delay = 450) => {
 };
 
 export const useAuth = () => {
+  const queryClient = useQueryClient();
   const {
     login,
     logout,
@@ -53,7 +59,11 @@ export const useAuth = () => {
 
   const loginMutation = useMutation({
     mutationFn: (payload: LoginPayload) => authService.login(payload),
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
+      if (data.token && data.user && !isUserEmailVerified(data.user)) {
+        setPendingEmail(variables.email);
+        return;
+      }
       if (data.token) {
         login({ token: data.token, user: data.user });
         toast.success(tToast("toast.auth.welcomeBack"));
@@ -120,16 +130,49 @@ export const useAuth = () => {
   });
 
   const updateSubdomainMutation = useMutation({
-    mutationFn: (subdomain: string) =>
-      authService.updateSubdomain({ subdomain }),
-    onSuccess: (data, subdomain) => {
-      if (data.user) {
-        setAuth({ user: data.user });
-      } else if (user) {
-        setAuth({ user: { ...user, subdomain } });
+    mutationFn: (payload: UpdateSubdomainPayload) =>
+      authService.updateSubdomain(payload),
+    onSuccess: (data, payload) => {
+      const domainPatch =
+        payload.domain !== undefined ? { domain: payload.domain } : {};
+      const mergedUser = data.user
+        ? { ...data.user, subdomain: payload.subdomain, ...domainPatch }
+        : user
+          ? { ...user, subdomain: payload.subdomain, ...domainPatch }
+          : undefined;
+
+      if (mergedUser) {
+        setAuth({ user: mergedUser });
       }
       if (data.token) setAuth({ token: data.token });
-      toast.success(tToast("toast.auth.subdomainUpdated"));
+
+      queryClient.setQueryData<Portfolio>(["portfolio", "me"], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          subdomain: payload.subdomain,
+          ...domainPatch,
+        };
+      });
+
+      const currentPortfolio = usePortfolioStore.getState().portfolio;
+      if (currentPortfolio) {
+        usePortfolioStore.getState().setPortfolio({
+          ...currentPortfolio,
+          subdomain: payload.subdomain,
+          ...domainPatch,
+        });
+      }
+
+      toast.success(
+        tToast(
+          payload.domain === true
+            ? "toast.auth.customDomainUpdated"
+            : payload.domain === false
+              ? "toast.auth.customDomainDisabled"
+              : "toast.auth.subdomainUpdated",
+        ),
+      );
     },
     onError: (error) =>
       toast.error(parseApiError(error, tToast("toast.auth.subdomainError"))),
@@ -181,6 +224,10 @@ export const useAuth = () => {
       toast.error(parseApiError(error, tToast("toast.auth.logoDeleteError"))),
   });
 
+  const verifyDomainMutation = useMutation({
+    mutationFn: () => authService.verifyDomain(),
+  });
+
   const updateProfileMutation = useMutation({
     mutationFn: (payload: UpdateProfilePayload) =>
       authService.updateProfile(payload),
@@ -222,6 +269,7 @@ export const useAuth = () => {
     forgotPasswordMutation,
     resetPasswordMutation,
     updateSubdomainMutation,
+    verifyDomainMutation,
     updateTemplateNameMutation,
     updateLogoMutation,
     deleteLogoMutation,
@@ -240,6 +288,21 @@ export const useSubdomainAvailability = (subdomainInput: string) => {
     queryKey: ["subdomain-availability", debouncedSubdomain],
     queryFn: () => authService.checkSubdomainAvailability(debouncedSubdomain),
     enabled: debouncedSubdomain.length >= 3,
+    staleTime: 20_000,
+  });
+};
+
+export const useDomainAvailability = (domainInput: string, enabled: boolean) => {
+  const normalized = useMemo(
+    () => domainInput.trim().toLowerCase(),
+    [domainInput],
+  );
+  const debouncedDomain = useDebouncedValue(normalized, 500);
+
+  return useQuery({
+    queryKey: ["domain-availability", debouncedDomain],
+    queryFn: () => authService.checkSubdomainAvailability(debouncedDomain),
+    enabled: enabled && isValidCustomDomain(debouncedDomain),
     staleTime: 20_000,
   });
 };

@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth, useSubdomainAvailability } from '@/hooks/useAuth';
+import { sanitizeSubdomainPart } from '@/lib/customDomain';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const sanitizeSubdomain = (value: string) => value.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 40);
+const sanitizeSubdomain = sanitizeSubdomainPart;
 
 type SubdomainManagerCardProps = {
   title: string;
@@ -72,7 +73,7 @@ const SubdomainManagerCard = ({
     event.preventDefault();
     if (!canUpdate) return;
     try {
-      await updateSubdomainMutation.mutateAsync(cleanSubdomain);
+      await updateSubdomainMutation.mutateAsync({ subdomain: cleanSubdomain });
       onSuccess?.();
     } catch {
       // Error handled in mutation hook.

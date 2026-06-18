@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import RedirectToEmailVerification from '@/components/RedirectToEmailVerification';
 import { getPostAuthEntryPath, needsSubscriptionOnboarding } from '@/lib/authRouting';
+import { isUserEmailVerified } from '@/lib/authVerification';
 import { useSubscriptionSummary } from '@/hooks/useSubscriptionSummary';
 import { useAuthStore } from '@/store/auth.store';
 import type { SubscriptionMeSummaryResponse } from '@/types/subscription.types';
@@ -22,6 +24,10 @@ const RequireAuth = ({ children }: Props) => {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  if (user?.email && !isUserEmailVerified(user)) {
+    return <RedirectToEmailVerification email={user.email} />;
   }
 
   if (needsSubscriptionOnboarding(user)) {

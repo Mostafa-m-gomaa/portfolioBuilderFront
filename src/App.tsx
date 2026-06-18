@@ -35,6 +35,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure";
 import PaymentStatusRedirect from "./components/payment/PaymentStatusRedirect";
 import WhatsAppFloatingButton from "./components/WhatsAppFloatingButton";
+import MetaPixelTracker from "./components/MetaPixelTracker";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <MetaPixelTracker />
             <PaymentStatusRedirect />
             <WhatsAppFloatingButton />
             <div className="min-h-screen overflow-x-clip">

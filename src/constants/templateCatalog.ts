@@ -5,6 +5,7 @@ export type TemplateCatalogEntry = {
   descAr: string;
   category:
     | "general"
+    | "education"
     | "fitness"
     | "medical"
     | "legal"
@@ -16,8 +17,8 @@ export type TemplateCatalogEntry = {
     | "technology";
 };
 
-const templateImage = (fileName: string) =>
-  new URL(`../assets/templates/${fileName}`, import.meta.url).href;
+const templatePreviewScreenshot = (templateName: string) =>
+  `https://image.thum.io/get/width/800/noanimate/https://${templateName}.getsirty.com`;
 
 export const templateCatalog: TemplateCatalogEntry[] = [
   {
@@ -41,7 +42,8 @@ export const templateCatalog: TemplateCatalogEntry[] = [
     image:
       "https://res.cloudinary.com/dsv5ldoji/image/upload/v1779455728/futuristic-3d_wojbxe.png",
     desc: "A bold technology layout for modern products, AI tools, and digital services.",
-    descAr: "تصميم تقني جريء للمنتجات الحديثة وأدوات الذكاء الاصطناعي والخدمات الرقمية.",
+    descAr:
+      "تصميم تقني جريء للمنتجات الحديثة وأدوات الذكاء الاصطناعي والخدمات الرقمية.",
     category: "technology",
   },
   {
@@ -89,7 +91,8 @@ export const templateCatalog: TemplateCatalogEntry[] = [
     image:
       "https://res.cloudinary.com/dsv5ldoji/image/upload/v1779455930/law-firm_ohntbg.png",
     desc: "A polished firm website for legal services, practice areas, and contact requests.",
-    descAr: "موقع مكتب محاماة أنيق للخدمات القانونية ومجالات الممارسة وطلبات التواصل.",
+    descAr:
+      "موقع مكتب محاماة أنيق للخدمات القانونية ومجالات الممارسة وطلبات التواصل.",
     category: "legal",
   },
   {
@@ -211,5 +214,86 @@ export const templateCatalog: TemplateCatalogEntry[] = [
     desc: "A premium visual layout for creators, consultants, and modern service brands.",
     descAr: "تصميم مشرق وعصري لعرض مهني واضح وجذاب.",
     category: "general",
+  },
+  {
+    templateName: "academy-future",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1781024140/Screenshot_2026-06-09_at_7.54.00_PM_hilqdr.png",
+    desc: "A future-forward education template for academies, teachers, and training centers.",
+    descAr: "قالب تعليمي عصري للأكاديميات والمدرسين ومراكز التدريب.",
+    category: "education",
+  },
+  {
+    templateName: "edu-mon",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1781024117/Screenshot_2026-06-09_at_7.52.11_PM_gfulxk.png",
+    desc: "A friendly education layout for Arabic centers and school support programs.",
+    descAr: "قالب تعليمي ودود لمراكز اللغة العربية وبرامج الدعم المدرسي.",
+    category: "education",
+  },
+  {
+    templateName: "edu-vivid",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1781024100/Screenshot_2026-06-09_at_7.51.43_PM_lvctyh.png",
+    desc: "A vivid learning template for workshops, courses, and teacher-led programs.",
+    descAr: "قالب تعليمي نابض لورش العمل والدورات والبرامج التعليمية.",
+    category: "education",
+  },
+  {
+    templateName: "edu-wave",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1781024084/Screenshot_2026-06-09_at_7.51.29_PM_hffmhv.png",
+    desc: "A modern institute template for structured courses and enrollment flows.",
+    descAr: "قالب معهد تعليمي حديث للدورات المنظمة ومسارات التسجيل.",
+    category: "education",
+  },
+  {
+    templateName: "expo-showcase",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1781024520/Screenshot_2026-06-09_at_8.01.24_PM_suxujp.png",
+    desc: "An exhibition and events template for booths, conferences, and brand activations.",
+    descAr: "قالب معارض وفعاليات للأجنحة والمؤتمرات والتنفيذ الميداني.",
+    category: "business",
+  },
+  {
+    templateName: "fund-glow",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1781023935/Screenshot_2026-06-09_at_7.50.22_PM_jnphdj.png",
+    desc: "A funding and growth advisory template for startups and investor readiness.",
+    descAr: "قالب استشارات نمو وتمويل للشركات الناشئة والاستعداد للمستثمرين.",
+    category: "business",
+  },
+  {
+    templateName: "estate-luxe",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1781023897/Screenshot_2026-06-09_at_7.50.05_PM_afutsp.png",
+    desc: "A premium real estate template for developers, sales offices, and property listings.",
+    descAr: "قالب عقاري فاخر للمطورين ومكاتب المبيعات وعروض الوحدات.",
+    category: "business",
+  },
+  {
+    templateName: "brand-curve",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1781024068/Screenshot_2026-06-09_at_7.51.03_PM_hamygz.png",
+    desc: "A curved brand studio layout for identities, packaging, and campaign design.",
+    descAr: "قالب استوديو تصميم للهويات البصرية والتغليف والحملات الإبداعية.",
+    category: "creative",
+  },
+  {
+    templateName: "design-flow",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1781023673/Screenshot_2026-06-09_at_7.47.29_PM_ccgtuq.png",
+    desc: "A creative studio template for visual identity, campaigns, and modern brand work.",
+    descAr:
+      "قالب استوديو إبداعي للهوية البصرية والحملات وعمل العلامات الحديثة.",
+    category: "creative",
+  },
+  {
+    templateName: "avynor-dark",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1781023967/Screenshot_2026-06-09_at_7.50.42_PM_xjeyyw.png",
+    desc: "A dark technology template for product studios and engineering teams.",
+    descAr: "قالب تقني داكن لاستوديوهات المنتجات وفرق الهندسة.",
+    category: "technology",
   },
 ];

@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { EmailInput, type EmailInputHandle } from '@/components/auth/EmailInput';
+import { trackLead } from '@/lib/metaPixel';
 
 const Contact = () => {
   const { t, lang } = useLanguage();
@@ -15,6 +16,7 @@ const Contact = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!emailRef.current?.validate()) return;
+    trackLead();
     // TODO: wire contact API when available
   };
 

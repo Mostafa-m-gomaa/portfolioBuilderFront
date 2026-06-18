@@ -2,6 +2,8 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { needsSubscriptionOnboarding } from '@/lib/authRouting';
+import { isUserEmailVerified } from '@/lib/authVerification';
+import RedirectToEmailVerification from '@/components/RedirectToEmailVerification';
 import SubdomainManagerCard from '@/components/auth/SubdomainManagerCard';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -13,6 +15,10 @@ const ChooseSubdomain = () => {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (user?.email && !isUserEmailVerified(user)) {
+    return <RedirectToEmailVerification email={user.email} />;
   }
 
   if (needsSubscriptionOnboarding(user)) {

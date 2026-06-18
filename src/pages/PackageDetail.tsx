@@ -8,7 +8,6 @@ import { parseApiError } from "@/api/axios";
 import {
   formatDurationMonths,
   formatPackageDisplayPrice,
-  getPackagePrice,
   isTwelveMonthPopularPlan,
   packageDescription,
   packageFeatureText,
@@ -37,7 +36,6 @@ const PackageDetail = () => {
   });
 
   const errMsg = isError ? parseApiError(error, t("pricing.loadError")) : "";
-  const listPrice = pkg ? getPackagePrice(pkg, displayCurrency) : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,7 +66,7 @@ const PackageDetail = () => {
               {t("pricing.retry")}
             </button>
           </div>
-        ) : pkg && listPrice ? (
+        ) : pkg ? (
           <article
             className={`relative mt-10 rounded-2xl border p-6 md:p-8 ${isTwelveMonthPopularPlan(pkg)
                 ? "border-primary bg-primary/5 shadow-lg shadow-primary/20"
@@ -111,9 +109,7 @@ const PackageDetail = () => {
               <SubscribePackageCta
                 packageId={pkg._id}
                 couponEnabled
-                packagePrice={listPrice.price}
-                packageCurrency={listPrice.currency}
-                selectedDisplayCurrency={displayCurrency}
+                packagePrice={pkg.priceEgp}
                 className="inline-flex rounded-xl bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
               >
                 {t("pricing.cta")}

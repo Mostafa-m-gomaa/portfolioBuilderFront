@@ -5,13 +5,8 @@ import type {
   PaymentCheckoutResponse,
 } from "@/types/payment.types";
 
-/** Always EGP or USD (3-letter ISO) for express-validator on the API. */
-export const toPaymentCheckoutCurrency = (
-  code: unknown,
-): PaymentCheckoutCurrency => {
-  const normalized = String(code ?? "").trim().toUpperCase();
-  return normalized === "USD" ? "USD" : "EGP";
-};
+/** Checkout is always EGP for express-validator on the API. */
+export const toPaymentCheckoutCurrency = (): PaymentCheckoutCurrency => "EGP";
 
 export const paymentsService = {
   async createCheckout(
@@ -25,7 +20,7 @@ export const paymentsService = {
     const body: PaymentCheckoutRequest = {
       packageId: String(payload.packageId ?? "").trim(),
       price,
-      currency: toPaymentCheckoutCurrency(payload.currency),
+      currency: toPaymentCheckoutCurrency(),
     };
     const coupon = payload.couponName?.trim();
     if (coupon) body.couponName = coupon;

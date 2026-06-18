@@ -7,7 +7,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useShallow } from "zustand/react/shallow";
 import { useAuthStore } from "@/store/auth.store";
 import { startPackageCheckout } from "@/lib/startPackageCheckout";
-import { normalizeCheckoutCurrency } from "@/lib/resolveCheckoutPrice";
 import { couponsService } from "@/services/coupons.service";
 import { formatPackagePrice } from "@/lib/packageDisplay";
 import { cn } from "@/lib/utils";
@@ -20,11 +19,8 @@ type Props = {
    * Keep false on marketing grids so cards stay compact.
    */
   couponEnabled?: boolean;
-  /** Package list price in API currency — same value sent to POST /coupons/apply. */
+  /** Package price in EGP — same value sent to POST /coupons/apply and checkout. */
   packagePrice?: number;
-  packageCurrency?: string;
-  /** EGP | USD — same as the currency `<select>` on the page. */
-  selectedDisplayCurrency: string;
   /** Extra classes on the outer stack when coupon UI is shown (e.g. `flex-1`). */
   stackClassName?: string;
   className?: string;
@@ -39,8 +35,6 @@ const SubscribePackageCta = ({
   packageId,
   couponEnabled = false,
   packagePrice,
-  packageCurrency,
-  selectedDisplayCurrency,
   stackClassName,
   className,
   children,
@@ -88,7 +82,7 @@ const SubscribePackageCta = ({
     );
   }
 
-  const basisCurrency = (packageCurrency?.trim() || "EGP").toUpperCase();
+  const basisCurrency = "EGP";
 
   const checkoutButton = (
     <button
@@ -107,19 +101,12 @@ const SubscribePackageCta = ({
           const basePrice =
             applied?.finalPrice ??
             (typeof packagePrice === "number" ? packagePrice : undefined);
-          await startPackageCheckout(
-            packageId,
-            t("payment.checkoutError"),
-            {
-              checkoutCurrency: normalizeCheckoutCurrency(
-                selectedDisplayCurrency,
-              ),
-              ...(typeof basePrice === "number" ? { price: basePrice } : {}),
-              ...(applied
-                ? { couponName: nameFromApply || couponInput.trim() }
-                : {}),
-            },
-          );
+          await startPackageCheckout(packageId, t("payment.checkoutError"), {
+            ...(typeof basePrice === "number" ? { price: basePrice } : {}),
+            ...(applied
+              ? { couponName: nameFromApply || couponInput.trim() }
+              : {}),
+          });
         } finally {
           setPending(false);
         }

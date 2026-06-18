@@ -4,7 +4,7 @@ export type AuthUser = {
   email?: string;
   type?: string;
   subdomain?: string | null;
-  domain?: string | null;
+  domain?: boolean;
   templateName?: string | null;
   logo?: string | null;
   currency?: string | null;
@@ -71,8 +71,14 @@ export type SubdomainAvailabilityResponse = {
   message?: string;
 };
 
+export type VerifyDomainResponse = {
+  success: boolean;
+  message?: string;
+};
+
 export type UpdateSubdomainPayload = {
   subdomain: string;
+  domain?: boolean;
 };
 
 export type UpdateTemplateNamePayload = {
