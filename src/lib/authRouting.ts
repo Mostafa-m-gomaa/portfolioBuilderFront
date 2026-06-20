@@ -7,6 +7,23 @@ export const isConfiguredSubdomain = (subdomain?: string | null) =>
 export const needsSubscriptionOnboarding = (user?: AuthUser | null) =>
   user?.subscriptionStatus == null || user?.subscriptionStatus === "NOT_DETECTED";
 
+export const PENDING_SUBSCRIPTION_CHOICE_KEY = "pending_subscription_choice";
+
+/** Set after Google (or other) signup until the user picks trial or a paid plan. */
+export const markPendingSubscriptionChoice = () => {
+  if (typeof sessionStorage === "undefined") return;
+  sessionStorage.setItem(PENDING_SUBSCRIPTION_CHOICE_KEY, "1");
+};
+
+export const clearPendingSubscriptionChoice = () => {
+  if (typeof sessionStorage === "undefined") return;
+  sessionStorage.removeItem(PENDING_SUBSCRIPTION_CHOICE_KEY);
+};
+
+export const hasPendingSubscriptionChoice = () =>
+  typeof sessionStorage !== "undefined" &&
+  sessionStorage.getItem(PENDING_SUBSCRIPTION_CHOICE_KEY) === "1";
+
 /**
  * Default authenticated landing path (does not check portfolio / language — those pages redirect further).
  */

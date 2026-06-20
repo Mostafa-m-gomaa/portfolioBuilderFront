@@ -1,3 +1,7 @@
+import type { AuthUser } from "@/types/auth.types";
+import type { Portfolio } from "@/types/portfolio.types";
+import { resolveCustomDomainEnabled } from "@/lib/authMeSync";
+
 const PORTFOLIO_SITE_HOST = "getsirty.com";
 
 const customDomainPublicHost = (subdomain: string) => {
@@ -23,6 +27,41 @@ export const portfolioSiteBaseUrl = (subdomain: string, usesCustomDomain = false
   }
 
   return `https://${host}.${PORTFOLIO_SITE_HOST}`;
+};
+
+export type PortfolioSiteContext = {
+  host: string;
+  usesCustomDomain: boolean;
+  siteUrl: string | null;
+  siteEditorUrl: string | null;
+};
+
+/** Resolve public site host + custom-domain flag from the latest auth/portfolio snapshot. */
+export const resolvePortfolioSiteContext = (
+  user?: Pick<AuthUser, "subdomain" | "domain"> | null,
+  portfolio?: Pick<Portfolio, "subdomain" | "domain"> | null,
+  token?: string | null,
+): PortfolioSiteContext => {
+  const host = String(user?.subdomain ?? portfolio?.subdomain ?? "").trim();
+  const usesCustomDomain = resolveCustomDomainEnabled(user, portfolio);
+
+  if (!host) {
+    return {
+      host: "",
+      usesCustomDomain,
+      siteUrl: null,
+      siteEditorUrl: null,
+    };
+  }
+
+  return {
+    host,
+    usesCustomDomain,
+    siteUrl: portfolioSiteBaseUrl(host, usesCustomDomain),
+    siteEditorUrl: token
+      ? portfolioSiteEditorUrl(host, token, usesCustomDomain)
+      : null,
+  };
 };
 
 export const portfolioSiteEditorUrl = (

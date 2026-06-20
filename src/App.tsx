@@ -2,9 +2,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { GOOGLE_CLIENT_ID, isGoogleAuthConfigured } from "@/lib/googleAuth";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Services from "./pages/Services";
@@ -13,6 +15,7 @@ import PackageDetail from "./pages/PackageDetail";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import GoogleSignUpComplete from "./pages/GoogleSignUpComplete";
 import GetStarted from "./pages/GetStarted";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
@@ -39,7 +42,7 @@ import MetaPixelTracker from "./components/MetaPixelTracker";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const AppShell = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <LanguageProvider>
@@ -62,6 +65,10 @@ const App = () => (
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/login" element={<GuestOnly><Login /></GuestOnly>} />
                 <Route path="/signup" element={<GuestOnly><SignUp /></GuestOnly>} />
+                <Route
+                  path="/signup/google"
+                  element={<GuestOnly><GoogleSignUpComplete /></GuestOnly>}
+                />
                 <Route path="/verify-email" element={<VerifyEmail />} />
                 <Route path="/quickstart" element={<QuickStart />} />
                 <Route path="/forgot-password" element={<GuestOnly><ForgotPassword /></GuestOnly>} />
@@ -87,5 +94,14 @@ const App = () => (
     </ThemeProvider>
   </QueryClientProvider>
 );
+
+const App = () =>
+  isGoogleAuthConfigured() ? (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <AppShell />
+    </GoogleOAuthProvider>
+  ) : (
+    <AppShell />
+  );
 
 export default App;

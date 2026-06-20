@@ -5,6 +5,7 @@ import type {
   AuthUser,
   ForgotPasswordPayload,
   GoogleAuthPayload,
+  GoogleCheckResponse,
   LoginPayload,
   RegisterPayload,
   ResendVerificationPayload,
@@ -92,15 +93,26 @@ export const authService = {
     return normalizeAuthResponse(response.data);
   },
 
+  async googleCheck(idToken: string): Promise<GoogleCheckResponse> {
+    const response = await apiClient.post<GoogleCheckResponse>(
+      "/auth/google/check",
+      { idToken },
+    );
+    return response.data;
+  },
+
   async googleAuth(payload: GoogleAuthPayload): Promise<AuthSuccess> {
-    const ensuredSubdomain =
-      payload.subdomain && payload.subdomain.trim()
-        ? payload.subdomain
-        : generateTemporarySubdomain("google-user");
-    const response = await apiClient.post("/auth/google", {
-      ...payload,
-      subdomain: ensuredSubdomain,
-    });
+    const body: Record<string, string> = { idToken: payload.idToken };
+    if (payload.type) {
+      body.type = payload.type;
+      if (payload.subdomain?.trim()) {
+        body.subdomain = payload.subdomain.trim();
+      }
+      if (payload.country) {
+        body.country = payload.country;
+      }
+    }
+    const response = await apiClient.post("/auth/google", body);
     return normalizeAuthResponse(response.data);
   },
 

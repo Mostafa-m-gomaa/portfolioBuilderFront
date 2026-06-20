@@ -7,6 +7,7 @@ import {
   PAYMENT_CHECKOUT_CURRENCY,
 } from "@/lib/resolveCheckoutPrice";
 import { storePendingPurchase } from "@/lib/metaPixel";
+import { clearPendingSubscriptionChoice } from "@/lib/authRouting";
 import { paymentsService } from "@/services/payments.service";
 
 export type StartPackageCheckoutOptions = {
@@ -24,6 +25,7 @@ export async function startPackageCheckout(
   options?: StartPackageCheckoutOptions,
 ): Promise<boolean> {
   try {
+    clearPendingSubscriptionChoice();
     let price = options?.price;
     if (typeof price !== "number" || !Number.isFinite(price)) {
       const pkg = await fetchPackageById(packageId);

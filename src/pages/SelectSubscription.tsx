@@ -17,7 +17,7 @@ import {
   packageName,
   sortPackagesByOrder,
 } from "@/lib/packageDisplay";
-import { needsSubscriptionOnboarding, getPostAuthEntryPath } from "@/lib/authRouting";
+import { needsSubscriptionOnboarding, getPostAuthEntryPath, hasPendingSubscriptionChoice, clearPendingSubscriptionChoice } from "@/lib/authRouting";
 import { trackStartTrial } from "@/lib/metaPixel";
 import { useAuthStore } from "@/store/auth.store";
 import { subscriptionsService } from "@/services/subscriptions.service";
@@ -71,6 +71,7 @@ const SelectSubscription = () => {
           user: { ...u, subscriptionStatus: "FREE_TRIAL" },
         });
       }
+      clearPendingSubscriptionChoice();
       toast.success(t("subscription.freeTrial.success"));
       void queryClient.invalidateQueries({ queryKey: ["subscription-summary"] });
       trackStartTrial("EGP");
@@ -87,11 +88,15 @@ const SelectSubscription = () => {
     },
   });
 
-  if (!needsSubscriptionOnboarding(user)) {
+  if (!hasPendingSubscriptionChoice() && !needsSubscriptionOnboarding(user)) {
     return <Navigate to={getPostAuthEntryPath(user)} replace />;
   }
 
-  if (user?.subscriptionStatus === "NOT_DETECTED" && !subSumFetched) {
+  if (
+    !hasPendingSubscriptionChoice() &&
+    user?.subscriptionStatus === "NOT_DETECTED" &&
+    !subSumFetched
+  ) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -104,6 +109,7 @@ const SelectSubscription = () => {
   }
 
   if (
+    !hasPendingSubscriptionChoice() &&
     user?.subscriptionStatus === "NOT_DETECTED" &&
     subSummary &&
     subSummary.subscriptionStatus !== "NOT_DETECTED"

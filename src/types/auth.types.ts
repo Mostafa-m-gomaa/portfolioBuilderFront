@@ -46,6 +46,16 @@ export type GoogleAuthPayload = {
   subdomain?: string;
 };
 
+export type GoogleCheckResponse = {
+  exists: boolean;
+  needsSignup: boolean;
+  email?: string;
+  name?: string;
+  picture?: string;
+  hasSubdomain?: boolean;
+  authProvider?: "google" | "local" | string | null;
+};
+
 export type VerifyEmailPayload = {
   email: string;
   code: string;
@@ -69,6 +79,7 @@ export type SubdomainAvailabilityResponse = {
   available: boolean;
   subdomain?: string;
   message?: string;
+  reason?: string | null;
 };
 
 export type VerifyDomainResponse = {

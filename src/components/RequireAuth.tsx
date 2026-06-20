@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import RedirectToEmailVerification from '@/components/RedirectToEmailVerification';
-import { getPostAuthEntryPath, needsSubscriptionOnboarding } from '@/lib/authRouting';
+import { getPostAuthEntryPath, hasPendingSubscriptionChoice, needsSubscriptionOnboarding } from '@/lib/authRouting';
 import { isUserEmailVerified } from '@/lib/authVerification';
 import { useSubscriptionSummary } from '@/hooks/useSubscriptionSummary';
 import { useAuthStore } from '@/store/auth.store';
@@ -37,7 +37,7 @@ const RequireAuth = ({ children }: Props) => {
         return <Navigate to="/select-subscription" replace state={{ from: path }} />;
       }
     }
-  } else if (path === '/select-subscription') {
+  } else if (path === '/select-subscription' && !hasPendingSubscriptionChoice()) {
     return <Navigate to={getPostAuthEntryPath(user)} replace />;
   }
 

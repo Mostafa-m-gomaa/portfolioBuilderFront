@@ -132,37 +132,37 @@ export const useAuth = () => {
   const updateSubdomainMutation = useMutation({
     mutationFn: (payload: UpdateSubdomainPayload) =>
       authService.updateSubdomain(payload),
-    onSuccess: (data, payload) => {
-      const domainPatch =
-        payload.domain !== undefined ? { domain: payload.domain } : {};
-      const mergedUser = data.user
-        ? { ...data.user, subdomain: payload.subdomain, ...domainPatch }
-        : user
-          ? { ...user, subdomain: payload.subdomain, ...domainPatch }
-          : undefined;
-
-      if (mergedUser) {
-        setAuth({ user: mergedUser });
+    onSuccess: async (data, payload) => {
+      const subdomain = payload.subdomain.trim();
+      const patch: Partial<AuthUser> = { subdomain };
+      if (payload.domain !== undefined) {
+        patch.domain = payload.domain;
       }
-      if (data.token) setAuth({ token: data.token });
 
-      queryClient.setQueryData<Portfolio>(["portfolio", "me"], (old) => {
-        if (!old) return old;
-        return {
-          ...old,
-          subdomain: payload.subdomain,
-          ...domainPatch,
-        };
+      const baseUser = data.user ?? useAuthStore.getState().user;
+      const mergedUser = baseUser ? { ...baseUser, ...patch } : null;
+
+      useAuthStore.getState().setAuth({
+        ...(data.token ? { token: data.token } : {}),
+        ...(mergedUser ? { user: mergedUser } : {}),
       });
 
-      const currentPortfolio = usePortfolioStore.getState().portfolio;
-      if (currentPortfolio) {
-        usePortfolioStore.getState().setPortfolio({
-          ...currentPortfolio,
-          subdomain: payload.subdomain,
-          ...domainPatch,
-        });
-      }
+      const portfolioPatch = {
+        subdomain,
+        ...(payload.domain !== undefined ? { domain: payload.domain } : {}),
+      };
+
+      queryClient.setQueryData<Portfolio>(["portfolio", "me"], (old) => ({
+        ...(old ?? {}),
+        ...portfolioPatch,
+      }));
+
+      usePortfolioStore.getState().setPortfolio({
+        ...(usePortfolioStore.getState().portfolio ?? {}),
+        ...portfolioPatch,
+      } as Portfolio);
+
+      await queryClient.invalidateQueries({ queryKey: ["portfolio", "me"] });
 
       toast.success(
         tToast(

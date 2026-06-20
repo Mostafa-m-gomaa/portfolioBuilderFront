@@ -21,7 +21,7 @@ import LogoManagerCard from '@/components/auth/LogoManagerCard';
 import ProfilePreferencesCard from '@/components/auth/ProfilePreferencesCard';
 import { resolvePortfolioDisplayLang } from '@/lib/portfolioDisplayLang';
 import { prettyTemplateName, sectionLabel } from '@/lib/templateCatalogView';
-import { portfolioSiteBaseUrl, portfolioSiteEditorUrl } from '@/lib/portfolioSiteUrl';
+import { resolvePortfolioSiteContext } from '@/lib/portfolioSiteUrl';
 import { resolveCustomDomainEnabled } from '@/lib/authMeSync';
 
 const DASHBOARD_TABS = ['sections', 'domain', 'add-domain', 'logo', 'template', 'settings'] as const;
@@ -34,8 +34,9 @@ const normalizeDashboardTab = (value: string | null): string | null =>
   value === 'site' ? 'domain' : value;
 
 const Dashboard = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const authUser = useAuthStore((state) => state.user);
   const token = useAuthStore((state) => state.token);
+  const { isAuthenticated, logout } = useAuth();
   const { lang, t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = normalizeDashboardTab(searchParams.get('tab'));
@@ -64,7 +65,18 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
-  const usesCustomDomain = resolveCustomDomainEnabled(user, portfolio);
+  const usesCustomDomain = resolveCustomDomainEnabled(authUser, portfolio);
+
+  const { siteUrl, siteEditorUrl } = useMemo(
+    () => resolvePortfolioSiteContext(authUser, portfolio, token),
+    [
+      authUser?.subdomain,
+      authUser?.domain,
+      portfolio?.subdomain,
+      portfolio?.domain,
+      token,
+    ],
+  );
 
   useEffect(() => {
     if (usesCustomDomain && activeTab === 'domain') {
@@ -79,7 +91,7 @@ const Dashboard = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (needsSubscriptionOnboarding(user)) {
+  if (needsSubscriptionOnboarding(authUser)) {
     if (!subSumFetched) {
       return (
         <div className="min-h-screen bg-background">
@@ -99,17 +111,10 @@ const Dashboard = () => {
     }
   }
 
-  const effectiveSubdomain = user?.subdomain || portfolio?.subdomain;
+  const effectiveSubdomain = authUser?.subdomain || portfolio?.subdomain;
   if (!effectiveSubdomain || effectiveSubdomain.startsWith('temp-')) {
     return <Navigate to="/choose-subdomain" replace />;
   }
-
-  const siteSubdomain = String(user?.subdomain || portfolio?.subdomain || '');
-  const siteUrl = portfolioSiteBaseUrl(siteSubdomain, usesCustomDomain);
-  const siteEditorUrl =
-    token && siteSubdomain
-      ? portfolioSiteEditorUrl(siteSubdomain, token, usesCustomDomain)
-      : null;
 
   const sectionEntries = Array.isArray(sections)
     ? sections.map((section) => [String(section), { active: false }] as const)
@@ -117,7 +122,7 @@ const Dashboard = () => {
 
   const freeTrialExpired = subSumFetched && subSummary
     ? subSummary.subscriptionStatus === 'FREE_TRIAL_EXPIRED'
-    : user?.subscriptionStatus === 'FREE_TRIAL_EXPIRED';
+    : authUser?.subscriptionStatus === 'FREE_TRIAL_EXPIRED';
 
   const showSubscriptionAside =
     subSummaryLoading ||
@@ -165,9 +170,9 @@ const Dashboard = () => {
             <h1 className="font-heading text-3xl font-bold">{t('dashboard.title')}</h1>
             <p className="text-muted-foreground text-sm">
               {t('dashboard.welcome')}{' '}
-              {typeof user?.name === 'string'
-                ? user.name
-                : user?.email || t('dashboard.creatorFallback')}
+              {typeof authUser?.name === 'string'
+                ? authUser.name
+                : authUser?.email || t('dashboard.creatorFallback')}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -204,10 +209,11 @@ const Dashboard = () => {
             className="glass-strong rounded-3xl p-6 h-full"
           >
             <p className="text-sm text-muted-foreground">{t('dashboard.subdomain')}</p>
-            <p className="text-lg font-semibold">{user?.subdomain || portfolio?.subdomain || t('dashboard.notSet')}</p>
+            <p className="text-lg font-semibold">{authUser?.subdomain || portfolio?.subdomain || t('dashboard.notSet')}</p>
             <div className='flex flex-col gap-2'>
             <a
-              href={siteUrl}
+              key={siteUrl ?? 'site'}
+              href={siteUrl ?? '#'}
               target="_blank"
               rel="noopener noreferrer"
               className="group mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl gradient-bg px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/20 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto"
@@ -220,6 +226,7 @@ const Dashboard = () => {
             </a>
             {siteEditorUrl ? (
               <a
+                key={siteEditorUrl}
                 href={siteEditorUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -245,8 +252,8 @@ const Dashboard = () => {
             </div>
             <p className="text-xs text-muted-foreground mt-4">
               {t('dashboard.template')}{' '}
-              {user?.templateName || portfolio?.templateName
-                ? prettyTemplateName(String(user?.templateName || portfolio?.templateName), lang)
+              {authUser?.templateName || portfolio?.templateName
+                ? prettyTemplateName(String(authUser?.templateName || portfolio?.templateName), lang)
                 : t('templates.choose.notSelected')}
             </p>
             <p className="text-xs text-muted-foreground mt-2">
@@ -380,25 +387,25 @@ const Dashboard = () => {
                 title={t('profile.updateSubdomain.title')}
                 description={t('profile.updateSubdomain.description')}
                 buttonLabel={t('profile.updateSubdomain.button')}
-                currentSubdomain={user?.subdomain || portfolio?.subdomain || ''}
+                currentSubdomain={authUser?.subdomain || portfolio?.subdomain || ''}
               />
             </TabsContent>
           ) : null}
 
           <TabsContent value="add-domain" className="mt-0 focus-visible:outline-none space-y-6">
             <DomainManagerCard
-              currentSubdomain={user?.subdomain || portfolio?.subdomain || ''}
+              currentSubdomain={authUser?.subdomain || portfolio?.subdomain || ''}
               customDomainEnabled={usesCustomDomain}
             />
             <CustomDomainDnsGuide />
           </TabsContent>
 
           <TabsContent value="logo" className="mt-0 focus-visible:outline-none">
-            <LogoManagerCard currentLogo={user?.logo || null} />
+            <LogoManagerCard currentLogo={authUser?.logo || null} />
           </TabsContent>
 
           <TabsContent value="template" className="mt-0 focus-visible:outline-none">
-            <TemplateManagerCard currentTemplateName={user?.templateName || String(portfolio?.templateName ?? '')} />
+            <TemplateManagerCard currentTemplateName={authUser?.templateName || String(portfolio?.templateName ?? '')} />
           </TabsContent>
 
           <TabsContent value="settings" className="mt-0 focus-visible:outline-none space-y-4">
@@ -407,11 +414,11 @@ const Dashboard = () => {
               currentDefaultLanguage={portfolio?.defaultLanguage || null}
             />
             <ProfilePreferencesCard
-              currentCountry={user?.country || null}
-              currentCurrency={user?.currency || null}
-              currentAllowWhatsapp={user?.allowWhatsapp}
-              currentWhatsApp={user?.WhatsApp || null}
-              currentWhatsapp={user?.whatsapp || null}
+              currentCountry={authUser?.country || null}
+              currentCurrency={authUser?.currency || null}
+              currentAllowWhatsapp={authUser?.allowWhatsapp}
+              currentWhatsApp={authUser?.WhatsApp || null}
+              currentWhatsapp={authUser?.whatsapp || null}
             />
           </TabsContent>
         </Tabs>
