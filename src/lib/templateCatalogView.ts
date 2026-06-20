@@ -16,15 +16,15 @@ export const CATEGORY_ORDER = [
 ] as const;
 
 const NEWEST_TEMPLATE_PRIORITY = [
+  "fund-glow",
+  "estate-luxe",
+  "avynor-dark",
   "academy-future",
   "expo-showcase",
   "edu-mon",
   "edu-vivid",
   "edu-wave",
   "brand-curve",
-  "avynor-dark",
-  "fund-glow",
-  "estate-luxe",
   "design-flow",
 ] as const;
 
