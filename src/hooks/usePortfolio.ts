@@ -49,7 +49,7 @@ export const usePortfolioBootstrap = () => {
   });
 };
 
-export const useMyPortfolio = () => {
+export const useMyPortfolio = (enabled = true) => {
   const { setPortfolio } = usePortfolioStore();
   return useQuery({
     queryKey: portfolioKeys.me,
@@ -58,6 +58,7 @@ export const useMyPortfolio = () => {
       setPortfolio(data);
       return data;
     },
+    enabled,
   });
 };
 

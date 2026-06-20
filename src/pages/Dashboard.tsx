@@ -40,7 +40,7 @@ const Dashboard = () => {
   const { lang, t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = normalizeDashboardTab(searchParams.get('tab'));
-  const activeTab: DashboardTab = isDashboardTab(tabParam) ? tabParam : 'sections';
+  const activeTab: DashboardTab = isDashboardTab(tabParam) ? tabParam : 'settings';
   const bootstrapMutation = usePortfolioBootstrap();
   const { data: portfolio, isLoading: portfolioLoading } = useMyPortfolio();
   const { data: sections, isLoading: sectionsLoading } = useAllSections();
@@ -211,44 +211,44 @@ const Dashboard = () => {
             <p className="text-sm text-muted-foreground">{t('dashboard.subdomain')}</p>
             <p className="text-lg font-semibold">{authUser?.subdomain || portfolio?.subdomain || t('dashboard.notSet')}</p>
             <div className='flex flex-col gap-2'>
-            <a
-              key={siteUrl ?? 'site'}
-              href={siteUrl ?? '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl gradient-bg px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/20 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto"
-            >
-              {t('dashboard.goToSite')}
-              <ExternalLink
-                className="h-4 w-4 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                aria-hidden
-              />
-            </a>
-            {siteEditorUrl ? (
               <a
-                key={siteEditorUrl}
-                href={siteEditorUrl}
+                key={siteUrl ?? 'site'}
+                href={siteUrl ?? '#'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/10 px-5 py-3 text-sm font-semibold text-primary transition-all hover:scale-[1.02] hover:bg-primary/15 active:scale-[0.98] sm:w-auto"
+                className="group mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl gradient-bg px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/20 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto"
               >
-                {t('dashboard.goToEditor')}
+                {t('dashboard.goToSite')}
                 <ExternalLink
                   className="h-4 w-4 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                   aria-hidden
                 />
               </a>
-            ) : null}
-            {siteEditorUrl ? (
-              <div className="mt-3 rounded-lg border border-border bg-background p-3 text-sm">
-                <p className="font-semibold text-foreground">{lang === 'ar' ? 'ملاحظة:' : 'Note:'}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {lang === 'ar'
-                    ? 'قد لا يعرض المحرر القالب الذي اخترته أثناء التحرير، لكن التعديلات ستُطبق على القالب النشط لديك.'
-                    : 'The editor may not display your selected template, but any changes will still be applied to your active template.'}
-                </p>
-              </div>
-            ) : null}
+              {siteEditorUrl ? (
+                <a
+                  key={siteEditorUrl}
+                  href={siteEditorUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/10 px-5 py-3 text-sm font-semibold text-primary transition-all hover:scale-[1.02] hover:bg-primary/15 active:scale-[0.98] sm:w-auto"
+                >
+                  {t('dashboard.goToEditor')}
+                  <ExternalLink
+                    className="h-4 w-4 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                    aria-hidden
+                  />
+                </a>
+              ) : null}
+              {/* {siteEditorUrl ? (
+                <div className="mt-3 rounded-lg border border-border bg-background p-3 text-sm">
+                  <p className="font-semibold text-foreground">{lang === 'ar' ? 'ملاحظة:' : 'Note:'}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {lang === 'ar'
+                      ? 'قد لا يعرض المحرر القالب الذي اخترته أثناء التحرير، لكن التعديلات ستُطبق على القالب النشط لديك.'
+                      : 'The editor may not display your selected template, but any changes will still be applied to your active template.'}
+                  </p>
+                </div>
+              ) : null} */}
             </div>
             <p className="text-xs text-muted-foreground mt-4">
               {t('dashboard.template')}{' '}
@@ -272,13 +272,13 @@ const Dashboard = () => {
           className="space-y-6"
         >
           <TabsList className="h-auto flex w-full flex-wrap justify-start gap-2 rounded-2xl bg-transparent p-0">
-            <TabsTrigger
+            {/* <TabsTrigger
               value="sections"
               className="inline-flex glass rounded-xl px-4 py-2.5 text-sm gap-2 data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
             >
               <LayoutGrid className="h-4 w-4 shrink-0" aria-hidden />
               {t('dashboard.tab.sections')}
-            </TabsTrigger>
+            </TabsTrigger> */}
             {!usesCustomDomain ? (
               <TabsTrigger
                 value="domain"
@@ -331,10 +331,10 @@ const Dashboard = () => {
                   const sectionName = String(section);
                   const active = Boolean(
                     value &&
-                      typeof value === 'object' &&
-                      'active' in value &&
-                      typeof (value as { active?: unknown }).active === 'boolean' &&
-                      (value as { active: boolean }).active,
+                    typeof value === 'object' &&
+                    'active' in value &&
+                    typeof (value as { active?: unknown }).active === 'boolean' &&
+                    (value as { active: boolean }).active,
                   );
                   const isToggling =
                     setSectionActiveMutation.isPending &&
@@ -344,7 +344,7 @@ const Dashboard = () => {
                     <div key={sectionName} className="glass-strong rounded-2xl p-5 glow-border">
                       <div className="flex items-start justify-between gap-2">
                         <div >
-                              <h3 className="font-heading font-semibold">{sectionLabel(sectionName, lang)}</h3>
+                          <h3 className="font-heading font-semibold">{sectionLabel(sectionName, lang)}</h3>
                           <p className="text-xs text-muted-foreground mt-1">{t('dashboard.editSection')}</p>
                         </div>
                         <div className="flex items-center gap-2">
