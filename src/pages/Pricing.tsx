@@ -7,7 +7,7 @@ const Pricing = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-20">
-        <PricingPreview />
+        <PricingPreview showBenefitCards />
       </main>
       <Footer />
     </div>

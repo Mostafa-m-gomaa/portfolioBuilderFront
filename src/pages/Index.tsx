@@ -1,7 +1,6 @@
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import HeroSection from '@/components/landing/HeroSection';
-import TemplateShowcaseSection from '@/components/landing/TemplateShowcaseSection';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import HowItWorksSection from '@/components/landing/HowItWorksSection';
 import PricingPreview from '@/components/landing/PricingPreview';
@@ -14,7 +13,6 @@ const Index = () => {
       <Navbar />
       <main className="overflow-x-clip">
         <HeroSection />
-        <TemplateShowcaseSection />
         <FeaturesSection />
         <HowItWorksSection />
         <PricingPreview />

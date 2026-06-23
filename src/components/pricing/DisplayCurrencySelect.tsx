@@ -21,11 +21,10 @@ const DisplayCurrencySelect = ({ value, onChange, className }: Props) => {
           return (
             <label
               key={item.code}
-              className={`inline-flex items-center gap-3 rounded-xl border px-3 py-2 text-sm cursor-pointer transition-shadow ${
-                selected
+              className={`inline-flex items-center gap-3 rounded-xl border px-3 py-2 text-sm cursor-pointer transition-shadow ${selected
                   ? 'bg-primary text-primary-foreground border-primary shadow-sm'
                   : 'bg-background text-foreground border-border hover:shadow-sm'
-              }`}
+                }`}
             >
               <input
                 type="radio"

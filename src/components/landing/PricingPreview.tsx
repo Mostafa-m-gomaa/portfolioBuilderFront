@@ -1,7 +1,16 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check, Loader2 } from 'lucide-react';
+import {
+  Check,
+  Globe,
+  Headphones,
+  LayoutDashboard,
+  LayoutTemplate,
+  Loader2,
+  Sparkles,
+  Wand2,
+} from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPackages } from '@/api/packages';
 import { parseApiError } from '@/api/axios';
@@ -18,7 +27,20 @@ import SubscribePackageCta from '@/components/pricing/SubscribePackageCta';
 import DisplayCurrencySelect from '@/components/pricing/DisplayCurrencySelect';
 import { useDisplayCurrency } from '@/hooks/useDisplayCurrency';
 
-const PricingPreview = () => {
+type PricingPreviewProps = {
+  showBenefitCards?: boolean;
+};
+
+const benefitCards = [
+  { icon: Sparkles, textKey: 'pricing.benefits.1' },
+  { icon: LayoutDashboard, textKey: 'pricing.benefits.2' },
+  { icon: Wand2, textKey: 'pricing.benefits.3' },
+  { icon: Globe, textKey: 'pricing.benefits.4' },
+  { icon: LayoutTemplate, textKey: 'pricing.benefits.5' },
+  { icon: Headphones, textKey: 'pricing.benefits.6' },
+] as const;
+
+const PricingPreview = ({ showBenefitCards = false }: PricingPreviewProps) => {
   const { t, lang } = useLanguage();
   const { displayCurrency, setDisplayCurrency } = useDisplayCurrency();
 
@@ -50,6 +72,38 @@ const PricingPreview = () => {
             </div>
           ) : null}
         </motion.div>
+
+        {showBenefitCards ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-14"
+          >
+            <p className="mx-auto mb-8 max-w-3xl text-center text-base leading-8 text-muted-foreground sm:text-lg">
+              {t('pricing.benefits.subtitle')}
+            </p>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {benefitCards.map((benefit, i) => (
+                <motion.div
+                  key={benefit.textKey}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.06 }}
+                  className="flex items-start gap-4 rounded-xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md"
+                >
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <benefit.icon className="h-5 w-5" aria-hidden />
+                  </div>
+                  <p className="pt-1 text-sm font-semibold leading-7 text-foreground sm:text-base">
+                    {t(benefit.textKey)}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        ) : null}
 
         {isPending ? (
           <div className="flex flex-col items-center justify-center gap-4 py-16 text-muted-foreground">
@@ -88,8 +142,8 @@ const PricingPreview = () => {
                   transition={{ delay: i * 0.08 }}
                   whileHover={{ y: -6, transition: { duration: 0.25 } }}
                   className={`relative flex flex-col rounded-2xl border p-6 ${isPopular
-                      ? 'border-primary bg-primary text-primary-foreground shadow-xl shadow-primary/25 md:z-10 md:-my-1 md:py-7 xl:scale-[1.03]'
-                      : 'border-border bg-card text-foreground shadow-sm'
+                    ? 'border-primary bg-primary text-primary-foreground shadow-xl shadow-primary/25 md:z-10 md:-my-1 md:py-7 xl:scale-[1.03]'
+                    : 'border-border bg-card text-foreground shadow-sm'
                     }`}
                 >
                   {isPopular ? (
@@ -131,8 +185,8 @@ const PricingPreview = () => {
                     <Link
                       to={`/pricing/${pkg._id}`}
                       className={`block w-full rounded-xl border px-4 py-3 text-center text-sm font-medium transition-colors ${isPopular
-                          ? 'border-primary-foreground/40 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20'
-                          : 'border-border bg-background text-foreground hover:bg-muted/60'
+                        ? 'border-primary-foreground/40 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20'
+                        : 'border-border bg-background text-foreground hover:bg-muted/60'
                         }`}
                     >
                       {t('package.details')}

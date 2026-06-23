@@ -18,6 +18,7 @@ export const useSubscriptionSummary = () => {
     },
     enabled: Boolean(token),
     staleTime: 30_000,
+    refetchOnMount: "always",
     refetchOnWindowFocus: true,
   });
 };

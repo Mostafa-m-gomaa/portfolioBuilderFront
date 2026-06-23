@@ -6,13 +6,12 @@ import { CheckCircle2, LayoutDashboard, UserCog } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { applySubscriptionSummaryToAuth } from '@/lib/syncSubscriptionAuth';
+import { pollSubscriptionSummaryAfterPayment } from '@/lib/syncSubscriptionAuth';
 import {
   consumePendingPurchase,
   trackPurchase,
   waitForMetaPixel,
 } from '@/lib/metaPixel';
-import { subscriptionsService } from '@/services/subscriptions.service';
 import { useAuthStore } from '@/store/auth.store';
 
 const PaymentSuccess = () => {
@@ -53,17 +52,9 @@ const PaymentSuccess = () => {
     if (!isAuthenticated) return;
     void (async () => {
       await queryClient.resetQueries({ queryKey: ['subscription-summary'] });
-      try {
-        const summary = await queryClient.fetchQuery({
-          queryKey: ['subscription-summary'],
-          queryFn: () => subscriptionsService.getMeSummary(),
-        });
-        applySubscriptionSummaryToAuth(summary);
-      } catch {
-        /* Dashboard will refetch; avoid blocking success UI */
-      }
+      await pollSubscriptionSummaryAfterPayment(queryClient);
       void queryClient.invalidateQueries({ queryKey: ['portfolio', 'me'] });
-   })();
+    })();
   }, [isAuthenticated, queryClient]);
 
   return (

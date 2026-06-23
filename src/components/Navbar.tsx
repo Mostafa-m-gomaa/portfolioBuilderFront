@@ -38,7 +38,7 @@ const Navbar = () => {
   return (
     <nav className="fixed inset-x-0 top-0 z-50 overflow-x-clip">
       <div className="mx-4 mt-4 max-w-[calc(100%-2rem)]">
-        <div className="mx-auto flex max-w-7xl min-w-0 items-center justify-between gap-2 rounded-2xl border border-border bg-background/90 px-4 py-3 shadow-sm backdrop-blur-xl sm:px-6">
+        <div className="mx-auto flex max-w-7xl min-w-0 items-center justify-between gap-2 rounded-2xl border border-white/30 bg-background/65 px-4 py-3 shadow-xl shadow-foreground/5 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/55 sm:px-6 dark:border-white/10 dark:bg-background/45">
           {/* Logo */}
           <Link to="/" className="group flex min-w-0 shrink items-center gap-2 sm:gap-3">
             <img src={logo} alt={t('brand.logoAlt')} className="w-12 h-12 rounded-xl object-contain" />
@@ -60,8 +60,8 @@ const Navbar = () => {
                 key={link.to}
                 to={link.to}
                 className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${location.pathname === link.to
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-primary/12 text-primary shadow-sm'
+                  : 'text-muted-foreground hover:bg-background/45 hover:text-foreground'
                   }`}
               >
                 {link.label}
@@ -73,7 +73,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-2">
             <button
               onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
-              className="flex rounded-xl border border-border bg-card p-2 text-muted-foreground transition-colors hover:text-foreground"
+              className="flex rounded-xl border border-white/25 bg-card/60 p-2 text-muted-foreground shadow-sm backdrop-blur transition-colors hover:text-foreground dark:border-white/10"
               aria-label={t('a11y.switchLanguage')}
             >
               <Globe className="w-4 h-4" />
@@ -81,7 +81,7 @@ const Navbar = () => {
             </button>
             <button
               onClick={toggleTheme}
-              className="rounded-xl border border-border bg-card p-2 text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-xl border border-white/25 bg-card/60 p-2 text-muted-foreground shadow-sm backdrop-blur transition-colors hover:text-foreground dark:border-white/10"
               aria-label={t('a11y.toggleTheme')}
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -89,7 +89,7 @@ const Navbar = () => {
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="rounded-xl border border-border bg-card p-2.5 text-foreground transition-colors hover:text-primary" aria-label={t('a11y.openProfileMenu')}>
+                  <button className="rounded-xl border border-white/25 bg-card/60 p-2.5 text-foreground shadow-sm backdrop-blur transition-colors hover:text-primary dark:border-white/10" aria-label={t('a11y.openProfileMenu')}>
                     {user?.logo ? (
                       <img
                         src={resolveApiAssetUrl(user.logo)}
@@ -141,7 +141,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/signup"
-                  className="rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition hover:bg-primary/90"
+                  className="rounded-xl bg-gradient-to-r from-primary via-secondary to-sky-400 px-4 py-2 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition hover:opacity-95"
                 >
                   {t('nav.signup')}
                 </Link>
@@ -152,7 +152,7 @@ const Navbar = () => {
           {/* Mobile toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden rounded-xl border border-border bg-card p-2 text-foreground"
+            className="md:hidden rounded-xl border border-white/25 bg-card/60 p-2 text-foreground shadow-sm backdrop-blur dark:border-white/10"
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -168,25 +168,25 @@ const Navbar = () => {
             exit={{ opacity: 0, y: -10 }}
             className="md:hidden mx-4 mt-2"
           >
-            <div className="flex flex-col gap-2 rounded-2xl border border-border bg-background/95 p-4 shadow-sm backdrop-blur-xl">
+            <div className="flex flex-col gap-2 rounded-2xl border border-white/25 bg-background/70 p-4 shadow-xl shadow-foreground/10 backdrop-blur-2xl dark:border-white/10 dark:bg-background/55">
               {navLinks.map(link => (
                 <Link
                   key={link.to}
                   to={link.to}
                   onClick={() => setMobileOpen(false)}
                   className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${location.pathname === link.to
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'bg-primary/12 text-primary'
+                    : 'text-muted-foreground hover:bg-background/45 hover:text-foreground'
                     }`}
                 >
                   {link.label}
                 </Link>
               ))}
               <div className="flex items-center gap-2 mt-2 px-4">
-                <button onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')} className="rounded-xl border border-border bg-card p-2 text-muted-foreground">
+                <button onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')} className="rounded-xl border border-white/25 bg-card/60 p-2 text-muted-foreground backdrop-blur dark:border-white/10">
                   <Globe className="w-4 h-4" />
                 </button>
-                <button onClick={toggleTheme} className="rounded-xl border border-border bg-card p-2 text-muted-foreground">
+                <button onClick={toggleTheme} className="rounded-xl border border-white/25 bg-card/60 p-2 text-muted-foreground backdrop-blur dark:border-white/10">
                   {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                 </button>
               </div>
@@ -195,7 +195,7 @@ const Navbar = () => {
                   <Link
                     to="/profile"
                     onClick={() => setMobileOpen(false)}
-                    className="w-full rounded-xl border border-border bg-card px-4 py-3 text-center text-sm font-medium text-foreground"
+                    className="w-full rounded-xl border border-white/25 bg-card/60 px-4 py-3 text-center text-sm font-medium text-foreground backdrop-blur dark:border-white/10"
                   >
                     {t('nav.profile')}
                   </Link>
@@ -204,17 +204,17 @@ const Navbar = () => {
                       logout();
                       setMobileOpen(false);
                     }}
-                    className="w-full rounded-xl border border-border bg-card px-4 py-3 text-center text-sm font-medium text-destructive"
+                    className="w-full rounded-xl border border-white/25 bg-card/60 px-4 py-3 text-center text-sm font-medium text-destructive backdrop-blur dark:border-white/10"
                   >
                     {t('nav.logout')}
                   </button>
                 </div>
               ) : (
                 <div className="flex gap-2 mt-2">
-                  <Link to="/login" onClick={() => setMobileOpen(false)} className="flex-1 rounded-xl border border-border bg-card px-4 py-3 text-center text-sm font-medium text-foreground">
+                  <Link to="/login" onClick={() => setMobileOpen(false)} className="flex-1 rounded-xl border border-white/25 bg-card/60 px-4 py-3 text-center text-sm font-medium text-foreground backdrop-blur dark:border-white/10">
                     {t('nav.login')}
                   </Link>
-                  <Link to="/signup" onClick={() => setMobileOpen(false)} className="flex-1 rounded-xl bg-primary px-4 py-3 text-center text-sm font-bold text-primary-foreground">
+                  <Link to="/signup" onClick={() => setMobileOpen(false)} className="flex-1 rounded-xl bg-gradient-to-r from-primary via-secondary to-sky-400 px-4 py-3 text-center text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20">
                     {t('nav.signup')}
                   </Link>
                 </div>

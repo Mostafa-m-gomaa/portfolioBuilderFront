@@ -205,6 +205,9 @@ const SelectSubscription = () => {
                 <p className="relative mt-1 text-sm text-muted-foreground">
                   {t("subscription.freeTrial.duration")}
                 </p>
+                <p className="relative mt-3 inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+                  {t("subscription.freeTrial.noPayment")}
+                </p>
                 <p className="relative mt-3 line-clamp-3 text-sm text-muted-foreground">
                   {t("subscription.freeTrial.description")}
                 </p>
