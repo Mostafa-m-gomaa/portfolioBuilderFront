@@ -15,6 +15,7 @@ import {
 } from "@/constants/accountTypes";
 import { sortCountriesForDisplay } from "@/constants/countries";
 import { trackCompleteRegistration } from "@/lib/metaPixel";
+import { primaryButton } from "@/lib/buttonStyles";
 
 const GoogleSignUpComplete = () => {
   const { t, lang } = useLanguage();
@@ -100,7 +101,7 @@ const GoogleSignUpComplete = () => {
         >
           <div className="text-center mb-8">
             <div className="mx-auto mb-4 flex items-center justify-center">
-              <div className="rounded-full p-2 shadow-md dark:shadow-none dark:bg-transparent bg-gradient-to-br from-slate-800/80 to-slate-600/60">
+              <div className="rounded-full bg-violet-100 p-2 shadow-md ring-1 ring-violet-200/70 dark:bg-transparent dark:shadow-none dark:ring-0 dark:bg-gradient-to-br dark:from-slate-800/80 dark:to-slate-600/60">
                 {signupState.picture ? (
                   <img
                     src={signupState.picture}
@@ -190,7 +191,7 @@ const GoogleSignUpComplete = () => {
             <button
               type="submit"
               disabled={!canSubmit || googleAuthMutation.isPending}
-              className="w-full gradient-bg-full py-3 rounded-xl text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-70"
+              className={primaryButton('w-full')}
             >
               {googleAuthMutation.isPending
                 ? t("auth.googleSignup.submitting")

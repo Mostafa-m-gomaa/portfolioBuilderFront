@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { EmailInput, type EmailInputHandle } from '@/components/auth/EmailInput';
 import { normalizeEmail } from '@/lib/emailValidation';
+import { primaryButton } from '@/lib/buttonStyles';
 
 const ForgotPassword = () => {
   const { lang, t } = useLanguage();
@@ -75,7 +76,7 @@ const ForgotPassword = () => {
                 </div>
                 <button
                   disabled={forgotPasswordMutation.isPending}
-                  className="gradient-bg w-full rounded-xl py-3 text-sm font-semibold text-primary-foreground disabled:opacity-70"
+                  className={primaryButton('w-full')}
                 >
                   {forgotPasswordMutation.isPending
                     ? isAr

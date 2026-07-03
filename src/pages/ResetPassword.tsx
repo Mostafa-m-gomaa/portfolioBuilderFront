@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PasswordInput } from '@/components/auth/PasswordInput';
+import { primaryButton } from '@/lib/buttonStyles';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -112,7 +113,7 @@ const ResetPassword = () => {
                     !newPassword ||
                     !newPasswordConfirmation
                   }
-                  className="gradient-bg w-full rounded-xl py-3 text-sm font-semibold text-primary-foreground disabled:opacity-70"
+                  className={primaryButton('w-full')}
                 >
                   {resetPasswordMutation.isPending
                     ? isAr

@@ -13,6 +13,7 @@ import {
   waitForMetaPixel,
 } from '@/lib/metaPixel';
 import { useAuthStore } from '@/store/auth.store';
+import { primaryButtonMdClass } from '@/lib/buttonStyles';
 
 const PaymentSuccess = () => {
   const { t } = useLanguage();
@@ -80,7 +81,7 @@ const PaymentSuccess = () => {
               <>
                 <Link
                   to="/dashboard"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition hover:bg-primary/90"
+                  className={primaryButtonMdClass}
                 >
                   <LayoutDashboard className="h-4 w-4" aria-hidden />
                   {t('payment.success.ctaDashboard')}
@@ -97,7 +98,7 @@ const PaymentSuccess = () => {
               <>
                 <Link
                   to="/login"
-                  className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition hover:bg-primary/90"
+                  className={primaryButtonMdClass}
                 >
                   {t('nav.login')}
                 </Link>

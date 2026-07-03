@@ -33,7 +33,7 @@ const Footer = () => {
             <div className="flex flex-col gap-3">
               <Link
                 to="/terms"
-                className="group glass rounded-xl px-3 py-2 border border-white/10 hover:border-primary/40 transition-all"
+                className="group glass rounded-xl px-3 py-2 border border-border hover:border-primary/40 transition-all"
               >
                 <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                   {t('footer.terms')}
@@ -44,7 +44,7 @@ const Footer = () => {
               </Link>
               <Link
                 to="/privacy"
-                className="group glass rounded-xl px-3 py-2 border border-white/10 hover:border-primary/40 transition-all"
+                className="group glass rounded-xl px-3 py-2 border border-border hover:border-primary/40 transition-all"
               >
                 <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                   {t('footer.privacy')}
@@ -55,7 +55,7 @@ const Footer = () => {
               </Link>
               <Link
                 to="/refund-policy"
-                className="group glass rounded-xl px-3 py-2 border border-white/10 hover:border-primary/40 transition-all"
+                className="group glass rounded-xl px-3 py-2 border border-border hover:border-primary/40 transition-all"
               >
                 <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
                   {t('footer.refund')}

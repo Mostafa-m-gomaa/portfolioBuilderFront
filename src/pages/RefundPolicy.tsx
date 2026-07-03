@@ -89,7 +89,7 @@ const RefundPolicy = () => {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.06 }}
-                className="glass-strong rounded-2xl p-6 border border-white/10"
+                className="glass-strong rounded-2xl p-6 border border-border"
               >
                 <h2 className="font-heading font-semibold text-xl text-foreground mb-3">
                   {section.title}

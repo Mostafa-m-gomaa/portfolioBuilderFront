@@ -23,6 +23,8 @@ import { useAuthStore } from "@/store/auth.store";
 import { subscriptionsService } from "@/services/subscriptions.service";
 import DisplayCurrencySelect from "@/components/pricing/DisplayCurrencySelect";
 import SubscribePackageCta from "@/components/pricing/SubscribePackageCta";
+import { primaryButton, primaryButtonSmClass } from "@/lib/buttonStyles";
+import { cn } from "@/lib/utils";
 import { useDisplayCurrency } from "@/hooks/useDisplayCurrency";
 import { useSubscriptionSummary } from "@/hooks/useSubscriptionSummary";
 
@@ -166,7 +168,7 @@ const SelectSubscription = () => {
             <button
               type="button"
               onClick={() => refetch()}
-              className="mt-6 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+              className={cn(primaryButtonSmClass, 'mt-6')}
             >
               {t("pricing.retry")}
             </button>
@@ -237,7 +239,7 @@ const SelectSubscription = () => {
                     type="button"
                     disabled={freeTrialMutation.isPending}
                     onClick={() => freeTrialMutation.mutate()}
-                    className="block w-full rounded-xl bg-primary py-2.5 text-center text-sm font-medium text-primary-foreground shadow-md shadow-primary/30 transition-opacity hover:opacity-90 disabled:opacity-60"
+                    className={primaryButton('block w-full py-2.5 text-center')}
                   >
                     {freeTrialMutation.isPending
                       ? t("subscription.freeTrial.pending")
@@ -290,7 +292,7 @@ const SelectSubscription = () => {
                       packageId={pkg._id}
                       couponEnabled
                       packagePrice={pkg.priceEgp}
-                      className="block w-full rounded-xl bg-primary py-2.5 text-center text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+                      className={primaryButton('block w-full py-2.5 text-center')}
                     >
                       {t("pricing.cta")}
                     </SubscribePackageCta>

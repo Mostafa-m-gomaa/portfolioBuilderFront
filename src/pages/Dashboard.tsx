@@ -9,6 +9,8 @@ import { useSubscriptionSummary } from '@/hooks/useSubscriptionSummary';
 import SubscriptionSummaryPanelSafe from '@/components/subscription/SubscriptionSummaryPanelSafe';
 import { useAllSections, useMyPortfolio, usePortfolioActions, usePortfolioBootstrap } from '@/hooks/usePortfolio';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { primaryButton, primaryButtonCompactClass, primaryButtonDefaultClass, primaryButtonMdClass } from '@/lib/buttonStyles';
+import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -159,7 +161,7 @@ const Dashboard = () => {
             </div>
             <Link
               to="/pricing"
-              className="shrink-0 rounded-xl bg-primary px-4 py-2.5 text-center text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 sm:min-w-[10rem]"
+              className={cn(primaryButtonCompactClass, 'shrink-0 text-center sm:min-w-[10rem]')}
             >
               {t('subscription.banner.freeTrialExpired.cta')}
             </Link>
@@ -179,7 +181,7 @@ const Dashboard = () => {
             <button
               onClick={() => publishMutation.mutate()}
               disabled={publishMutation.isPending}
-              className="gradient-bg px-4 py-2 rounded-xl text-primary-foreground text-sm disabled:opacity-70"
+              className={primaryButtonCompactClass}
             >
               {publishMutation.isPending ? t('dashboard.publishing') : t('dashboard.publish')}
             </button>
@@ -216,7 +218,7 @@ const Dashboard = () => {
                 href={siteUrl ?? '#'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl gradient-bg px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/20 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/40 active:scale-[0.98] sm:w-auto"
+                className={cn(primaryButtonMdClass, 'group mt-4 w-full sm:mt-4 sm:w-auto')}
               >
                 {t('dashboard.goToSite')}
                 <ExternalLink

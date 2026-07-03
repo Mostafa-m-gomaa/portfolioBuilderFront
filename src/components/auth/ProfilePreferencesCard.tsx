@@ -10,6 +10,7 @@ import {
   PROFILE_CURRENCY_OPTIONS,
   type ProfileCurrencyCode,
 } from '@/constants/profileCurrencies';
+import { primaryButtonFullClass } from '@/lib/buttonStyles';
 
 type ProfilePreferencesCardProps = {
   currentCountry?: string | null;
@@ -228,7 +229,7 @@ const ProfilePreferencesCard = ({
         <button
           type="submit"
           disabled={updateProfileMutation.isPending}
-          className="w-full gradient-bg py-3 rounded-xl text-primary-foreground font-semibold text-sm disabled:opacity-70"
+          className={primaryButtonFullClass}
         >
           {updateProfileMutation.isPending ? (isAr ? 'جار الحفظ...' : 'Saving...') : isAr ? 'حفظ التفضيلات' : 'Save preferences'}
         </button>

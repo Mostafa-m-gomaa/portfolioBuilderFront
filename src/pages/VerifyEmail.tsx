@@ -12,6 +12,7 @@ import { useAuthStore } from '@/store/auth.store';
 import { EmailInput, type EmailInputHandle } from '@/components/auth/EmailInput';
 import { getEmailValidationError, normalizeEmail } from '@/lib/emailValidation';
 import { subscriptionsService } from '@/services/subscriptions.service';
+import { primaryButton } from '@/lib/buttonStyles';
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
@@ -133,7 +134,7 @@ const VerifyEmail = () => {
 
             <button
               disabled={verifyEmailMutation.isPending}
-              className="w-full gradient-bg py-3 rounded-xl text-primary-foreground font-semibold text-sm disabled:opacity-70"
+              className={primaryButton('w-full')}
             >
               {verifyEmailMutation.isPending ? t('auth.verify.submitting') : t('auth.verify.submit')}
             </button>

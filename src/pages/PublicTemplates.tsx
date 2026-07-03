@@ -16,6 +16,7 @@ import {
 import { ArrowUpRight, Eye } from 'lucide-react';
 import { TemplatePreviewImage } from '@/components/templates/TemplatePreviewImage';
 import { toLatinDigits } from '@/lib/latinDigits';
+import { primaryButton, primaryButtonDefaultClass } from '@/lib/buttonStyles';
 
 const PublicTemplates = () => {
   const { lang, t } = useLanguage();
@@ -54,7 +55,7 @@ const PublicTemplates = () => {
                 {isAuthenticated ? (
                   <Link
                     to="/dashboard?tab=template"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition hover:bg-primary/90"
+                    className={primaryButtonDefaultClass}
                   >
                     {t('dashboard.title')}
                     <ArrowUpRight className="h-4 w-4" />
@@ -62,7 +63,7 @@ const PublicTemplates = () => {
                 ) : (
                   <Link
                     to="/signup"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition hover:bg-primary/90"
+                    className={primaryButtonDefaultClass}
                   >
                     {t('templates.library.startSite')}
                     <ArrowUpRight className="h-4 w-4" />
@@ -143,7 +144,7 @@ const PublicTemplates = () => {
                               type="button"
                               onClick={() => updateTemplateNameMutation.mutate(template.templateName)}
                               disabled={updateTemplateNameMutation.isPending || isActive}
-                              className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                              className={primaryButton('w-full px-4 py-3 disabled:cursor-not-allowed')}
                             >
                               {isActive ? t('templates.choose.active') : t('templates.choose.activate')}
                             </button>

@@ -2,6 +2,7 @@ import { useState, type ChangeEvent } from 'react';
 import { resolveApiAssetUrl } from '@/api/axios';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { primaryButton } from '@/lib/buttonStyles';
 
 type LogoManagerCardProps = {
   currentLogo?: string | null;
@@ -44,7 +45,7 @@ const LogoManagerCard = ({ currentLogo }: LogoManagerCardProps) => {
         )}
       </div>
       <div className="mt-4 flex gap-2">
-        <label className="flex-1 cursor-pointer gradient-bg py-2.5 rounded-xl text-center text-primary-foreground text-sm font-semibold">
+        <label className={primaryButton('flex-1 cursor-pointer py-2.5 text-center')}>
           {currentLogo ? (isAr ? 'تغيير الشعار' : 'Change logo') : isAr ? 'رفع الشعار' : 'Upload logo'}
           <input
             type="file"

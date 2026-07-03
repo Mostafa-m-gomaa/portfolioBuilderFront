@@ -6,6 +6,7 @@ import { parseApiError } from '@/api/axios';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { primaryButtonFullClass } from '@/lib/buttonStyles';
 import { CUSTOM_DOMAIN_CNAME_TARGET } from '@/constants/customDomainDns';
 import { SUPPORT_WHATSAPP_URL } from '@/constants/supportWhatsApp';
 import type { VerifyDomainResponse } from '@/types/auth.types';
@@ -200,7 +201,7 @@ const CustomDomainDnsGuide = () => {
         type="button"
         onClick={handleVerify}
         disabled={verifyDomainMutation.isPending}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl gradient-bg py-3 text-sm font-semibold text-primary-foreground disabled:opacity-70"
+        className={cn(primaryButtonFullClass, 'mt-6')}
       >
         {verifyDomainMutation.isPending ? (
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden />

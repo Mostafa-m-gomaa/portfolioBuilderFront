@@ -95,7 +95,7 @@ const Privacy = () => {
           </motion.div>
           <div className="space-y-8">
             {content.map((s, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="glass-strong rounded-2xl p-6 border border-white/10">
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="glass-strong rounded-2xl p-6 border border-border">
                 <h2 className="font-heading font-semibold text-xl text-foreground mb-3">{s.title}</h2>
                 <p className="text-muted-foreground text-sm leading-relaxed">{s.text}</p>
               </motion.div>

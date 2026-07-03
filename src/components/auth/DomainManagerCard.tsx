@@ -4,6 +4,7 @@ import { useAuth, useDomainAvailability, useSubdomainAvailability } from '@/hook
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
+import { primaryButtonFullClass } from '@/lib/buttonStyles';
 import {
   isValidCustomDomain,
   sanitizeCustomDomainInput,
@@ -248,7 +249,7 @@ const DomainManagerCard = ({
             <button
               type="submit"
               disabled={updateSubdomainMutation.isPending}
-              className="w-full rounded-xl gradient-bg py-3 text-sm font-semibold text-primary-foreground disabled:opacity-70"
+              className={primaryButtonFullClass}
             >
               {updateSubdomainMutation.isPending ? t('domainManager.saving') : t('domainManager.revert.save')}
             </button>
@@ -292,7 +293,7 @@ const DomainManagerCard = ({
             <button
               type="submit"
               disabled={updateSubdomainMutation.isPending}
-              className="w-full rounded-xl gradient-bg py-3 text-sm font-semibold text-primary-foreground disabled:opacity-70"
+              className={primaryButtonFullClass}
             >
               {updateSubdomainMutation.isPending ? t('domainManager.saving') : t('domainManager.save')}
             </button>

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useAuth, useSubdomainAvailability } from '@/hooks/useAuth';
 import { sanitizeSubdomainPart } from '@/lib/customDomain';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { primaryButtonFullClass } from '@/lib/buttonStyles';
 
 const sanitizeSubdomain = sanitizeSubdomainPart;
 
@@ -110,7 +111,7 @@ const SubdomainManagerCard = ({
         {canUpdate && (
           <button
             disabled={updateSubdomainMutation.isPending}
-            className="w-full gradient-bg py-3 rounded-xl text-primary-foreground font-semibold text-sm disabled:opacity-70"
+            className={primaryButtonFullClass}
           >
             {updateSubdomainMutation.isPending ? (isAr ? 'جار الحفظ...' : 'Saving...') : buttonLabel}
           </button>

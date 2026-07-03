@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+import { primaryButtonFullClass } from '@/lib/buttonStyles';
 
 type TemplateManagerCardProps = {
   currentTemplateName?: string | null;
@@ -19,7 +21,7 @@ const TemplateManagerCard = ({ currentTemplateName }: TemplateManagerCardProps) 
       </div>
       <Link
         to="/template-selector"
-        className="mt-4 inline-flex items-center justify-center w-full gradient-bg py-3 rounded-xl text-primary-foreground font-semibold text-sm"
+        className={cn(primaryButtonFullClass, 'mt-4')}
       >
         {isAr ? 'تغيير القالب' : 'Change template'}
       </Link>

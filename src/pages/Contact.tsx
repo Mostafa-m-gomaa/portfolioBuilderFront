@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { EmailInput, type EmailInputHandle } from '@/components/auth/EmailInput';
 import { trackLead } from '@/lib/metaPixel';
+import { primaryButton } from '@/lib/buttonStyles';
 
 const Contact = () => {
   const { t, lang } = useLanguage();
@@ -68,7 +69,7 @@ const Contact = () => {
                 className="w-full glass rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 bg-transparent resize-none"
                 placeholder={t('contact.message')}
               />
-              <button className="w-full gradient-bg py-3 rounded-xl text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">
+              <button type="submit" className={primaryButton('w-full')}>
                 {t('contact.send')}
               </button>
             </motion.form>

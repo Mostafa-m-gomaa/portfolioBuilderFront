@@ -93,6 +93,11 @@ export default {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(-50%)" },
         },
+        "blob-float": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "33%": { transform: "translate(24px, -18px) scale(1.05)" },
+          "66%": { transform: "translate(-16px, 12px) scale(0.97)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -101,6 +106,9 @@ export default {
         "scale-in": "scale-in 0.4s ease-out forwards",
         "slide-up": "slide-up 0.8s ease-out forwards",
         marquee: "marquee 55s linear infinite",
+        "blob-float": "blob-float 14s ease-in-out infinite",
+        "blob-float-delayed": "blob-float 18s ease-in-out 2s infinite",
+        "blob-float-slow": "blob-float 22s ease-in-out 4s infinite",
       },
     },
   },

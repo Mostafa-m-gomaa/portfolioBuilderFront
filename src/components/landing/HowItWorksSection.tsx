@@ -2,6 +2,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
 import PlatformVideoSection from '@/components/shared/PlatformVideoSection';
+import LandingSection from '@/components/landing/LandingSection';
+import LandingSectionHeader from '@/components/landing/LandingSectionHeader';
+import { landingViewport, staggerContainer, staggerItem } from '@/lib/landingMotion';
 
 const HowItWorksSection = () => {
   const { t } = useLanguage();
@@ -13,30 +16,25 @@ const HowItWorksSection = () => {
   ];
 
   return (
-    <section className="relative py-24">
-      <div className="max-w-5xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mx-auto mb-14 max-w-2xl text-center"
-        >
-          <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary">{t('how.kicker')}</span>
-          <h2 className="mt-3 font-heading text-3xl font-bold text-foreground md:text-5xl">{t('how.title')}</h2>
-          <p className="mx-auto mt-4 text-lg leading-8 text-muted-foreground">{t('how.subtitle')}</p>
-        </motion.div>
+    <LandingSection variant="cool" alternate>
+      <div className="mx-auto max-w-5xl px-6">
+        <LandingSectionHeader
+          kicker={t('how.kicker')}
+          title={t('how.title')}
+          subtitle={t('how.subtitle')}
+          className="max-w-2xl"
+        />
 
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={landingViewport}
+          variants={staggerContainer}
+          className="grid grid-cols-1 gap-5 md:grid-cols-3"
+        >
           {steps.map((step, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.15 }}
-              className="relative text-start"
-            >
-              <div className="h-full rounded-2xl border border-border bg-card p-7 shadow-sm">
+            <motion.div key={i} variants={staggerItem} className="relative text-start">
+              <div className="h-full rounded-2xl border border-border/80 bg-card/80 p-7 shadow-sm backdrop-blur-sm transition-shadow hover:shadow-lg hover:shadow-secondary/5">
                 <div className="mb-8 flex items-center justify-between">
                   <span className="font-heading text-sm font-bold text-primary">{step.num}</span>
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -48,11 +46,11 @@ const HowItWorksSection = () => {
               </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         <PlatformVideoSection className="mt-20" />
       </div>
-    </section>
+    </LandingSection>
   );
 };
 

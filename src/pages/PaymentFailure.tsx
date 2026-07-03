@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { primaryButtonMdClass } from '@/lib/buttonStyles';
 import { XCircle, RotateCcw, MessageCircle, Home } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -28,7 +29,7 @@ const PaymentFailure = () => {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
               to="/pricing"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition hover:bg-primary/90"
+              className={primaryButtonMdClass}
             >
               <RotateCcw className="h-4 w-4" aria-hidden />
               {t('payment.failure.ctaRetry')}

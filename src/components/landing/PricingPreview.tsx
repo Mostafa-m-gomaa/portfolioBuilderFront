@@ -26,6 +26,11 @@ import {
 import SubscribePackageCta from '@/components/pricing/SubscribePackageCta';
 import DisplayCurrencySelect from '@/components/pricing/DisplayCurrencySelect';
 import { useDisplayCurrency } from '@/hooks/useDisplayCurrency';
+import LandingSection from '@/components/landing/LandingSection';
+import LandingSectionHeader from '@/components/landing/LandingSectionHeader';
+import { landingViewport, scaleUp, staggerContainer, staggerItem } from '@/lib/landingMotion';
+import { primaryButtonClass, primaryButtonSmClass } from '@/lib/buttonStyles';
+import { cn } from '@/lib/utils';
 
 type PricingPreviewProps = {
   showBenefitCards?: boolean;
@@ -54,44 +59,37 @@ const PricingPreview = ({ showBenefitCards = false }: PricingPreviewProps) => {
   const errMsg = isError ? parseApiError(error, t('pricing.loadError')) : '';
 
   return (
-    <section className="relative py-24">
-      <div className="max-w-6xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mx-auto mb-14 max-w-3xl text-center"
+    <LandingSection variant="warm">
+      <div className="mx-auto max-w-6xl px-6">
+        <LandingSectionHeader
+          kicker={t('pricing.kicker')}
+          title={t('pricing.title')}
+          subtitle={t('pricing.subtitle')}
         >
-          <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary">{t('pricing.kicker')}</span>
-          <h2 className="mt-3 font-heading text-3xl font-bold text-foreground md:text-5xl">{t('pricing.title')}</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-muted-foreground">{t('pricing.subtitle')}</p>
-
           {!isPending && !isError && packages.length > 0 ? (
             <div className="mt-8 flex justify-center">
               <DisplayCurrencySelect value={displayCurrency} onChange={setDisplayCurrency} />
             </div>
           ) : null}
-        </motion.div>
+        </LandingSectionHeader>
 
         {showBenefitCards ? (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            initial="hidden"
+            whileInView="visible"
+            viewport={landingViewport}
+            variants={staggerContainer}
             className="mb-14"
           >
             <p className="mx-auto mb-8 max-w-3xl text-center text-base leading-8 text-muted-foreground sm:text-lg">
               {t('pricing.benefits.subtitle')}
             </p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {benefitCards.map((benefit, i) => (
+              {benefitCards.map((benefit) => (
                 <motion.div
                   key={benefit.textKey}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.06 }}
-                  className="flex items-start gap-4 rounded-xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md"
+                  variants={staggerItem}
+                  className="flex items-start gap-4 rounded-xl border border-border/80 bg-card/80 p-5 shadow-sm backdrop-blur-sm transition-shadow hover:shadow-md"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <benefit.icon className="h-5 w-5" aria-hidden />
@@ -111,47 +109,57 @@ const PricingPreview = ({ showBenefitCards = false }: PricingPreviewProps) => {
             <span>{t('pricing.loading')}</span>
           </div>
         ) : isError ? (
-          <div className="mx-auto max-w-lg rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={landingViewport}
+            variants={scaleUp}
+            className="mx-auto max-w-lg rounded-2xl border border-border bg-card p-8 text-center shadow-sm"
+          >
             <p className="text-foreground">{errMsg}</p>
             <button
               type="button"
               onClick={() => refetch()}
-              className="mt-6 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+              className={cn(primaryButtonSmClass, 'mt-6')}
             >
               {t('pricing.retry')}
             </button>
-          </div>
+          </motion.div>
         ) : packages.length === 0 ? (
           <p className="py-16 text-center text-lg text-muted-foreground">{t('pricing.empty')}</p>
         ) : (
-          <div
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={landingViewport}
+            variants={staggerContainer}
             className={
               packages.length === 3
                 ? 'grid grid-cols-1 gap-6 md:grid-cols-3'
                 : 'grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3'
             }
           >
-            {packages.map((pkg, i) => {
+            {packages.map((pkg) => {
               const isPopular = isTwelveMonthPopularPlan(pkg);
               return (
                 <motion.div
                   key={pkg._id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 }}
-                  whileHover={{ y: -6, transition: { duration: 0.25 } }}
-                  className={`relative flex flex-col rounded-2xl border p-6 ${isPopular
-                    ? 'border-primary bg-primary text-primary-foreground shadow-xl shadow-primary/25 md:z-10 md:-my-1 md:py-7 xl:scale-[1.03]'
-                    : 'border-border bg-card text-foreground shadow-sm'
-                    }`}
+                  variants={staggerItem}
+                  whileHover={{ y: -8, transition: { duration: 0.25 } }}
+                  className={`relative flex flex-col rounded-2xl border p-6 backdrop-blur-sm ${
+                    isPopular
+                      ? 'border-primary bg-primary text-primary-foreground shadow-xl shadow-primary/25 md:z-10 md:-my-1 md:py-7 xl:scale-[1.03]'
+                      : 'border-border/80 bg-card/80 text-foreground shadow-sm'
+                  }`}
                 >
                   {isPopular ? (
                     <span className="absolute -top-3 start-1/2 -translate-x-1/2 rounded-full bg-background px-3 py-1 text-xs font-semibold text-primary shadow-sm">
                       {t('pricing.popular')}
                     </span>
                   ) : null}
-                  <h3 className={`mb-2 font-heading text-xl font-semibold ${isPopular ? '' : 'text-foreground'}`}>{packageName(pkg, lang)}</h3>
+                  <h3 className={`mb-2 font-heading text-xl font-semibold ${isPopular ? '' : 'text-foreground'}`}>
+                    {packageName(pkg, lang)}
+                  </h3>
                   <div className="mb-6">
                     <span className={`font-heading text-4xl font-bold ${isPopular ? '' : 'text-foreground'}`}>
                       {formatPackageDisplayPrice(pkg, displayCurrency, lang)}
@@ -161,13 +169,22 @@ const PricingPreview = ({ showBenefitCards = false }: PricingPreviewProps) => {
                       {formatDurationMonths(pkg.durationMonths, lang)}
                     </p>
                     {packageDescription(pkg, lang) ? (
-                      <p className={`mt-3 text-sm leading-relaxed line-clamp-3 ${isPopular ? 'opacity-90' : 'text-muted-foreground'}`}>{packageDescription(pkg, lang)}</p>
+                      <p
+                        className={`mt-3 line-clamp-3 text-sm leading-relaxed ${isPopular ? 'opacity-90' : 'text-muted-foreground'}`}
+                      >
+                        {packageDescription(pkg, lang)}
+                      </p>
                     ) : null}
                   </div>
                   <ul className="mb-4 flex-1 space-y-3">
                     {pkg.features.map((f, j) => (
-                      <li key={j} className={`flex items-center gap-2 text-sm ${isPopular ? 'text-primary-foreground/95' : 'text-foreground'}`}>
-                        <Check className={`h-4 w-4 shrink-0 ${isPopular ? 'text-primary-foreground' : 'text-primary'}`} />
+                      <li
+                        key={j}
+                        className={`flex items-center gap-2 text-sm ${isPopular ? 'text-primary-foreground/95' : 'text-foreground'}`}
+                      >
+                        <Check
+                          className={`h-4 w-4 shrink-0 ${isPopular ? 'text-primary-foreground' : 'text-primary'}`}
+                        />
                         {packageFeatureText(f, lang)}
                       </li>
                     ))}
@@ -177,17 +194,22 @@ const PricingPreview = ({ showBenefitCards = false }: PricingPreviewProps) => {
                       packageId={pkg._id}
                       couponEnabled
                       packagePrice={pkg.priceEgp}
-                      className={`block w-full rounded-xl px-4 py-3 text-center text-sm font-medium transition-opacity hover:opacity-90 ${isPopular ? 'bg-background text-foreground' : 'bg-primary text-primary-foreground'
-                        }`}
+                      className={cn(
+                        'block w-full px-4 py-3 text-center',
+                        isPopular
+                          ? 'inline-flex items-center justify-center rounded-xl bg-background text-sm font-bold text-foreground shadow-sm transition hover:-translate-y-0.5 hover:bg-background/95'
+                          : primaryButtonClass,
+                      )}
                     >
                       {t('pricing.cta')}
                     </SubscribePackageCta>
                     <Link
                       to={`/pricing/${pkg._id}`}
-                      className={`block w-full rounded-xl border px-4 py-3 text-center text-sm font-medium transition-colors ${isPopular
-                        ? 'border-primary-foreground/40 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20'
-                        : 'border-border bg-background text-foreground hover:bg-muted/60'
-                        }`}
+                      className={`block w-full rounded-xl border px-4 py-3 text-center text-sm font-medium transition-colors ${
+                        isPopular
+                          ? 'border-primary-foreground/40 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20'
+                          : 'border-border bg-background text-foreground hover:bg-muted/60'
+                      }`}
                     >
                       {t('package.details')}
                     </Link>
@@ -195,10 +217,10 @@ const PricingPreview = ({ showBenefitCards = false }: PricingPreviewProps) => {
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         )}
       </div>
-    </section>
+    </LandingSection>
   );
 };
 

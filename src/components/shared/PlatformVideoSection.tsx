@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { fadeUp, fadeUpDelayed, landingViewport } from "@/lib/landingMotion";
 import { ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import YouTubeEmbed from "@/components/shared/YouTubeEmbed";
@@ -23,9 +24,10 @@ const PlatformVideoSection = ({
   return (
     <section id={id} className={className}>
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        initial="hidden"
+        whileInView="visible"
+        viewport={landingViewport}
+        variants={fadeUp}
         className="mx-auto max-w-3xl text-center"
       >
         <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary">
@@ -40,10 +42,10 @@ const PlatformVideoSection = ({
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.1 }}
+        initial="hidden"
+        whileInView="visible"
+        viewport={landingViewport}
+        variants={fadeUpDelayed}
         className="mx-auto mt-10 max-w-4xl"
       >
         <YouTubeEmbed src={PLATFORM_VIDEO_EMBED_URL} title={t("video.title")} />

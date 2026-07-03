@@ -14,6 +14,8 @@ import {
   packageName,
 } from "@/lib/packageDisplay";
 import SubscribePackageCta from "@/components/pricing/SubscribePackageCta";
+import { primaryButton, primaryButtonDefaultClass, primaryButtonSmClass } from "@/lib/buttonStyles";
+import { cn } from "@/lib/utils";
 import DisplayCurrencySelect from "@/components/pricing/DisplayCurrencySelect";
 import { useDisplayCurrency } from "@/hooks/useDisplayCurrency";
 import { Check, Loader2 } from "lucide-react";
@@ -61,7 +63,7 @@ const PackageDetail = () => {
             <button
               type="button"
               onClick={() => refetch()}
-              className="mt-6 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+              className={cn(primaryButtonSmClass, 'mt-6')}
             >
               {t("pricing.retry")}
             </button>
@@ -110,7 +112,7 @@ const PackageDetail = () => {
                 packageId={pkg._id}
                 couponEnabled
                 packagePrice={pkg.priceEgp}
-                className="inline-flex rounded-xl bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+                className={primaryButtonDefaultClass}
               >
                 {t("pricing.cta")}
               </SubscribePackageCta>

@@ -1,6 +1,7 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { primaryButtonDefaultClass } from '@/lib/buttonStyles';
 import { ArrowUpRight, CheckCircle2 } from 'lucide-react';
 import { TemplatePreviewImage } from '@/components/templates/TemplatePreviewImage';
 import { prettyTemplateName, showcaseTemplates, templatePreviewUrl } from '@/lib/templateCatalogView';
@@ -12,19 +13,19 @@ const HeroSection = () => {
   const bullets = [t('hero.bullet1'), t('hero.bullet2'), t('hero.bullet3')];
 
   return (
-    <section className="relative isolate overflow-hidden bg-[#050814] pt-28 pb-14 lg:pt-32 lg:pb-20">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_92%,rgba(139,92,246,0.35),transparent_30%),radial-gradient(circle_at_85%_72%,rgba(88,28,135,0.35),transparent_34%),linear-gradient(180deg,#070b18_0%,#050814_58%,#070717_100%)]" />
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-violet-500/20 via-violet-500/5 to-transparent" />
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+    <section className="relative isolate overflow-hidden bg-gradient-to-b from-violet-50/90 via-background to-indigo-50/40 pt-28 pb-14 dark:bg-[#050814] lg:pt-14 lg:pb-20">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_92%,rgba(139,92,246,0.18),transparent_32%),radial-gradient(circle_at_85%_72%,rgba(167,139,250,0.2),transparent_36%),linear-gradient(180deg,rgba(255,255,255,0.6)_0%,transparent_55%)] dark:bg-[radial-gradient(circle_at_18%_92%,rgba(139,92,246,0.35),transparent_30%),radial-gradient(circle_at_85%_72%,rgba(88,28,135,0.35),transparent_34%),linear-gradient(180deg,#070b18_0%,#050814_58%,#070717_100%)]" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-violet-300/20 via-violet-200/5 to-transparent dark:from-violet-500/20 dark:via-violet-500/5" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-300/50 to-transparent dark:via-white/10" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#070b18]/90 px-6 py-14 shadow-2xl shadow-violet-950/30 backdrop-blur sm:rounded-[2.5rem] sm:px-10 lg:px-12 lg:py-20">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_80%,rgba(168,85,247,0.22),transparent_28%),radial-gradient(circle_at_72%_35%,rgba(109,40,217,0.28),transparent_32%)]" />
+        <div className="relative overflow-hidden rounded-[2rem] border border-violet-200/70 bg-white/85 px-6 py-14 shadow-2xl shadow-violet-200/40 backdrop-blur sm:rounded-[2.5rem] sm:px-10 lg:px-12 lg:py-20 dark:border-white/10 dark:bg-[#070b18]/90 dark:shadow-violet-950/30">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_80%,rgba(139,92,246,0.12),transparent_30%),radial-gradient(circle_at_72%_35%,rgba(167,139,250,0.14),transparent_34%)] dark:bg-[radial-gradient(circle_at_16%_80%,rgba(168,85,247,0.22),transparent_28%),radial-gradient(circle_at_72%_35%,rgba(109,40,217,0.28),transparent_32%)]" />
           <div
-            className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.55)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.55)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]"
+            className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(rgba(15,23,42,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.12)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)] dark:opacity-[0.08] dark:[background-image:linear-gradient(rgba(255,255,255,0.55)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.55)_1px,transparent_1px)]"
             aria-hidden="true"
           />
-          <div className="absolute -bottom-24 left-0 h-64 w-96 rounded-full bg-violet-500/25 blur-3xl" aria-hidden="true" />
+          <div className="absolute -bottom-24 left-0 h-64 w-96 rounded-full bg-violet-400/20 blur-3xl dark:bg-violet-500/25" aria-hidden="true" />
 
           <div className="relative">
             <motion.div
@@ -33,25 +34,25 @@ const HeroSection = () => {
               transition={{ duration: 0.7, ease: 'easeOut' }}
               className="max-w-4xl text-start"
             >
-              <div className="inline-flex items-center rounded-full border border-violet-400/25 bg-violet-400/10 px-4 py-2 text-xs font-semibold text-violet-100 shadow-lg shadow-violet-950/20 backdrop-blur">
+              <div className="inline-flex items-center rounded-full border border-violet-200 bg-violet-100 px-4 py-2 text-xs font-semibold text-violet-700 shadow-sm shadow-violet-200/50 backdrop-blur dark:border-violet-400/25 dark:bg-violet-400/10 dark:text-violet-100 dark:shadow-violet-950/20">
                 {t('hero.badge')}
               </div>
 
-              <h1 className="text-balance mt-7 max-w-5xl font-heading text-5xl font-bold leading-[1.05] tracking-[-0.055em] text-white sm:text-6xl lg:text-7xl">
-                {t('hero.title')}{' '}
-                <span className="text-white/82">
-                  {t('hero.titleHighlight')}
+              <h1 className=" text-balance mt-7 max-w-5xl font-heading text-5xl font-bold leading-[1.35] tracking-[-0.055em] text-foreground sm:mt-12 sm:text-6xl sm:leading-[1.3] lg:text-7xl lg:leading-[1.25] dark:text-white">
+                <span className="block">{t('hero.title')}</span>
+                <span className="mt-2 block text-foreground/85 sm:mt-3 dark:text-white/82">
+                  {t('hero.titleHighlight').trim()}
                 </span>
               </h1>
 
-              <p className="mt-6 max-w-2xl text-base leading-8 text-white/62 sm:text-lg">
+              <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg dark:text-white/62">
                 {t('hero.subtitle')}
               </p>
 
-              <div className="mt-7 grid gap-3 text-sm text-white/82 sm:grid-cols-3">
+              <div className="mt-7 grid gap-3 text-sm text-foreground/85 sm:grid-cols-3 dark:text-white/82">
                 {bullets.map((bullet) => (
                   <div key={bullet} className="flex items-center gap-3">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/7 text-violet-200 ring-1 ring-white/10">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-700 ring-1 ring-violet-200/80 dark:bg-violet-900/50 dark:text-violet-200 dark:ring-white/10">
                       <CheckCircle2 className="h-4 w-4" />
                     </span>
                     <span>{bullet}</span>
@@ -60,16 +61,13 @@ const HeroSection = () => {
               </div>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <Link
-                  to="/signup"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-violet-500/25 transition hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-violet-500/30"
-                >
+                <Link to="/signup" className={primaryButtonDefaultClass}>
                   {t('hero.cta1')}
                   <ArrowUpRight className="h-4 w-4" />
                 </Link>
                 <Link
                   to="/templates"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/6 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-black/20 backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/10"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-6 py-3.5 text-sm font-bold text-foreground shadow-md shadow-violet-200/30 transition hover:-translate-y-0.5 hover:bg-muted/60 dark:border-white/10 dark:bg-white/6 dark:text-white dark:shadow-black/20 dark:hover:bg-white/10"
                 >
                   {t('hero.cta2')}
                 </Link>
@@ -83,21 +81,24 @@ const HeroSection = () => {
               className="mt-14"
             >
               <div className="mb-5 flex items-center justify-between gap-4">
-                <p className="text-sm font-bold uppercase tracking-[0.2em] text-violet-200">
+                <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary dark:text-violet-200">
                   {t('templateShowcase.kicker')}
                 </p>
-                <Link to="/templates" className="text-sm font-semibold text-white/45 transition hover:text-violet-200">
+                <Link
+                  to="/templates"
+                  className="text-sm font-semibold text-muted-foreground transition hover:text-primary dark:text-white/45 dark:hover:text-violet-200"
+                >
                   {t('hero.cta2')}
                 </Link>
               </div>
 
-              <div className="relative rounded-3xl border border-white/10 bg-white/[0.035] py-4 shadow-2xl shadow-black/20 backdrop-blur">
+              <div className="relative rounded-3xl border border-border/80 bg-card/70 py-4 shadow-xl shadow-violet-200/25 backdrop-blur dark:border-white/10 dark:bg-white/[0.035] dark:shadow-black/20">
                 <div
-                  className="pointer-events-none absolute inset-y-0 start-0 z-10 w-16 rounded-s-3xl bg-gradient-to-r from-[#070b18] via-[#070b18]/80 to-transparent sm:w-28"
+                  className="pointer-events-none absolute inset-y-0 start-0 z-10 w-16 rounded-s-3xl bg-gradient-to-r from-background via-background/85 to-transparent sm:w-28 dark:from-[#070b18] dark:via-[#070b18]/80"
                   aria-hidden="true"
                 />
                 <div
-                  className="pointer-events-none absolute inset-y-0 end-0 z-10 w-16 rounded-e-3xl bg-gradient-to-l from-[#070b18] via-[#070b18]/80 to-transparent sm:w-28"
+                  className="pointer-events-none absolute inset-y-0 end-0 z-10 w-16 rounded-e-3xl bg-gradient-to-l from-background via-background/85 to-transparent sm:w-28 dark:from-[#070b18] dark:via-[#070b18]/80"
                   aria-hidden="true"
                 />
 
@@ -109,15 +110,15 @@ const HeroSection = () => {
                         href={templatePreviewUrl(template.templateName)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group w-52 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.055] shadow-lg shadow-black/20 ring-1 ring-white/[0.03] backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-violet-300/35 hover:bg-white/[0.075] hover:shadow-xl hover:shadow-violet-950/25 sm:w-60"
+                        className="group w-52 shrink-0 overflow-hidden rounded-xl border border-border bg-card shadow-md ring-1 ring-border/40 backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-violet-300/60 hover:shadow-lg hover:shadow-violet-200/40 dark:border-white/10 dark:bg-white/[0.055] dark:shadow-black/20 dark:ring-white/[0.03] dark:hover:border-violet-300/35 dark:hover:bg-white/[0.075] dark:hover:shadow-violet-950/25 sm:w-60"
                       >
                         <TemplatePreviewImage
                           src={template.image}
                           alt={prettyTemplateName(template.templateName, lang)}
                           className="h-32 w-full sm:h-36"
                         />
-                        <div className="border-t border-white/10 bg-black/10 px-4 py-3 text-center">
-                          <h3 className="truncate font-heading text-sm font-semibold tracking-[-0.01em] text-white transition group-hover:text-violet-200">
+                        <div className="border-t border-border bg-muted/40 px-4 py-3 text-center dark:border-white/10 dark:bg-black/10">
+                          <h3 className="truncate font-heading text-sm font-semibold tracking-[-0.01em] text-foreground transition group-hover:text-primary dark:text-white dark:group-hover:text-violet-200">
                             {prettyTemplateName(template.templateName, lang)}
                           </h3>
                         </div>

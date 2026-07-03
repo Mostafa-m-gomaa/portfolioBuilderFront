@@ -13,6 +13,7 @@ import ProfilePreferencesCard from '@/components/auth/ProfilePreferencesCard';
 import { useMyPortfolio } from '@/hooks/usePortfolio';
 import { resolveApiAssetUrl } from '@/api/axios';
 import SubscriptionSummaryPanelSafe from '@/components/subscription/SubscriptionSummaryPanelSafe';
+import { primaryButtonMdClass } from '@/lib/buttonStyles';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getAccountTypeLabel } from '@/constants/accountTypes';
 import { prettyTemplateName } from '@/lib/templateCatalogView';
@@ -76,7 +77,7 @@ const Profile = () => {
                 </p>
               </div>
             </div>
-            <div className="text-xs px-3 py-1.5 rounded-full glass border border-white/20">
+            <div className="text-xs px-3 py-1.5 rounded-full glass border border-border">
               {user?.isVerified ? t('profile.verifiedAccount') : t('profile.emailNotVerified')}
             </div>
           </div>
@@ -143,7 +144,7 @@ const Profile = () => {
             <button
               type="submit"
               disabled={updateProfileMutation.isPending}
-              className="rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-70 sm:min-w-32"
+              className={primaryButtonMdClass}
             >
               {updateProfileMutation.isPending ? (lang === 'ar' ? 'جار الحفظ...' : 'Saving...') : (lang === 'ar' ? 'حفظ الاسم' : 'Save name')}
             </button>

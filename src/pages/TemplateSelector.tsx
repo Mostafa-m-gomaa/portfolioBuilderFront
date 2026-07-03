@@ -12,6 +12,7 @@ import {
   templateSelectorDescription,
 } from '@/lib/templateCatalogView';
 import { TemplatePreviewImage } from '@/components/templates/TemplatePreviewImage';
+import { primaryButton } from '@/lib/buttonStyles';
 
 const TemplateSelector = () => {
   const navigate = useNavigate();
@@ -86,7 +87,7 @@ const TemplateSelector = () => {
                         <button
                           onClick={() => updateTemplateNameMutation.mutate(template.templateName)}
                           disabled={updateTemplateNameMutation.isPending || isActive}
-                          className="w-full gradient-bg py-2.5 rounded-xl text-primary-foreground text-sm font-semibold disabled:opacity-60"
+                          className={primaryButton('w-full py-2.5')}
                         >
                           {isActive ? t('templates.choose.active') : t('templates.choose.activate')}
                         </button>

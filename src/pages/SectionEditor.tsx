@@ -10,6 +10,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { resolveApiAssetUrl } from '@/api/axios';
 import { resolvePortfolioDisplayLang } from '@/lib/portfolioDisplayLang';
 import { sectionLabel } from '@/lib/templateCatalogView';
+import { primaryButtonCompactClass } from '@/lib/buttonStyles';
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
@@ -112,8 +113,7 @@ const inputClass =
 const ghostButtonClass =
   'inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background px-3 py-2 text-sm font-semibold text-foreground transition hover:border-primary/30 hover:text-primary disabled:opacity-60';
 
-const primaryButtonClass =
-  'inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-sm shadow-primary/20 transition hover:bg-primary/90 disabled:opacity-60';
+const primaryButtonClass = primaryButtonCompactClass;
 
 const ensureLocalized = (value?: unknown): JsonValue => {
   if (isObject(value) && ('ar' in value || 'en' in value)) return value;

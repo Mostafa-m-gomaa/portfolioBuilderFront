@@ -138,22 +138,29 @@
 
 @layer components {
   .glass {
-    background: hsl(var(--glass-bg));
+    background: hsl(var(--card) / 0.78);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid hsl(var(--border));
+  }
+
+  .dark .glass {
+    background: hsl(var(--glass-bg));
     border: 1px solid hsl(var(--glass-border));
   }
 
   .glass-strong {
-    background: hsl(0 0% 100% / 0.15);
+    background: hsl(var(--card) / 0.92);
     backdrop-filter: blur(32px);
     -webkit-backdrop-filter: blur(32px);
-    border: 1px solid hsl(0 0% 100% / 0.25);
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 4px 24px hsl(var(--foreground) / 0.06);
   }
 
   .dark .glass-strong {
     background: hsl(0 0% 100% / 0.08);
     border: 1px solid hsl(0 0% 100% / 0.12);
+    box-shadow: none;
   }
 
   .glow-border {
@@ -198,27 +205,18 @@
   }
 
   .gradient-bg {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--glow-primary)),
-      hsl(var(--glow-secondary))
-    );
+    background-image: linear-gradient(to right, #8b5cf6, #d946ef);
   }
 
   .gradient-bg-full {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--glow-primary)),
-      hsl(var(--glow-secondary)),
-      hsl(var(--glow-accent))
-    );
+    background-image: linear-gradient(to right, #8b5cf6, #d946ef);
   }
 
   .floating-orb {
     position: absolute;
     border-radius: 50%;
     filter: blur(80px);
-    opacity: 0.3;
+    opacity: 0.22;
     pointer-events: none;
     animation: float 8s ease-in-out infinite;
     will-change: transform;

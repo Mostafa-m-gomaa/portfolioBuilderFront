@@ -18,6 +18,7 @@ import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 import { useGoogleSignIn } from '@/hooks/useGoogleSignIn';
 import { isGoogleAuthConfigured } from '@/lib/googleAuth';
 import { normalizeEmail } from '@/lib/emailValidation';
+import { primaryButton } from '@/lib/buttonStyles';
 
 const Login = () => {
   const { t } = useLanguage();
@@ -146,7 +147,7 @@ const Login = () => {
         >
           <div className="text-center mb-8">
             <div className="mx-auto mb-4 flex items-center justify-center">
-              <div className="rounded-full p-2 shadow-md dark:shadow-none dark:bg-transparent bg-gradient-to-br from-slate-800/80 to-slate-600/60">
+              <div className="rounded-full bg-violet-100 p-2 shadow-md ring-1 ring-violet-200/70 dark:bg-transparent dark:shadow-none dark:ring-0 dark:bg-gradient-to-br dark:from-slate-800/80 dark:to-slate-600/60">
                 <img src={anotherLogo} alt={t('brand.logoAlt')} className="w-16 h-16 object-contain" />
               </div>
             </div>
@@ -196,7 +197,7 @@ const Login = () => {
             </div>
             <button
               disabled={loginMutation.isPending}
-              className="w-full gradient-bg py-3 rounded-xl text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-70"
+              className={primaryButton('w-full')}
             >
               {loginMutation.isPending ? t('auth.loggingIn') : t('auth.login')}
             </button>
