@@ -265,7 +265,7 @@ const DomainManagerCard = ({
               className={cn(
                 'glass rounded-xl border border-transparent px-3 py-2 transition-all duration-300',
                 showEnableForm &&
-                  'border-emerald-500/60 ring-2 ring-emerald-500/80 shadow-[0_0_0_4px_rgba(16,185,129,0.12),0_0_28px_rgba(16,185,129,0.35)]',
+                'border-emerald-500/60 ring-2 ring-emerald-500/80 shadow-[0_0_0_4px_rgba(16,185,129,0.12),0_0_28px_rgba(16,185,129,0.35)]',
               )}
             >
               <input

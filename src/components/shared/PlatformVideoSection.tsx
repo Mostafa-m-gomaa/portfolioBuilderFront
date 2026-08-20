@@ -1,6 +1,4 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { fadeUp, fadeUpDelayed, landingViewport } from "@/lib/landingMotion";
 import { ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import YouTubeEmbed from "@/components/shared/YouTubeEmbed";
@@ -23,13 +21,7 @@ const PlatformVideoSection = ({
 
   return (
     <section id={id} className={className}>
-      <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={landingViewport}
-        variants={fadeUp}
-        className="mx-auto max-w-3xl text-center"
-      >
+      <div className="mx-auto max-w-3xl text-center">
         <span className="text-sm font-bold uppercase tracking-[0.2em] text-primary">
           {t("video.kicker")}
         </span>
@@ -39,17 +31,13 @@ const PlatformVideoSection = ({
         <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-muted-foreground">
           {t("video.subtitle")}
         </p>
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={landingViewport}
-        variants={fadeUpDelayed}
-        className="mx-auto mt-10 max-w-4xl"
-      >
-        <YouTubeEmbed src={PLATFORM_VIDEO_EMBED_URL} title={t("video.title")} />
-      </motion.div>
+      <div className="relative mx-auto mt-10 max-w-4xl overflow-hidden">
+        <div>
+          <YouTubeEmbed src={PLATFORM_VIDEO_EMBED_URL} title={t("video.title")} />
+        </div>
+      </div>
 
       {showQuickStartLink && (
         <div className="mt-8 text-center">

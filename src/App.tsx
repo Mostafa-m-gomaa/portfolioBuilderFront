@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,37 +9,40 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { GOOGLE_CLIENT_ID, isGoogleAuthConfigured } from "@/lib/googleAuth";
 import Index from "./pages/Index";
-import About from "./pages/About";
-import Services from "./pages/Services";
-import Pricing from "./pages/Pricing";
-import PackageDetail from "./pages/PackageDetail";
-import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
-import GoogleSignUpComplete from "./pages/GoogleSignUpComplete";
-import GetStarted from "./pages/GetStarted";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
-import RefundPolicy from "./pages/RefundPolicy";
-import NotFound from "./pages/NotFound";
-import VerifyEmail from "./pages/VerifyEmail";
-import ChooseSubdomain from "./pages/ChooseSubdomain";
-import Dashboard from "./pages/Dashboard";
-import QuickStart from "./pages/QuickStart";
-import SectionEditor from "./pages/SectionEditor";
 import RequireAuth from "./components/RequireAuth";
-import ResetPassword from "./pages/ResetPassword";
-import ForgotPassword from "./pages/ForgotPassword";
 import GuestOnly from "./components/GuestOnly";
-import Profile from "./pages/Profile";
-import SelectSubscription from "./pages/SelectSubscription";
-import TemplateSelector from "./pages/TemplateSelector";
-import PublicTemplates from "./pages/PublicTemplates";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import PaymentFailure from "./pages/PaymentFailure";
 import PaymentStatusRedirect from "./components/payment/PaymentStatusRedirect";
 import WhatsAppFloatingButton from "./components/WhatsAppFloatingButton";
+import CommentExitGate from "./components/auth/CommentExitGate";
 import MetaPixelTracker from "./components/MetaPixelTracker";
+import PageSkeleton from "./components/PageSkeleton";
+
+const About = lazy(() => import("./pages/About"));
+const Services = lazy(() => import("./pages/Services"));
+const Pricing = lazy(() => import("./pages/Pricing"));
+const PackageDetail = lazy(() => import("./pages/PackageDetail"));
+const Contact = lazy(() => import("./pages/Contact"));
+const GoogleSignUpComplete = lazy(() => import("./pages/GoogleSignUpComplete"));
+const GetStarted = lazy(() => import("./pages/GetStarted"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
+const ChooseSubdomain = lazy(() => import("./pages/ChooseSubdomain"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const QuickStart = lazy(() => import("./pages/QuickStart"));
+const SectionEditor = lazy(() => import("./pages/SectionEditor"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const Profile = lazy(() => import("./pages/Profile"));
+const SelectSubscription = lazy(() => import("./pages/SelectSubscription"));
+const TemplateSelector = lazy(() => import("./pages/TemplateSelector"));
+const PublicTemplates = lazy(() => import("./pages/PublicTemplates"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const PaymentFailure = lazy(() => import("./pages/PaymentFailure"));
 
 const queryClient = new QueryClient();
 
@@ -49,44 +53,52 @@ const AppShell = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true,
+            }}
+          >
             <MetaPixelTracker />
             <PaymentStatusRedirect />
             <WhatsAppFloatingButton />
-            <div className="min-h-screen overflow-x-clip">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/services" element={<Services />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/pricing/:packageId" element={<PackageDetail />} />
-                <Route path="/payment/success" element={<PaymentSuccess />} />
-                <Route path="/payment/failure" element={<PaymentFailure />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/login" element={<GuestOnly><Login /></GuestOnly>} />
-                <Route path="/signup" element={<GuestOnly><SignUp /></GuestOnly>} />
-                <Route
-                  path="/signup/google"
-                  element={<GuestOnly><GoogleSignUpComplete /></GuestOnly>}
-                />
-                <Route path="/verify-email" element={<VerifyEmail />} />
-                <Route path="/quickstart" element={<QuickStart />} />
-                <Route path="/forgot-password" element={<GuestOnly><ForgotPassword /></GuestOnly>} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/choose-subdomain" element={<ChooseSubdomain />} />
-                <Route path="/select-subscription" element={<RequireAuth><SelectSubscription /></RequireAuth>} />
-                <Route path="/select-language-mode" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-                <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
-                <Route path="/templates" element={<PublicTemplates />} />
-                <Route path="/template-selector" element={<RequireAuth><TemplateSelector /></RequireAuth>} />
-                <Route path="/section/:sectionName/editor" element={<RequireAuth><SectionEditor /></RequireAuth>} />
-                <Route path="/get-started" element={<GetStarted />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/refund-policy" element={<RefundPolicy />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+            <CommentExitGate />
+            <div className="relative min-h-screen overflow-x-clip">
+              <Suspense fallback={<PageSkeleton />}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/pricing/:packageId" element={<PackageDetail />} />
+                  <Route path="/payment/success" element={<PaymentSuccess />} />
+                  <Route path="/payment/failure" element={<PaymentFailure />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/login" element={<GuestOnly><Login /></GuestOnly>} />
+                  <Route path="/signup" element={<GuestOnly><SignUp /></GuestOnly>} />
+                  <Route
+                    path="/signup/google"
+                    element={<GuestOnly><GoogleSignUpComplete /></GuestOnly>}
+                  />
+                  <Route path="/verify-email" element={<VerifyEmail />} />
+                  <Route path="/quickstart" element={<QuickStart />} />
+                  <Route path="/forgot-password" element={<GuestOnly><ForgotPassword /></GuestOnly>} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/choose-subdomain" element={<ChooseSubdomain />} />
+                  <Route path="/select-subscription" element={<RequireAuth><SelectSubscription /></RequireAuth>} />
+                  <Route path="/select-language-mode" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+                  <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+                  <Route path="/templates" element={<PublicTemplates />} />
+                  <Route path="/template-selector" element={<RequireAuth><TemplateSelector /></RequireAuth>} />
+                  <Route path="/section/:sectionName/editor" element={<RequireAuth><SectionEditor /></RequireAuth>} />
+                  <Route path="/get-started" element={<GetStarted />} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/refund-policy" element={<RefundPolicy />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
             </div>
           </BrowserRouter>
         </TooltipProvider>

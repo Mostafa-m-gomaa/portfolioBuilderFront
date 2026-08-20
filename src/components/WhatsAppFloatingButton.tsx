@@ -37,7 +37,7 @@ const WhatsAppFloatingButton = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.3 }}
-            className="relative whitespace-nowrap rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground shadow-lg"
+            className="relative max-w-[calc(100vw-3rem)] rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground shadow-lg sm:max-w-xs sm:whitespace-nowrap"
           >
             {t("whatsappFloat.message")}
             <span

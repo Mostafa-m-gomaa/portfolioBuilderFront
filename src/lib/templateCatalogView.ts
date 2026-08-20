@@ -16,6 +16,12 @@ export const CATEGORY_ORDER = [
 ] as const;
 
 const NEWEST_TEMPLATE_PRIORITY = [
+  "bloom-fluid",
+  "bloom-aura",
+  "bloom-silk",
+  "bloom-studio",
+  "nova-prime",
+  "story-studio",
   "fund-glow",
   "estate-luxe",
   "avynor-dark",
@@ -54,6 +60,12 @@ const sortTemplatesNewestFirst = (templates: TemplateCatalogEntry[]) => {
 };
 
 const TEMPLATE_NAMES_AR: Record<string, string> = {
+  "bloom-fluid": "بلوم فلويد",
+  "bloom-aura": "بلوم أورا",
+  "bloom-silk": "بلوم سيلك",
+  "bloom-studio": "بلوم ستوديو",
+  "nova-prime": "نوفا برايم",
+  "story-studio": "ستوري ستوديو",
   developer: "مطور تقني",
   designer: "مصمم جرافيك",
   "futuristic-3d": "تقني متقدم",
@@ -147,6 +159,16 @@ export const sectionLabel = (sectionName: string, lang: Lang) => {
 
 export const templatePreviewUrl = (templateName: string) =>
   `https://${templateName}.getsirty.com`;
+
+/** Cloudinary transform for smaller, auto-format thumbnails. */
+export const cloudinaryThumb = (url: string, width = 480) => {
+  if (!url.includes('res.cloudinary.com') || !url.includes('/upload/')) {
+    return url;
+  }
+  return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width}/`);
+};
+
+export const templateThumbnailUrl = (url: string, width = 480) => cloudinaryThumb(url, width);
 
 export const categoryLabel = (category: string, lang: Lang) => {
   if (lang === "en") {

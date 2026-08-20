@@ -8,7 +8,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { getPostAuthEntryPath, markPendingSubscriptionChoice } from "@/lib/authRouting";
 import { sanitizeSubdomainPart } from "@/lib/customDomain";
 import { useAuthStore } from "@/store/auth.store";
-import anotherLogo from "@/assets/anotherLogo.png";
+import BrandLogo from "@/components/BrandLogo";
+import ColorBendsBackground from "@/components/ColorBendsBackground";
 import {
   ACCOUNT_TYPE_OPTIONS,
   type AccountTypeValue,
@@ -90,9 +91,10 @@ const GoogleSignUpComplete = () => {
   };
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-background">
+    <div className="relative min-h-screen overflow-x-clip">
+      <ColorBendsBackground />
       <Navbar />
-      <div className="relative flex min-h-screen w-full max-w-full items-center justify-center overflow-x-clip px-6 pt-24">
+      <div className="relative z-10 flex min-h-screen w-full max-w-full items-center justify-center overflow-x-clip px-6 pt-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -101,21 +103,17 @@ const GoogleSignUpComplete = () => {
         >
           <div className="text-center mb-8">
             <div className="mx-auto mb-4 flex items-center justify-center">
-              <div className="rounded-full bg-violet-100 p-2 shadow-md ring-1 ring-violet-200/70 dark:bg-transparent dark:shadow-none dark:ring-0 dark:bg-gradient-to-br dark:from-slate-800/80 dark:to-slate-600/60">
-                {signupState.picture ? (
+              {signupState.picture ? (
+                <div className="rounded-full bg-[#EEF0FF] p-2 shadow-md ring-1 ring-[#1D24CA]/20 dark:bg-transparent dark:shadow-none dark:ring-0 dark:bg-gradient-to-br dark:from-slate-800/80 dark:to-slate-600/60">
                   <img
                     src={signupState.picture}
                     alt=""
                     className="w-16 h-16 rounded-full object-cover"
                   />
-                ) : (
-                  <img
-                    src={anotherLogo}
-                    alt={t("brand.logoAlt")}
-                    className="w-16 h-16 object-contain"
-                  />
-                )}
-              </div>
+                </div>
+              ) : (
+                <BrandLogo className="h-24 sm:h-28" />
+              )}
             </div>
             <h1 className="font-heading text-2xl font-bold text-foreground">
               {t("auth.googleSignup.title")}

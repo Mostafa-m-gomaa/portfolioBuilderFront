@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import SocialLinks from '@/components/SocialLinks';
+import BrandLogo from '@/components/BrandLogo';
+import PaymentMethodsNote from '@/components/pricing/PaymentMethodsNote';
 import { MOSTAFA_BUILDS_FACEBOOK_URL } from '@/constants/socialLinks';
-import logo from '@/assets/logo.png';
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -12,12 +13,16 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <img src={logo} alt={t('brand.logoAlt')} className="w-12 h-12 rounded-xl object-contain" />
-              <span className="font-heading font-bold text-lg text-foreground">{t('brand.name')}</span>
+            <div className="mb-4 flex items-center">
+              <BrandLogo />
             </div>
             <p className="text-muted-foreground text-sm mb-5">{t('footer.description')}</p>
             <SocialLinks />
+            <PaymentMethodsNote
+              showTitle={false}
+              compact
+              className="mt-5 mx-0 max-w-none justify-start text-start [&_ul]:justify-start"
+            />
           </div>
           <div>
             <h4 className="font-heading font-semibold text-foreground mb-4">{t('footer.links')}</h4>

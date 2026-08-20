@@ -22,6 +22,54 @@ const templatePreviewScreenshot = (templateName: string) =>
 
 export const templateCatalog: TemplateCatalogEntry[] = [
   {
+    templateName: "bloom-fluid",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1784654574/Screenshot_2026-07-21_at_8.22.33_PM_dn5gd3.png",
+    desc: "A fluid dark portfolio with soft bloom light and bold centered typography.",
+    descAr: "بورتفوليو داكن بانسياب ضوئي ناعم وخطوط عريضة في المنتصف.",
+    category: "creative",
+  },
+  {
+    templateName: "bloom-aura",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1784654715/Screenshot_2026-07-21_at_8.24.38_PM_xupebc.png",
+    desc: "A dark aura layout with glowing accents and a focused hero portrait.",
+    descAr: "تصميم هالة داكنة مع لمسات مضيئة وصورة بطولية مركّزة.",
+    category: "creative",
+  },
+  {
+    templateName: "bloom-silk",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1784654808/Screenshot_2026-07-21_at_8.25.24_PM_grwbuq.png",
+    desc: "A silk-dark creative template with smoky light trails and premium polish.",
+    descAr: "قالب إبداعي داكن حريري بمسارات ضوء دخانية ولمسة فاخرة.",
+    category: "creative",
+  },
+  {
+    templateName: "bloom-studio",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1784654844/Screenshot_2026-07-21_at_8.26.32_PM_kzj7e5.png",
+    desc: "A light studio portfolio with grid atmosphere and purple accent details.",
+    descAr: "بورتفوليو استوديو فاتح بخلفية شبكية وتفاصيل بنفسجية.",
+    category: "creative",
+  },
+  {
+    templateName: "nova-prime",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1784654975/Screenshot_2026-07-21_at_8.28.52_PM_budv8y.png",
+    desc: "A premium dark showcase with flowing color bends and cinematic depth.",
+    descAr: "عرض فاخر داكن بألوان منسابة وعمق سينمائي.",
+    category: "creative",
+  },
+  {
+    templateName: "story-studio",
+    image:
+      "https://res.cloudinary.com/dsv5ldoji/image/upload/v1784655137/Screenshot_2026-07-21_at_8.30.55_PM_mm7m61.png",
+    desc: "An elegant light editorial template with serif headlines and calm whitespace.",
+    descAr: "قالب تحريري أنيق بخطوط سيريف ومساحات هادئة.",
+    category: "creative",
+  },
+  {
     templateName: "developer",
     image:
       "https://res.cloudinary.com/dsv5ldoji/image/upload/v1779455734/developer_fvkldc.png",

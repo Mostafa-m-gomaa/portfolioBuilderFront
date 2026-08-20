@@ -5,7 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { Moon, Sun, Globe, Menu, X, UserRound, LogOut, LayoutDashboard, UserCog } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/store/auth.store';
-import logo from '@/assets/logo.png';
+import BrandLogo from '@/components/BrandLogo';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +26,8 @@ const Navbar = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const isLight = theme === 'light';
+
   const navLinks = [
     { to: '/', label: t('nav.home') },
     { to: '/quickstart', label: lang === 'ar' ? 'خطوات انشاء ويبسايت في دقايق' : 'Website in Minutes' },
@@ -37,69 +39,86 @@ const Navbar = () => {
     ...(isAuthenticated ? [{ to: '/dashboard', label: t('nav.dashboard') }] : []),
   ];
 
+  const iconBtnClass = cn(
+    'inline-flex items-center justify-center rounded-full border p-2 transition-colors backdrop-blur-xl',
+    isLight
+      ? 'border-border/80 bg-white/70 text-muted-foreground hover:bg-white hover:text-foreground'
+      : 'border-white/10 bg-white/5 text-white/80 hover:bg-white/10 hover:text-white',
+  );
+
   return (
     <nav className="fixed inset-x-0 top-0 z-50 overflow-x-clip">
-      <div className="mx-4 mt-4 max-w-[calc(100%-2rem)]">
-        <div className="mx-auto flex max-w-7xl min-w-0 items-center justify-between gap-2 rounded-2xl border border-border/80 bg-background/80 px-4 py-3 shadow-xl shadow-foreground/5 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/70 sm:px-6 dark:border-white/10 dark:bg-background/45">
-          {/* Logo */}
-          <Link to="/" className="group flex min-w-0 shrink items-center gap-2 sm:gap-3">
-            <img src={logo} alt={t('brand.logoAlt')} className="w-12 h-12 rounded-xl object-contain" />
-            <span
-              className={`truncate bg-gradient-to-br from-foreground via-primary to-foreground bg-clip-text font-heading font-black leading-none text-transparent transition group-hover:from-primary group-hover:via-primary group-hover:to-secondary ${
-                lang === 'ar'
-                  ? 'text-xl tracking-[-0.045em] sm:text-[1.35rem]'
-                  : 'text-xl tracking-[-0.055em] sm:text-[1.45rem]'
-              }`}
-            >
-              {t('brand.name')}
-            </span>
+      <div className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+        <div className="flex h-20 min-w-0 items-center justify-between gap-3">
+          <Link to="/" className="group flex min-w-0 shrink items-center">
+            <BrandLogo />
           </Link>
 
-          {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map(link => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${location.pathname === link.to
-                  ? 'bg-primary/12 text-primary shadow-sm'
-                  : 'text-muted-foreground hover:bg-background/45 hover:text-foreground'
-                  }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+          <div
+            className={cn(
+              'hidden items-center gap-0.5 rounded-full border p-1 backdrop-blur-xl lg:flex',
+              isLight
+                ? 'border-border/70 bg-foreground/[0.04]'
+                : 'border-white/10 bg-white/5',
+            )}
+          >
+            {navLinks.map((link) => {
+              const active = location.pathname === link.to;
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={cn(
+                    'rounded-full px-3.5 py-2 text-sm font-medium transition-all',
+                    active
+                      ? isLight
+                        ? 'bg-primary/10 text-primary shadow-sm'
+                        : 'bg-white/10 text-white'
+                      : isLight
+                        ? 'text-muted-foreground hover:bg-foreground/5 hover:text-foreground'
+                        : 'text-white/75 hover:bg-white/10 hover:text-white',
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
 
-          {/* Actions */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden items-center gap-2 md:flex">
             <button
+              type="button"
               onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
-              className="flex rounded-xl border border-border bg-card p-2 text-muted-foreground shadow-sm backdrop-blur transition-colors hover:text-foreground dark:border-white/10 dark:bg-card/60"
+              className={iconBtnClass}
               aria-label={t('a11y.switchLanguage')}
             >
-              <Globe className="w-4 h-4" />
-              <span className="text-xs ms-1">{lang === 'ar' ? 'EN' : 'AR'}</span>
+              <Globe className="h-4 w-4" />
+              <span className="ms-1 text-xs">{lang === 'ar' ? 'EN' : 'AR'}</span>
             </button>
             <button
+              type="button"
               onClick={toggleTheme}
-              className="rounded-xl border border-border bg-card p-2 text-muted-foreground shadow-sm backdrop-blur transition-colors hover:text-foreground dark:border-white/10 dark:bg-card/60"
+              className={iconBtnClass}
               aria-label={t('a11y.toggleTheme')}
             >
-              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="rounded-xl border border-border bg-card p-2.5 text-foreground shadow-sm backdrop-blur transition-colors hover:text-primary dark:border-white/10 dark:bg-card/60" aria-label={t('a11y.openProfileMenu')}>
+                  <button
+                    type="button"
+                    className={cn(iconBtnClass, 'p-2.5')}
+                    aria-label={t('a11y.openProfileMenu')}
+                  >
                     {user?.logo ? (
                       <img
                         src={resolveApiAssetUrl(user.logo)}
                         alt={t('brand.logoAlt')}
-                        className="w-5 h-5 rounded object-cover"
+                        className="h-5 w-5 rounded object-cover"
                       />
                     ) : (
-                      <UserRound className="w-5 h-5" />
+                      <UserRound className="h-5 w-5" />
                     )}
                   </button>
                 </DropdownMenuTrigger>
@@ -113,13 +132,13 @@ const Navbar = () => {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link to="/profile" className="cursor-pointer">
-                      <UserCog className="w-4 h-4 me-2" />
+                      <UserCog className="me-2 h-4 w-4" />
                       {t('nav.profile')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/dashboard" className="cursor-pointer">
-                      <LayoutDashboard className="w-4 h-4 me-2" />
+                      <LayoutDashboard className="me-2 h-4 w-4" />
                       {t('nav.dashboard')}
                     </Link>
                   </DropdownMenuItem>
@@ -128,7 +147,7 @@ const Navbar = () => {
                     onClick={logout}
                     className="cursor-pointer text-destructive focus:text-destructive"
                   >
-                    <LogOut className="w-4 h-4 me-2" />
+                    <LogOut className="me-2 h-4 w-4" />
                     {t('nav.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -137,86 +156,126 @@ const Navbar = () => {
               <>
                 <Link
                   to="/login"
-                  className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  className={cn(
+                    'rounded-full px-4 py-2 text-sm font-medium transition-colors',
+                    isLight
+                      ? 'text-muted-foreground hover:text-foreground'
+                      : 'text-white/80 hover:text-white',
+                  )}
                 >
                   {t('nav.login')}
                 </Link>
-                <Link
-                  to="/signup"
-                  className={primaryButtonSmClass}
-                >
+                <Link to="/signup" className={cn(primaryButtonSmClass, 'rounded-full')}>
                   {t('nav.signup')}
                 </Link>
               </>
             )}
           </div>
 
-          {/* Mobile toggle */}
           <button
+            type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden rounded-xl border border-border bg-card p-2 text-foreground shadow-sm backdrop-blur dark:border-white/10 dark:bg-card/60"
+            className={cn(iconBtnClass, 'lg:hidden')}
           >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="md:hidden mx-4 mt-2"
+            className="mx-4 mt-2 lg:hidden"
           >
-            <div className="flex flex-col gap-2 rounded-2xl border border-border bg-background/90 p-4 shadow-xl shadow-foreground/10 backdrop-blur-2xl dark:border-white/10 dark:bg-background/55">
-              {navLinks.map(link => (
+            <div
+              className={cn(
+                'flex flex-col gap-2 rounded-3xl border p-4 shadow-xl backdrop-blur-2xl',
+                isLight
+                  ? 'border-border bg-background/90 shadow-foreground/10'
+                  : 'border-white/10 bg-black/55 shadow-black/30',
+              )}
+            >
+              {navLinks.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
                   onClick={() => setMobileOpen(false)}
-                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${location.pathname === link.to
-                    ? 'bg-primary/12 text-primary'
-                    : 'text-muted-foreground hover:bg-background/45 hover:text-foreground'
-                    }`}
+                  className={cn(
+                    'rounded-full px-4 py-3 text-sm font-medium transition-colors',
+                    location.pathname === link.to
+                      ? isLight
+                        ? 'bg-primary/12 text-primary'
+                        : 'bg-white/10 text-white'
+                      : isLight
+                        ? 'text-muted-foreground hover:bg-foreground/5 hover:text-foreground'
+                        : 'text-white/75 hover:bg-white/10 hover:text-white',
+                  )}
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="flex items-center gap-2 mt-2 px-4">
-                <button onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')} className="rounded-xl border border-border bg-card p-2 text-muted-foreground backdrop-blur dark:border-white/10 dark:bg-card/60">
-                  <Globe className="w-4 h-4" />
+              <div className="mt-2 flex items-center gap-2 px-2">
+                <button
+                  type="button"
+                  onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
+                  className={iconBtnClass}
+                >
+                  <Globe className="h-4 w-4" />
                 </button>
-                <button onClick={toggleTheme} className="rounded-xl border border-border bg-card p-2 text-muted-foreground backdrop-blur dark:border-white/10 dark:bg-card/60">
-                  {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                <button type="button" onClick={toggleTheme} className={iconBtnClass}>
+                  {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </button>
               </div>
               {isAuthenticated ? (
-                <div className="flex flex-col gap-2 mt-2">
+                <div className="mt-2 flex flex-col gap-2">
                   <Link
                     to="/profile"
                     onClick={() => setMobileOpen(false)}
-                    className="w-full rounded-xl border border-border bg-card px-4 py-3 text-center text-sm font-medium text-foreground backdrop-blur dark:border-white/10 dark:bg-card/60"
+                    className={cn(
+                      'w-full rounded-full border px-4 py-3 text-center text-sm font-medium backdrop-blur',
+                      isLight
+                        ? 'border-border bg-card text-foreground'
+                        : 'border-white/10 bg-white/5 text-white',
+                    )}
                   >
                     {t('nav.profile')}
                   </Link>
                   <button
+                    type="button"
                     onClick={() => {
                       logout();
                       setMobileOpen(false);
                     }}
-                    className="w-full rounded-xl border border-border bg-card px-4 py-3 text-center text-sm font-medium text-destructive backdrop-blur dark:border-white/10 dark:bg-card/60"
+                    className={cn(
+                      'w-full rounded-full border px-4 py-3 text-center text-sm font-medium text-destructive backdrop-blur',
+                      isLight ? 'border-border bg-card' : 'border-white/10 bg-white/5',
+                    )}
                   >
                     {t('nav.logout')}
                   </button>
                 </div>
               ) : (
-                <div className="flex gap-2 mt-2">
-                  <Link to="/login" onClick={() => setMobileOpen(false)} className="flex-1 rounded-xl border border-border bg-card px-4 py-3 text-center text-sm font-medium text-foreground backdrop-blur dark:border-white/10 dark:bg-card/60">
+                <div className="mt-2 flex gap-2">
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      'flex-1 rounded-full border px-4 py-3 text-center text-sm font-medium backdrop-blur',
+                      isLight
+                        ? 'border-border bg-card text-foreground'
+                        : 'border-white/10 bg-white/5 text-white',
+                    )}
+                  >
                     {t('nav.login')}
                   </Link>
-                  <Link to="/signup" onClick={() => setMobileOpen(false)} className={cn('flex-1 text-center', primaryButtonSmClass, 'py-3')}>
+                  <Link
+                    to="/signup"
+                    onClick={() => setMobileOpen(false)}
+                    className={cn('flex-1 text-center', primaryButtonSmClass, 'rounded-full py-3')}
+                  >
                     {t('nav.signup')}
                   </Link>
                 </div>

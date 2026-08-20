@@ -61,11 +61,10 @@ const LanguageModeCard = ({ currentLanguageMode, currentDefaultLanguage, onSucce
               key={option.value}
               onClick={() => handleSelect(option.value)}
               disabled={updateLanguageModeMutation.isPending}
-              className={`rounded-2xl px-3 py-3 text-start transition-colors disabled:opacity-60 ${
-                isSelected
+              className={`rounded-2xl px-3 py-3 text-start transition-colors disabled:opacity-60 ${isSelected
                   ? 'gradient-bg text-primary-foreground'
                   : 'glass text-foreground hover:bg-foreground/5'
-              }`}
+                }`}
             >
               <p className="text-sm font-semibold">{option.title}</p>
               <p className={`text-xs mt-1 ${isSelected ? 'text-primary-foreground/85' : 'text-muted-foreground'}`}>
@@ -86,22 +85,20 @@ const LanguageModeCard = ({ currentLanguageMode, currentDefaultLanguage, onSucce
             <button
               onClick={() => handleDefaultSelect('ar')}
               disabled={updateDefaultLanguageMutation.isPending}
-              className={`rounded-xl px-3 py-2 text-start transition-colors disabled:opacity-60 ${
-                currentDefaultLanguage === 'ar'
+              className={`rounded-xl px-3 py-2 text-start transition-colors disabled:opacity-60 ${currentDefaultLanguage === 'ar'
                   ? 'gradient-bg text-primary-foreground'
                   : 'glass text-foreground hover:bg-foreground/5'
-              }`}
+                }`}
             >
               {isAr ? 'العربية (ar)' : 'Arabic (ar)'}
             </button>
             <button
               onClick={() => handleDefaultSelect('en')}
               disabled={updateDefaultLanguageMutation.isPending}
-              className={`rounded-xl px-3 py-2 text-start transition-colors disabled:opacity-60 ${
-                currentDefaultLanguage === 'en'
+              className={`rounded-xl px-3 py-2 text-start transition-colors disabled:opacity-60 ${currentDefaultLanguage === 'en'
                   ? 'gradient-bg text-primary-foreground'
                   : 'glass text-foreground hover:bg-foreground/5'
-              }`}
+                }`}
             >
               {isAr ? 'الإنجليزية (en)' : 'English (en)'}
             </button>

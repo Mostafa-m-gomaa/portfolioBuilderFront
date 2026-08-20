@@ -17,6 +17,7 @@ import SubscribePackageCta from "@/components/pricing/SubscribePackageCta";
 import { primaryButton, primaryButtonDefaultClass, primaryButtonSmClass } from "@/lib/buttonStyles";
 import { cn } from "@/lib/utils";
 import DisplayCurrencySelect from "@/components/pricing/DisplayCurrencySelect";
+import PaymentMethodsNote from "@/components/pricing/PaymentMethodsNote";
 import { useDisplayCurrency } from "@/hooks/useDisplayCurrency";
 import { Check, Loader2 } from "lucide-react";
 
@@ -123,6 +124,7 @@ const PackageDetail = () => {
                 {t("package.back")}
               </Link>
             </div>
+            <PaymentMethodsNote compact className="mt-6 text-start sm:text-center" />
           </article>
         ) : null}
       </main>

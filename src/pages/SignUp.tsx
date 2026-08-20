@@ -11,7 +11,8 @@ import {
   isConfiguredSubdomain,
   needsSubscriptionOnboarding,
 } from '@/lib/authRouting';
-import anotherLogo from '@/assets/anotherLogo.png';
+import BrandLogo from '@/components/BrandLogo';
+import ColorBendsBackground from '@/components/ColorBendsBackground';
 import { PasswordInput } from '@/components/auth/PasswordInput';
 import { EmailInput, type EmailInputHandle } from '@/components/auth/EmailInput';
 import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
@@ -103,17 +104,10 @@ const SignUp = () => {
   }
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-background">
+    <div className="relative min-h-screen overflow-x-clip">
+      <ColorBendsBackground />
       <Navbar />
-      <div className="relative flex min-h-screen w-full max-w-full items-center justify-center overflow-x-clip px-6 pt-24">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-          <div className="floating-orb end-0 top-0 h-48 w-48 bg-secondary/20 sm:h-72 sm:w-72" />
-          <div
-            className="floating-orb start-0 bottom-0 h-40 w-40 bg-accent/15 sm:h-56 sm:w-56"
-            style={{ animation: 'float-delayed 10s ease-in-out infinite' }}
-          />
-        </div>
-
+      <div className="relative z-10 flex min-h-screen w-full max-w-full items-center justify-center overflow-x-clip px-6 pt-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -122,11 +116,12 @@ const SignUp = () => {
         >
           <div className="text-center mb-8">
             <div className="mx-auto mb-4 flex items-center justify-center">
-              <div className="rounded-full bg-violet-100 p-2 shadow-md ring-1 ring-violet-200/70 dark:bg-transparent dark:shadow-none dark:ring-0 dark:bg-gradient-to-br dark:from-slate-800/80 dark:to-slate-600/60">
-                <img src={anotherLogo} alt={t('brand.logoAlt')} className="w-16 h-16 object-contain" />
-              </div>
+              <BrandLogo className="h-24 sm:h-28" />
             </div>
-            <h1 className="font-heading text-2xl font-bold text-foreground">{t('auth.signup')}</h1>
+            <p className="mb-3 text-sm font-semibold text-primary sm:text-base">
+              {t('hero.noCard')}
+            </p>
+            <h1 className="font-heading text-2xl font-bold text-foreground">{t('auth.signupTitle')}</h1>
           </div>
 
           {isGoogleAuthConfigured() && (

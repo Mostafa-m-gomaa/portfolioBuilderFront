@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Check, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
+import ColorBendsBackground from "@/components/ColorBendsBackground";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { fetchPackages } from "@/api/packages";
 import { parseApiError } from "@/api/axios";
@@ -22,6 +23,7 @@ import { trackStartTrial } from "@/lib/metaPixel";
 import { useAuthStore } from "@/store/auth.store";
 import { subscriptionsService } from "@/services/subscriptions.service";
 import DisplayCurrencySelect from "@/components/pricing/DisplayCurrencySelect";
+import PaymentMethodsNote from "@/components/pricing/PaymentMethodsNote";
 import SubscribePackageCta from "@/components/pricing/SubscribePackageCta";
 import { primaryButton, primaryButtonSmClass } from "@/lib/buttonStyles";
 import { cn } from "@/lib/utils";
@@ -100,9 +102,10 @@ const SelectSubscription = () => {
     !subSumFetched
   ) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="relative min-h-screen">
+        <ColorBendsBackground />
         <Navbar />
-        <main className="mx-auto flex max-w-6xl flex-col items-center justify-center gap-3 px-6 pt-32 pb-24 text-sm text-muted-foreground">
+        <main className="relative z-10 mx-auto flex max-w-6xl flex-col items-center justify-center gap-3 px-6 pt-32 pb-24 text-sm text-muted-foreground">
           <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden />
           {t("subscription.summary.syncing")}
         </main>
@@ -130,9 +133,10 @@ const SelectSubscription = () => {
   const errMsg = isError ? parseApiError(error, t("pricing.loadError")) : "";
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen">
+      <ColorBendsBackground />
       <Navbar />
-      <main className="mx-auto max-w-6xl px-6 pb-24 pt-24">
+      <main className="relative z-10 mx-auto max-w-6xl px-6 pb-24 pt-24">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -148,11 +152,12 @@ const SelectSubscription = () => {
             {t("subscription.subtitle")}
           </p>
           {!isPending && !isError && packages.length > 0 ? (
-            <div className="mt-8 flex justify-center">
+            <div className="mt-8 flex flex-col items-center gap-2">
               <DisplayCurrencySelect
                 value={displayCurrency}
                 onChange={setDisplayCurrency}
               />
+              <PaymentMethodsNote className="mt-4" />
             </div>
           ) : null}
         </motion.div>

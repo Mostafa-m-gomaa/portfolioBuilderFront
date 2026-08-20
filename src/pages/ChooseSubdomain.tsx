@@ -1,5 +1,6 @@
 import { Navigate, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
+import ColorBendsBackground from '@/components/ColorBendsBackground';
 import { useAuth } from '@/hooks/useAuth';
 import { needsSubscriptionOnboarding } from '@/lib/authRouting';
 import { isUserEmailVerified } from '@/lib/authVerification';
@@ -30,9 +31,10 @@ const ChooseSubdomain = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen">
+      <ColorBendsBackground />
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen px-6 pt-24">
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-6 pt-24">
         <div className="w-full max-w-md">
           <SubdomainManagerCard
             title={t('onboarding.subdomain.title')}

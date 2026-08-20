@@ -13,6 +13,7 @@ import type {
   SubdomainAvailabilityResponse,
   UpdateProfilePayload,
   UpdateSubdomainPayload,
+  SubmitCommentResponse,
   UpdateTemplateNamePayload,
   VerifyDomainResponse,
   VerifyEmailPayload,
@@ -47,6 +48,13 @@ const normalizeUser = (raw: unknown): AuthUser | undefined => {
     subscriptionStatus:
       (r.subscriptionStatus as string | null | undefined) ?? null,
     country: (r.country as string | null | undefined) ?? null,
+    hasComment:
+      r.hasComment === false || r.hasComment === "false"
+        ? false
+        : r.hasComment === true || r.hasComment === "true"
+          ? true
+          : undefined,
+    comment: (r.comment as string | null | undefined) ?? null,
   };
 };
 
@@ -194,5 +202,13 @@ export const authService = {
   async deleteLogo(): Promise<AuthSuccess> {
     const response = await apiClient.delete("/auth/logo");
     return normalizeAuthResponse(response.data);
+  },
+
+  async submitComment(comment: string): Promise<SubmitCommentResponse> {
+    const response = await apiClient.post<SubmitCommentResponse>(
+      "/auth/comment",
+      { comment: comment.trim() },
+    );
+    return response.data;
   },
 };

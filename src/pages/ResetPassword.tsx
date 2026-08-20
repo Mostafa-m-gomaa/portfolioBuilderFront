@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import Navbar from '@/components/Navbar';
+import ColorBendsBackground from '@/components/ColorBendsBackground';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PasswordInput } from '@/components/auth/PasswordInput';
@@ -44,9 +45,10 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-background">
+    <div className="relative min-h-screen overflow-x-clip">
+      <ColorBendsBackground />
       <Navbar />
-      <div className="flex min-h-screen items-center justify-center px-6 pt-24">
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-6 pt-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

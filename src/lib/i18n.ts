@@ -8,10 +8,6 @@ export function getAppLang(): Lang {
     const stored = localStorage.getItem(LANG_STORAGE_KEY);
     if (stored === "ar" || stored === "en") return stored;
   }
-  if (typeof document !== "undefined") {
-    const doc = document.documentElement.lang;
-    if (doc === "ar" || doc === "en") return doc;
-  }
   return "ar";
 }
 

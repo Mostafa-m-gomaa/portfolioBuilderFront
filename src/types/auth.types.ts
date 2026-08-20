@@ -17,6 +17,18 @@ export type AuthUser = {
   authProvider?: string | null;
   subscriptionStatus?: string | null;
   country?: string | null;
+  hasComment?: boolean;
+  comment?: string | null;
+};
+
+export type SubmitCommentPayload = {
+  comment: string;
+};
+
+export type SubmitCommentResponse = {
+  message: string;
+  comment: string;
+  hasComment: true;
 };
 
 export type AuthSuccess = {

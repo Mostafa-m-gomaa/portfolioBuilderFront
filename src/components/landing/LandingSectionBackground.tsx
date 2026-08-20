@@ -9,14 +9,14 @@ const variantConfig = {
   default: {
     orb1: 'bg-primary/20',
     orb2: 'bg-secondary/15',
-    orb3: 'bg-violet-400/10',
+    orb3: 'bg-[#1D24CA]/10',
     gradient: 'from-primary/[0.04] via-transparent to-secondary/[0.03]',
   },
   warm: {
-    orb1: 'bg-fuchsia-400/15',
+    orb1: 'bg-[#3D45E0]/15',
     orb2: 'bg-primary/18',
     orb3: 'bg-orange-400/8',
-    gradient: 'from-fuchsia-500/[0.05] via-transparent to-primary/[0.04]',
+    gradient: 'from-[#1D24CA]/[0.05] via-transparent to-primary/[0.04]',
   },
   cool: {
     orb1: 'bg-secondary/18',
@@ -26,9 +26,9 @@ const variantConfig = {
   },
   accent: {
     orb1: 'bg-primary/22',
-    orb2: 'bg-violet-500/14',
-    orb3: 'bg-fuchsia-400/10',
-    gradient: 'from-violet-500/[0.06] via-transparent to-fuchsia-500/[0.04]',
+    orb2: 'bg-[#1D24CA]/14',
+    orb3: 'bg-[#3D45E0]/10',
+    gradient: 'from-[#1D24CA]/[0.06] via-transparent to-[#3D45E0]/[0.04]',
   },
 } as const;
 

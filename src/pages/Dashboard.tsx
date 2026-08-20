@@ -137,9 +137,9 @@ const Dashboard = () => {
             subSummary.subscriptionStatus === 'CANCELLED'))));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-clip bg-background">
       <Navbar />
-      <main className="pt-28 pb-16 px-6 max-w-6xl mx-auto">
+      <main className="mx-auto min-w-0 max-w-6xl overflow-x-clip px-4 pb-16 pt-28 sm:px-6">
         {freeTrialExpired ? (
           <div
             role="alert"
@@ -167,32 +167,32 @@ const Dashboard = () => {
             </Link>
           </div>
         ) : null}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="font-heading text-3xl font-bold">{t('dashboard.title')}</h1>
-            <p className="text-muted-foreground text-sm">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="font-heading text-2xl font-bold sm:text-3xl">{t('dashboard.title')}</h1>
+            <p className="text-sm text-muted-foreground">
               {t('dashboard.welcome')}{' '}
               {typeof authUser?.name === 'string'
                 ? authUser.name
                 : authUser?.email || t('dashboard.creatorFallback')}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-wrap gap-2 sm:w-auto">
             <button
               onClick={() => publishMutation.mutate()}
               disabled={publishMutation.isPending}
-              className={primaryButtonCompactClass}
+              className={cn(primaryButtonCompactClass, 'flex-1 sm:flex-none')}
             >
               {publishMutation.isPending ? t('dashboard.publishing') : t('dashboard.publish')}
             </button>
             <button
               onClick={() => unpublishMutation.mutate()}
               disabled={unpublishMutation.isPending}
-              className="glass px-4 py-2 rounded-xl text-sm disabled:opacity-70"
+              className="glass flex-1 rounded-xl px-4 py-2 text-sm disabled:opacity-70 sm:flex-none"
             >
               {unpublishMutation.isPending ? t('dashboard.unpublishing') : t('dashboard.unpublish')}
             </button>
-            <button onClick={logout} className="glass px-4 py-2 rounded-xl text-sm">
+            <button onClick={logout} className="glass flex-1 rounded-xl px-4 py-2 text-sm sm:flex-none">
               {t('dashboard.logout')}
             </button>
           </div>
@@ -208,7 +208,7 @@ const Dashboard = () => {
           <motion.div
             initial={{ opacity: 1, y: 0 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-strong rounded-3xl p-6 h-full"
+            className="glass-strong h-full min-w-0 rounded-3xl p-6"
           >
             <p className="text-sm text-muted-foreground">{t('dashboard.subdomain')}</p>
             <p className="text-lg font-semibold">{authUser?.subdomain || portfolio?.subdomain || t('dashboard.notSet')}</p>
@@ -232,7 +232,7 @@ const Dashboard = () => {
                   href={siteEditorUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/10 px-5 py-3 text-sm font-semibold text-primary transition-all hover:scale-[1.02] hover:bg-primary/15 active:scale-[0.98] sm:w-auto"
+                  className={cn(primaryButtonMdClass, 'group mt-3 w-full sm:w-auto')}
                 >
                   {t('dashboard.goToEditor')}
                   <ExternalLink
@@ -273,10 +273,10 @@ const Dashboard = () => {
           onValueChange={(value) => setSearchParams({ tab: value }, { replace: true })}
           className="space-y-6"
         >
-          <TabsList className="h-auto flex w-full flex-wrap justify-start gap-2 rounded-2xl bg-transparent p-0">
+          <TabsList className="-mx-4 flex h-auto w-full flex-nowrap justify-start gap-2 overflow-x-auto rounded-2xl bg-transparent p-0 px-4 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
             {/* <TabsTrigger
               value="sections"
-              className="inline-flex glass rounded-xl px-4 py-2.5 text-sm gap-2 data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
+              className="inline-flex shrink-0 gap-2 rounded-xl px-4 py-2.5 text-sm glass data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
             >
               <LayoutGrid className="h-4 w-4 shrink-0" aria-hidden />
               {t('dashboard.tab.sections')}
@@ -284,7 +284,7 @@ const Dashboard = () => {
             {!usesCustomDomain ? (
               <TabsTrigger
                 value="domain"
-                className="inline-flex glass rounded-xl px-4 py-2.5 text-sm gap-2 data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
+                className="inline-flex shrink-0 gap-2 rounded-xl px-4 py-2.5 text-sm glass data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
               >
                 <Globe className="h-4 w-4 shrink-0" aria-hidden />
                 {t('dashboard.tab.domain')}
@@ -292,28 +292,28 @@ const Dashboard = () => {
             ) : null}
             <TabsTrigger
               value="add-domain"
-              className="inline-flex glass rounded-xl px-4 py-2.5 text-sm gap-2 data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
+              className="inline-flex shrink-0 gap-2 rounded-xl px-4 py-2.5 text-sm glass data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
             >
               <Link2 className="h-4 w-4 shrink-0" aria-hidden />
               {t('dashboard.tab.addDomain')}
             </TabsTrigger>
             <TabsTrigger
               value="logo"
-              className="inline-flex glass rounded-xl px-4 py-2.5 text-sm gap-2 data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
+              className="inline-flex shrink-0 gap-2 rounded-xl px-4 py-2.5 text-sm glass data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
             >
               <Image className="h-4 w-4 shrink-0" aria-hidden />
               {t('dashboard.tab.logo')}
             </TabsTrigger>
             <TabsTrigger
               value="template"
-              className="inline-flex glass rounded-xl px-4 py-2.5 text-sm gap-2 data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
+              className="inline-flex shrink-0 gap-2 rounded-xl px-4 py-2.5 text-sm glass data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
             >
               <LayoutTemplate className="h-4 w-4 shrink-0" aria-hidden />
               {t('dashboard.tab.template')}
             </TabsTrigger>
             <TabsTrigger
               value="settings"
-              className="inline-flex glass rounded-xl px-4 py-2.5 text-sm gap-2 data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
+              className="inline-flex shrink-0 gap-2 rounded-xl px-4 py-2.5 text-sm glass data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
             >
               <Settings2 className="h-4 w-4 shrink-0" aria-hidden />
               {t('dashboard.tab.settings')}
