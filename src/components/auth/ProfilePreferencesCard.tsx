@@ -5,6 +5,12 @@ import { Switch } from '@/components/ui/switch';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { COUNTRY_OPTIONS, sortCountriesForDisplay } from '@/constants/countries';
 import {
+  buildWhatsAppLink,
+  normalizeLocalPhoneDigits,
+  parseWhatsAppUrlToPhone,
+  validateWhatsappNumber,
+} from '@/lib/whatsappPhone';
+import {
   defaultProfileCurrency,
   isProfileCurrencyCode,
   PROFILE_CURRENCY_OPTIONS,
@@ -18,51 +24,6 @@ type ProfilePreferencesCardProps = {
   currentAllowWhatsapp?: boolean;
   currentWhatsApp?: string | null;
   currentWhatsapp?: string | null;
-};
-
-const digitsOnly = (value: string) => value.replace(/\D/g, '');
-
-const normalizeLocalPhoneDigits = (value: string) => {
-  const raw = digitsOnly(value);
-  return raw.replace(/^0+/, '');
-};
-
-const parseWhatsAppUrlToPhone = (value: string | null | undefined) => {
-  if (!value) return null;
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-
-  let digits = '';
-  try {
-    const url = new URL(trimmed);
-    const host = url.hostname.toLowerCase();
-    if (host.includes('whatsapp.com')) {
-      const phoneParam = url.searchParams.get('phone');
-      if (phoneParam) digits = digitsOnly(phoneParam);
-    }
-    if (!digits && (host === 'wa.me' || host === 'www.wa.me')) {
-      digits = digitsOnly(url.pathname);
-    }
-  } catch {
-    // Not a URL, fallback to extracting digits.
-    digits = digitsOnly(trimmed);
-  }
-
-  if (!digits) return null;
-  if (digits.startsWith('00')) digits = digits.slice(2);
-
-  const candidates = [...COUNTRY_OPTIONS]
-    .sort((a, b) => b.dialCode.length - a.dialCode.length)
-    .filter((c) => digits.startsWith(c.dialCode));
-
-  const matched = candidates[0];
-  if (!matched) return null;
-
-  const local = digits.slice(matched.dialCode.length);
-  return {
-    countryIso2: matched.iso2,
-    localNumber: local,
-  };
 };
 
 const ProfilePreferencesCard = ({
@@ -124,14 +85,15 @@ const ProfilePreferencesCard = ({
         setValidationError(isAr ? 'يرجى إضافة رقم الموبايل.' : 'Please enter your phone number.');
         return;
       }
-      if (normalizedNumber.length < 6 || normalizedNumber.length > 15) {
-        setValidationError(isAr ? 'يرجى إدخال رقم موبايل صحيح.' : 'Please enter a valid phone number.');
+      const phoneError = validateWhatsappNumber(whatsappNumber, isAr);
+      if (phoneError) {
+        setValidationError(phoneError);
         return;
       }
     }
 
     const whatsappLink = allowWhatsapp
-      ? `https://wa.me/${selectedCountry.dialCode}${normalizedNumber}`
+      ? buildWhatsAppLink(selectedCountry.dialCode, normalizedNumber)
       : '';
 
     try {

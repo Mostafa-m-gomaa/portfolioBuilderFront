@@ -5,10 +5,9 @@ import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { isEmailNotVerifiedLoginError } from '@/lib/authErrors';
-import { getPostAuthEntryPath, isConfiguredSubdomain, needsSubscriptionOnboarding } from '@/lib/authRouting';
+import { getPostAuthEntryPath } from '@/lib/authRouting';
 import { isUserEmailVerified, prepareEmailVerificationFlow } from '@/lib/authVerification';
 import { startPackageCheckout } from '@/lib/startPackageCheckout';
-import { portfolioService } from '@/services/portfolio.service';
 import { useAuthStore } from '@/store/auth.store';
 import type { AuthUser } from '@/types/auth.types';
 import BrandLogo from '@/components/BrandLogo';
@@ -36,29 +35,8 @@ const Login = () => {
   const [searchParams] = useSearchParams();
   const emailRef = useRef<EmailInputHandle>(null);
 
-  const resolvePortfolioOnboardingRoute = async (subdomain?: string | null) => {
-    if (!isConfiguredSubdomain(subdomain)) {
-      navigate('/choose-subdomain');
-      return;
-    }
-    try {
-      try {
-        await portfolioService.getMyPortfolio();
-      } catch {
-        await portfolioService.createPortfolio();
-      }
-      navigate('/dashboard');
-    } catch {
-      navigate('/dashboard');
-    }
-  };
-
   const continueAfterAuth = async (authUser?: AuthUser | null) => {
-    if (needsSubscriptionOnboarding(authUser)) {
-      navigate('/select-subscription');
-      return;
-    }
-    await resolvePortfolioOnboardingRoute(authUser?.subdomain);
+    navigate(getPostAuthEntryPath(authUser));
   };
 
   const goToVerifyWithResend = async (targetEmail: string) => {
@@ -81,7 +59,7 @@ const Login = () => {
       (typeof sessionStorage !== 'undefined'
         ? sessionStorage.getItem('pending_checkout_package_id')
         : null);
-    if (!pendingPkg || needsSubscriptionOnboarding(authUser)) return false;
+    if (!pendingPkg) return false;
     const navigated = await startPackageCheckout(
       pendingPkg,
       t('payment.checkoutError'),

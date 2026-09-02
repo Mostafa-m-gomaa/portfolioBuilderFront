@@ -14,7 +14,9 @@ import type {
   UpdateProfilePayload,
   UpdateSubdomainPayload,
   SubmitCommentResponse,
+  TourStatusResponse,
   UpdateTemplateNamePayload,
+  UpdateTourPayload,
   VerifyDomainResponse,
   VerifyEmailPayload,
 } from "@/types/auth.types";
@@ -55,6 +57,12 @@ const normalizeUser = (raw: unknown): AuthUser | undefined => {
           ? true
           : undefined,
     comment: (r.comment as string | null | undefined) ?? null,
+    takeTour:
+      r.takeTour === false || r.takeTour === "false"
+        ? false
+        : r.takeTour === true || r.takeTour === "true"
+          ? true
+          : undefined,
   };
 };
 
@@ -210,5 +218,15 @@ export const authService = {
       { comment: comment.trim() },
     );
     return response.data;
+  },
+
+  async getTourStatus(): Promise<TourStatusResponse> {
+    const response = await apiClient.get<TourStatusResponse>("/auth/tour");
+    return response.data;
+  },
+
+  async updateTour(payload: UpdateTourPayload): Promise<AuthSuccess> {
+    const response = await apiClient.patch("/auth/tour", payload);
+    return normalizeAuthResponse(response.data);
   },
 };

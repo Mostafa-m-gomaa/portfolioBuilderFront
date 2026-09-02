@@ -9,6 +9,7 @@ import {
   formatSubscriptionPackagePrice,
 } from "@/lib/packageDisplay";
 import { toLatinDigits } from "@/lib/latinDigits";
+import { primaryButtonCompactClass } from "@/lib/buttonStyles";
 import { cn } from "@/lib/utils";
 
 type Lang = "ar" | "en";
@@ -31,6 +32,9 @@ const formatSummaryDate = (iso: string, _lang: Lang) => {
 };
 
 const formatDays = (n: number) => toLatinDigits(String(n));
+
+const isFreePlanStatus = (status: string) =>
+  status === "FREE_TRIAL" || status === "FREE";
 
 const subscriptionStatusLabel = (
   status: unknown,
@@ -60,7 +64,7 @@ const SubscriptionSummaryPanel = ({
 
   const rootClass = (extra: string) =>
     cn(
-      compact ? "glass-strong rounded-3xl p-4 h-full" : "mb-8 rounded-2xl p-5",
+      compact ? "glass-strong rounded-3xl p-4 h-auto" : "mb-8 rounded-2xl p-5",
       extra,
       className,
     );
@@ -96,7 +100,7 @@ const SubscriptionSummaryPanel = ({
     return null;
   }
 
-  if (data.subscriptionStatus === "FREE_TRIAL" && data.subscription) {
+  if (isFreePlanStatus(data.subscriptionStatus)) {
     const sub = data.subscription;
     return (
       <div
@@ -104,27 +108,46 @@ const SubscriptionSummaryPanel = ({
           "border border-sky-500/40 bg-sky-500/10 dark:bg-sky-950/20",
         )}
       >
-        <div className="flex h-full items-start gap-3">
-          <Sparkles
-            className={cn("mt-0.5 shrink-0 text-sky-600 dark:text-sky-400", iconClass)}
-          />
-          <div className="min-w-0">
-            <p className={cn(titleClass, "text-foreground")}>
-              {t("subscription.summary.trialTitle")}
-            </p>
-            <p className={detailClass}>
-              {t("subscription.summary.trialEnds")}{" "}
-              <span className="font-medium text-foreground">
-                {formatSummaryDate(sub.endDate, lang)}
-              </span>
-            </p>
-            <p className={detailClassTight}>
-              {t("subscription.summary.daysLeft")}{" "}
-              <span className="font-medium text-foreground">
-                {formatDays(sub.remainingDays)}
-              </span>
-            </p>
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+          <div className="flex min-w-0 items-start gap-3">
+            <Sparkles
+              className={cn("mt-0.5 shrink-0 text-sky-600 dark:text-sky-400", iconClass)}
+            />
+            <div className="min-w-0">
+              <p className={cn(titleClass, "text-foreground")}>
+                {t("subscription.summary.trialTitle")}
+              </p>
+              {sub ? (
+                <>
+                  <p className={detailClass}>
+                    {t("subscription.summary.trialEnds")}{" "}
+                    <span className="font-medium text-foreground">
+                      {formatSummaryDate(sub.endDate, lang)}
+                    </span>
+                  </p>
+                  <p className={detailClassTight}>
+                    {t("subscription.summary.daysLeft")}{" "}
+                    <span className="font-medium text-foreground">
+                      {formatDays(sub.remainingDays)}
+                    </span>
+                  </p>
+                </>
+              ) : (
+                <p className={detailClass}>
+                  {subscriptionStatusLabel(data.subscriptionStatus, lang, t)}
+                </p>
+              )}
+            </div>
           </div>
+          <Link
+            to="/pricing"
+            className={cn(
+              primaryButtonCompactClass,
+              "shrink-0 text-center sm:min-w-[9rem]",
+            )}
+          >
+            {t("subscription.summary.subscribeNow")}
+          </Link>
         </div>
       </div>
     );
@@ -142,7 +165,7 @@ const SubscriptionSummaryPanel = ({
           "border border-primary/35 bg-primary/5 shadow-sm dark:bg-primary/10",
         )}
       >
-        <div className="flex h-full flex-col justify-between gap-3 sm:flex-row sm:items-start">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
           <div className="flex min-w-0 items-start gap-3">
             <CreditCard
               className={cn("mt-0.5 shrink-0 text-primary", iconClass)}

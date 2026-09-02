@@ -1,14 +1,14 @@
 import { useMemo, useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { User } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useAuth, useSubdomainAvailability } from "@/hooks/useAuth";
 import type { GoogleSignUpState } from "@/hooks/useGoogleSignIn";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { getPostAuthEntryPath, markPendingSubscriptionChoice } from "@/lib/authRouting";
+import { getPostAuthEntryPath, markPendingSiteContent, getPostSubdomainOnboardingPath } from "@/lib/authRouting";
 import { sanitizeSubdomainPart } from "@/lib/customDomain";
 import { useAuthStore } from "@/store/auth.store";
-import BrandLogo from "@/components/BrandLogo";
 import ColorBendsBackground from "@/components/ColorBendsBackground";
 import {
   ACCOUNT_TYPE_OPTIONS,
@@ -28,6 +28,7 @@ const GoogleSignUpComplete = () => {
   const [type, setType] = useState<AccountTypeValue>("freelancer");
   const [country, setCountry] = useState("EG");
   const [subdomain, setSubdomain] = useState("");
+  const [avatarFailed, setAvatarFailed] = useState(false);
   const sortedCountries = useMemo(() => sortCountriesForDisplay(lang), [lang]);
   const cleanSubdomain = useMemo(
     () => sanitizeSubdomainPart(subdomain),
@@ -77,18 +78,14 @@ const GoogleSignUpComplete = () => {
       });
       const authUser = result.user ?? useAuthStore.getState().user;
       trackCompleteRegistration();
-      // New Google signups must choose free trial or a plan before dashboard.
-      if (authUser) {
-        useAuthStore.getState().setAuth({
-          user: { ...authUser, subscriptionStatus: null },
-        });
-      }
-      markPendingSubscriptionChoice();
-      navigate("/select-subscription");
+      markPendingSiteContent();
+      navigate(getPostSubdomainOnboardingPath(authUser));
     } catch {
       // Error toast handled in mutation hook.
     }
   };
+
+  const showGoogleAvatar = Boolean(signupState.picture) && !avatarFailed;
 
   return (
     <div className="relative min-h-screen overflow-x-clip">
@@ -103,17 +100,19 @@ const GoogleSignUpComplete = () => {
         >
           <div className="text-center mb-8">
             <div className="mx-auto mb-4 flex items-center justify-center">
-              {signupState.picture ? (
-                <div className="rounded-full bg-[#EEF0FF] p-2 shadow-md ring-1 ring-[#1D24CA]/20 dark:bg-transparent dark:shadow-none dark:ring-0 dark:bg-gradient-to-br dark:from-slate-800/80 dark:to-slate-600/60">
+              <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-[#EEF0FF] shadow-md ring-1 ring-[#1D24CA]/20 dark:bg-gradient-to-br dark:from-slate-800/80 dark:to-slate-600/60">
+                {showGoogleAvatar ? (
                   <img
                     src={signupState.picture}
                     alt=""
-                    className="w-16 h-16 rounded-full object-cover"
+                    className="h-full w-full object-cover"
+                    onError={() => setAvatarFailed(true)}
+                    referrerPolicy="no-referrer"
                   />
-                </div>
-              ) : (
-                <BrandLogo className="h-24 sm:h-28" />
-              )}
+                ) : (
+                  <User className="h-10 w-10 text-primary" aria-hidden />
+                )}
+              </div>
             </div>
             <h1 className="font-heading text-2xl font-bold text-foreground">
               {t("auth.googleSignup.title")}

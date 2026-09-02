@@ -32,6 +32,8 @@ const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
 const ChooseSubdomain = lazy(() => import("./pages/ChooseSubdomain"));
+const SetupSiteContent = lazy(() => import("./pages/SetupSiteContent"));
+const SiteReady = lazy(() => import("./pages/SiteReady"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const QuickStart = lazy(() => import("./pages/QuickStart"));
 const SectionEditor = lazy(() => import("./pages/SectionEditor"));
@@ -85,6 +87,8 @@ const AppShell = () => (
                   <Route path="/forgot-password" element={<GuestOnly><ForgotPassword /></GuestOnly>} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/choose-subdomain" element={<ChooseSubdomain />} />
+                  <Route path="/setup-site-content" element={<RequireAuth><SetupSiteContent /></RequireAuth>} />
+                  <Route path="/site-ready" element={<RequireAuth><SiteReady /></RequireAuth>} />
                   <Route path="/select-subscription" element={<RequireAuth><SelectSubscription /></RequireAuth>} />
                   <Route path="/select-language-mode" element={<Navigate to="/dashboard" replace />} />
                   <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />

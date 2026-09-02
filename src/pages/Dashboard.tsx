@@ -4,7 +4,6 @@ import { AlertTriangle, ExternalLink, Globe, Image, LayoutGrid, LayoutTemplate, 
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { useAuthStore } from '@/store/auth.store';
-import { needsSubscriptionOnboarding } from '@/lib/authRouting';
 import { useSubscriptionSummary } from '@/hooks/useSubscriptionSummary';
 import SubscriptionSummaryPanelSafe from '@/components/subscription/SubscriptionSummaryPanelSafe';
 import { useAllSections, useMyPortfolio, usePortfolioActions, usePortfolioBootstrap } from '@/hooks/usePortfolio';
@@ -25,6 +24,7 @@ import { resolvePortfolioDisplayLang } from '@/lib/portfolioDisplayLang';
 import { prettyTemplateName, sectionLabel } from '@/lib/templateCatalogView';
 import { resolvePortfolioSiteContext } from '@/lib/portfolioSiteUrl';
 import { resolveCustomDomainEnabled } from '@/lib/authMeSync';
+import { useDashboardTour } from '@/hooks/useDashboardTour';
 
 const DASHBOARD_TABS = ['sections', 'domain', 'add-domain', 'logo', 'template', 'settings'] as const;
 type DashboardTab = (typeof DASHBOARD_TABS)[number];
@@ -89,28 +89,22 @@ const Dashboard = () => {
   const visibleActiveTab: DashboardTab =
     usesCustomDomain && activeTab === 'domain' ? 'add-domain' : activeTab;
 
+  const effectiveSubdomainForTour = authUser?.subdomain || portfolio?.subdomain;
+  const dashboardTourReady =
+    isAuthenticated &&
+    !!effectiveSubdomainForTour &&
+    !effectiveSubdomainForTour.startsWith('temp-');
+
+  useDashboardTour({
+    setSearchParams,
+    usesCustomDomain,
+    siteEditorUrl,
+    portfolioLoading,
+    enabled: dashboardTourReady,
+  });
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
-  }
-
-  if (needsSubscriptionOnboarding(authUser)) {
-    if (!subSumFetched) {
-      return (
-        <div className="min-h-screen bg-background">
-          <Navbar />
-          <main className="mx-auto flex max-w-6xl flex-col items-center justify-center gap-3 px-6 pt-32 pb-16 text-sm text-muted-foreground">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden />
-            {t('subscription.summary.syncing')}
-          </main>
-        </div>
-      );
-    }
-    if (
-      !subSummary?.hasActiveSubscription &&
-      subSummary?.subscriptionStatus === 'NOT_DETECTED'
-    ) {
-      return <Navigate to="/select-subscription" replace />;
-    }
   }
 
   const effectiveSubdomain = authUser?.subdomain || portfolio?.subdomain;
@@ -126,15 +120,22 @@ const Dashboard = () => {
     ? subSummary.subscriptionStatus === 'FREE_TRIAL_EXPIRED'
     : authUser?.subscriptionStatus === 'FREE_TRIAL_EXPIRED';
 
+  const isFreePlan =
+    subSummary &&
+    (subSummary.subscriptionStatus === 'FREE_TRIAL' ||
+      subSummary.subscriptionStatus === 'FREE');
+
   const showSubscriptionAside =
     subSummaryLoading ||
+    isFreePlan ||
     (!subSummaryError &&
       subSummary &&
-      ((subSummary.subscriptionStatus === 'FREE_TRIAL' && subSummary.subscription) ||
-        (subSummary.hasActiveSubscription && subSummary.subscription) ||
+      ((subSummary.hasActiveSubscription && subSummary.subscription) ||
         (!subSummary.hasActiveSubscription &&
           (subSummary.subscriptionStatus === 'EXPIRED' ||
             subSummary.subscriptionStatus === 'CANCELLED'))));
+
+  const showUnpublishedBanner = !portfolioLoading && !!portfolio && portfolio.isPublished !== true;
 
   return (
     <div className="min-h-screen overflow-x-clip bg-background">
@@ -165,6 +166,37 @@ const Dashboard = () => {
             >
               {t('subscription.banner.freeTrialExpired.cta')}
             </Link>
+          </div>
+        ) : null}
+        {showUnpublishedBanner ? (
+          <div
+            role="alert"
+            className="mb-8 flex flex-col gap-4 rounded-2xl border border-amber-500/45 bg-amber-500/10 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-6 dark:bg-amber-950/25"
+          >
+            <div className="flex min-w-0 flex-1 gap-3">
+              <AlertTriangle
+                className="mt-0.5 h-6 w-6 shrink-0 text-amber-600 dark:text-amber-500"
+                aria-hidden
+              />
+              <div className="min-w-0">
+                <p className="font-heading font-semibold text-foreground">
+                  {t('dashboard.banner.unpublished.title')}
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                  {t('dashboard.banner.unpublished.description')}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => publishMutation.mutate()}
+              disabled={publishMutation.isPending}
+              className={cn(primaryButtonCompactClass, 'shrink-0 text-center disabled:opacity-70 sm:min-w-[10rem]')}
+            >
+              {publishMutation.isPending
+                ? t('dashboard.publishing')
+                : t('dashboard.banner.unpublished.cta')}
+            </button>
           </div>
         ) : null}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
@@ -198,17 +230,14 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div
-          className={
-            showSubscriptionAside
-              ? 'mb-6 grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2'
-              : 'mb-6'
-          }
-        >
+        <div className="mb-6 flex flex-col gap-4">
+          {showSubscriptionAside ? (
+            <SubscriptionSummaryPanelSafe compact className="mb-0 h-auto w-full" />
+          ) : null}
           <motion.div
             initial={{ opacity: 1, y: 0 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-strong h-full min-w-0 rounded-3xl p-6"
+            className="glass-strong w-full min-w-0 rounded-3xl p-6"
           >
             <p className="text-sm text-muted-foreground">{t('dashboard.subdomain')}</p>
             <p className="text-lg font-semibold">{authUser?.subdomain || portfolio?.subdomain || t('dashboard.notSet')}</p>
@@ -218,6 +247,7 @@ const Dashboard = () => {
                 href={siteUrl ?? '#'}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-tour="view-site"
                 className={cn(primaryButtonMdClass, 'group mt-4 w-full sm:mt-4 sm:w-auto')}
               >
                 {t('dashboard.goToSite')}
@@ -232,6 +262,7 @@ const Dashboard = () => {
                   href={siteEditorUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  data-tour="edit-site"
                   className={cn(primaryButtonMdClass, 'group mt-3 w-full sm:w-auto')}
                 >
                   {t('dashboard.goToEditor')}
@@ -263,9 +294,6 @@ const Dashboard = () => {
               {portfolio?.isPublished ? t('dashboard.published') : t('dashboard.draft')}
             </p>
           </motion.div>
-          {showSubscriptionAside ? (
-            <SubscriptionSummaryPanelSafe compact className="mb-0" />
-          ) : null}
         </div>
 
         <Tabs
@@ -284,6 +312,7 @@ const Dashboard = () => {
             {!usesCustomDomain ? (
               <TabsTrigger
                 value="domain"
+                data-tour="tab-domain"
                 className="inline-flex shrink-0 gap-2 rounded-xl px-4 py-2.5 text-sm glass data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
               >
                 <Globe className="h-4 w-4 shrink-0" aria-hidden />
@@ -292,6 +321,7 @@ const Dashboard = () => {
             ) : null}
             <TabsTrigger
               value="add-domain"
+              data-tour="tab-add-domain"
               className="inline-flex shrink-0 gap-2 rounded-xl px-4 py-2.5 text-sm glass data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
             >
               <Link2 className="h-4 w-4 shrink-0" aria-hidden />
@@ -299,6 +329,7 @@ const Dashboard = () => {
             </TabsTrigger>
             <TabsTrigger
               value="logo"
+              data-tour="tab-logo"
               className="inline-flex shrink-0 gap-2 rounded-xl px-4 py-2.5 text-sm glass data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
             >
               <Image className="h-4 w-4 shrink-0" aria-hidden />
@@ -306,6 +337,7 @@ const Dashboard = () => {
             </TabsTrigger>
             <TabsTrigger
               value="template"
+              data-tour="tab-template"
               className="inline-flex shrink-0 gap-2 rounded-xl px-4 py-2.5 text-sm glass data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
             >
               <LayoutTemplate className="h-4 w-4 shrink-0" aria-hidden />
@@ -313,6 +345,7 @@ const Dashboard = () => {
             </TabsTrigger>
             <TabsTrigger
               value="settings"
+              data-tour="tab-settings"
               className="inline-flex shrink-0 gap-2 rounded-xl px-4 py-2.5 text-sm glass data-[state=active]:gradient-bg data-[state=active]:text-primary-foreground"
             >
               <Settings2 className="h-4 w-4 shrink-0" aria-hidden />

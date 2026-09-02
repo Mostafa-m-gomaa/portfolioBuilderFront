@@ -4,12 +4,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import { useAuth } from '@/hooks/useAuth';
-import { portfolioService } from '@/services/portfolio.service';
 import type { AuthUser } from '@/types/auth.types';
 import {
   getPostAuthEntryPath,
-  isConfiguredSubdomain,
-  needsSubscriptionOnboarding,
 } from '@/lib/authRouting';
 import BrandLogo from '@/components/BrandLogo';
 import ColorBendsBackground from '@/components/ColorBendsBackground';
@@ -46,29 +43,8 @@ const SignUp = () => {
     if (id) sessionStorage.setItem('pending_checkout_package_id', id);
   }, [searchParams]);
 
-  const resolvePortfolioOnboardingRoute = async (subdomain?: string | null) => {
-    if (!isConfiguredSubdomain(subdomain)) {
-      navigate('/choose-subdomain');
-      return;
-    }
-    try {
-      try {
-        await portfolioService.getMyPortfolio();
-      } catch {
-        await portfolioService.createPortfolio();
-      }
-      navigate('/dashboard');
-    } catch {
-      navigate('/dashboard');
-    }
-  };
-
   const continueAfterAuth = async (authUser?: AuthUser | null) => {
-    if (needsSubscriptionOnboarding(authUser)) {
-      navigate('/select-subscription');
-      return;
-    }
-    await resolvePortfolioOnboardingRoute(authUser?.subdomain);
+    navigate(getPostAuthEntryPath(authUser));
   };
 
   const { handleGoogleCredential, handleGoogleError, isPending: isGooglePending } =

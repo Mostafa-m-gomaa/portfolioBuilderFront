@@ -18,7 +18,7 @@ import {
   packageName,
   sortPackagesByOrder,
 } from "@/lib/packageDisplay";
-import { needsSubscriptionOnboarding, getPostAuthEntryPath, hasPendingSubscriptionChoice, clearPendingSubscriptionChoice } from "@/lib/authRouting";
+import { needsSubscriptionOnboarding, getPostAuthEntryPath, getPostSubdomainOnboardingPath, hasPendingSubscriptionChoice, clearPendingSubscriptionChoice } from "@/lib/authRouting";
 import { trackStartTrial } from "@/lib/metaPixel";
 import { useAuthStore } from "@/store/auth.store";
 import { subscriptionsService } from "@/services/subscriptions.service";
@@ -79,7 +79,7 @@ const SelectSubscription = () => {
       toast.success(t("subscription.freeTrial.success"));
       void queryClient.invalidateQueries({ queryKey: ["subscription-summary"] });
       trackStartTrial("EGP");
-      navigate("/choose-subdomain");
+      navigate(getPostSubdomainOnboardingPath(useAuthStore.getState().user));
     },
     onError: (err: unknown) => {
       if (axios.isAxiosError(err) && err.response?.status === 409) {

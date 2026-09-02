@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import UserCommentPopup from "@/components/auth/UserCommentPopup";
-import { needsUserComment } from "@/lib/userComment";
+import {
+  canPromptUserComment,
+  isDashboardTourActive,
+} from "@/lib/userComment";
 import { useAuthStore } from "@/store/auth.store";
 
 const EXIT_INTENT_COOLDOWN_MS = 30_000;
@@ -15,10 +18,11 @@ const CommentExitGate = () => {
   const hasEngagedRef = useRef(false);
   const exitIntentReadyRef = useRef(false);
 
-  const shouldPrompt = isAuthenticated && needsUserComment(user);
+  const shouldPrompt = isAuthenticated && canPromptUserComment(user);
 
   const tryOpenPopup = useCallback(() => {
     if (!shouldPrompt || open || !exitIntentReadyRef.current) return;
+    if (isDashboardTourActive()) return;
     const now = Date.now();
     if (now - lastShownAtRef.current < EXIT_INTENT_COOLDOWN_MS) return;
     lastShownAtRef.current = now;
@@ -50,6 +54,7 @@ const CommentExitGate = () => {
 
     const handleMouseOut = (event: MouseEvent) => {
       if (!hasEngagedRef.current || !exitIntentReadyRef.current) return;
+      if (isDashboardTourActive()) return;
       if (event.clientY > 8) return;
       const related = event.relatedTarget as Node | null;
       if (related && document.documentElement.contains(related)) return;
@@ -57,7 +62,7 @@ const CommentExitGate = () => {
     };
 
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (!exitIntentReadyRef.current) return;
+      if (!exitIntentReadyRef.current || isDashboardTourActive()) return;
       event.preventDefault();
       event.returnValue = "";
     };

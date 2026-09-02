@@ -19,6 +19,15 @@ export type AuthUser = {
   country?: string | null;
   hasComment?: boolean;
   comment?: string | null;
+  takeTour?: boolean;
+};
+
+export type TourStatusResponse = {
+  takeTour: boolean;
+};
+
+export type UpdateTourPayload = {
+  takeTour: boolean;
 };
 
 export type SubmitCommentPayload = {
